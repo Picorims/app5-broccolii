@@ -1,5 +1,5 @@
-function fight_room() {
+function FightRoom() {
   return "salu";
 }
 
-export default fight_room;
+export default FightRoom;
