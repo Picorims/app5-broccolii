@@ -9,6 +9,7 @@
 
 @import "./css/fonts/enter_command/stylesheet.css";
 @import "./css/color_palette.css";
+@import "./css/variables.css";
 
 * {
   font-family: "EnterCommand", sans-serif;

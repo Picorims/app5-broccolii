@@ -7,17 +7,16 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import Card from "../../components/Card/Card";
+import styles from "./Card.module.css";
 
-export default function LoginPage() {
+export interface Props {
+    children: React.ReactNode;
+}
+
+export default function Card({ children }: Props) {
     return (
-        <>
-            <Card>
-                <h2>Login</h2>
-            </Card >
-            <Card>
-                <h2>Register</h2>
-            </Card>
-        </>
+        <div className={styles.container}>
+            {children}
+        </div>
     );
 };
