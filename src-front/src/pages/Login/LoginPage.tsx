@@ -10,10 +10,11 @@
 import Button from "../../components/Button/Button";
 import Card from "../../components/Card/Card";
 import LabeledInput from "../../components/LabeledInput/LabeledInput";
+import styles from "./LoginPage.module.css";
 
 export default function LoginPage() {
     return (
-        <>
+        <main className={styles.main}>
             <Card>
                 <h2>Login</h2>
                 <LabeledInput type="text" label="Username" />
@@ -27,6 +28,6 @@ export default function LoginPage() {
                 <LabeledInput type="password" label="Confirm Password" />
                 <Button type="submit" variant="primary">Register</Button>
             </Card>
-        </>
+        </main>
     );
 };

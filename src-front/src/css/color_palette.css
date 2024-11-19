@@ -7,10 +7,10 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-/* https://www.realtimecolors.com/?colors=001404-ebf6ec-49d55e-71d3fa-34fa5f&fonts=Inter-Inter */
+/* https://www.realtimecolors.com/?colors=ebffef-111312-2ab73f-05688f-05cc30&fonts=Inter-Inter */
 
 :root {
-  --shadow-800: #001a0399;
+  --shadow: #0c0e0d99;
 
   --text-50: #e5ffeb;
   --text-100: #ccffd6;
@@ -23,19 +23,19 @@
   --text-800: #006614;
   --text-900: #00330a;
   --text-950: #001a05;
-  
-  --background-50: #edf7ee;
-  --background-100: #dcefdd;
-  --background-200: #b9dfbc;
-  --background-300: #95d09a;
-  --background-400: #72c079;
-  --background-500: #4fb057;
-  --background-600: #3f8d46;
-  --background-700: #2f6a34;
-  --background-800: #204623;
-  --background-900: #102311;
-  --background-950: #081209;
-  
+
+  --background-50: #f1f3f2;
+  --background-100: #e4e7e6;
+  --background-200: #c9cfcc;
+  --background-300: #aeb7b3;
+  --background-400: #939f99;
+  --background-500: #788780;
+  --background-600: #606c66;
+  --background-700: #48514d;
+  --background-800: #303633;
+  --background-900: #181b1a;
+  --background-950: #0c0e0d;
+
   --primary-50: #eafaed;
   --primary-100: #d5f6da;
   --primary-200: #acecb6;
@@ -47,7 +47,7 @@
   --primary-800: #13531d;
   --primary-900: #092a0e;
   --primary-950: #051507;
-  
+
   --secondary-50: #e6f7fe;
   --secondary-100: #cef0fd;
   --secondary-200: #9de1fb;
@@ -59,7 +59,7 @@
   --secondary-800: #044862;
   --secondary-900: #022431;
   --secondary-950: #011219;
-  
+
   --accent-50: #e6feeb;
   --accent-100: #cdfed8;
   --accent-200: #9cfcb1;
@@ -70,5 +70,6 @@
   --accent-700: #049523;
   --accent-800: #036318;
   --accent-900: #01320c;
-  --accent-950: #011906;  
+  --accent-950: #011906;
+
 }

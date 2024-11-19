@@ -1,10 +1,15 @@
 .container {
-    background-color: var(--primary-300);
+    width: 360px;
     margin: var(--spacing-l);
     padding: var(--spacing-m);
+    
+    border: var(--border-ms) solid var(--primary-500);
     border-radius: var(--border-radius-m);
-    box-shadow: 0 8px 1px -4px var(--shadow-800);
-    border: var(--border-ms) solid var(--background-950);
+    
+    background-color: var(--primary-600);
+    box-shadow: 0 8px 1px -4px var(--shadow);
+    
+    text-align: left;
 }
 
 .container h2 {
@@ -12,4 +17,15 @@
     line-height: 1.1;
     margin-top: 0;
     margin-bottom: var(--spacing-m);
+}
+
+@media screen and (max-width: 460px) {
+    .container {
+        width: 100%;
+    }
+}
+@media screen and (min-width: 461px) and (max-width: 900px) {
+    .container {
+        width: 70%;
+    }
 }

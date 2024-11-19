@@ -20,8 +20,8 @@
     height: 1.5em;
     font-size: 1.2rem;
     padding: 0.5em;
-    background-color: var(--background-50);
+    background-color: var(--primary-100);
     color: var(--text-950);
-    border: var(--border-xs) solid var(--background-800);
+    border: var(--border-s) solid var(--background-800);
     border-radius: var(--border-radius-s);
 }
