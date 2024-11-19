@@ -101,12 +101,12 @@ for account in accounts:
     print(f"ID: {account[0]}, Username: {account[1]}")
 
 # Creating Category
-categories = ["Plants", "Green", "Bwords"]
+categories = ["Agriculture", "Green", "Bwords"]
 for category in categories:
     cursor.execute("INSERT OR IGNORE INTO Category (name) VALUES (?);", (category,))
 
 #%% Word list for each categories
-plants = ["carrot", "potato", "rice", "tomato", "cabbage", "tractor", "wheat", "corn", "lettuce", 
+agriculture = ["carrot", "potato", "rice", "tomato", "cabbage", "tractor", "wheat", "corn", "lettuce", 
           "cucumber", "irrigation", "plow", "soybean", "fertilizer", "compost", "mulch", "barley", 
           "oats", "pesticide", "greenhouse", "broccoli", "spinach", "radish", "parsley", "zucchini", 
           "herbicide", "orchard", "vineyard", "pumpkin", "beans", "eggplant", "manure", "greenhouse", 
@@ -231,7 +231,7 @@ b_words = ["bamboo", "basil", "beet", "broccoli", "blueberry", "blackberry", "ba
 #%%
 
 words = {
-    "Plants": plants,
+    "Agriculture": agriculture,
     "Green": green,
     "Bwords": b_words,
 }
