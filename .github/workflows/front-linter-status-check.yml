@@ -34,3 +34,4 @@ jobs:
     # - run: cd src-front
     - run: npm ci
     - run: npm run lint:code-status
+    - run: npm run format:code-status
