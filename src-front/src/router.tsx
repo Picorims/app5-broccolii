@@ -9,6 +9,7 @@
 
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
+import FightRoom from './pages/fight_room';
 
 export const router = createBrowserRouter([
     {
@@ -18,5 +19,9 @@ export const router = createBrowserRouter([
     {
         path: "/about",
         element: <h1>About</h1>,
+    },
+    {
+        path: "/fight",
+        element: <FightRoom />,
     }
 ]);
