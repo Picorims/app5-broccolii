@@ -7,9 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "lint:code-status": "eslint --max-warnings=0 .",
+    "lint:check": "eslint --max-warnings=0 .",
     "format": "npx prettier . --write",
-    "format:code-status": "npx prettier . --check",
+    "format:check": "npx prettier . --check",
     "check-compat": "npx eslint-config-prettier src/main.js",
     "preview": "vite preview"
   },
