@@ -1,0 +1,16 @@
+[tool.black]
+line-length = 100
+target-version = ['py311']  # Python versions supported
+skip-string-normalization = false  # If false, format quote
+include = '\.pyi?$'  # Include files .py et .pyi
+exclude = '''
+/(
+    \.git
+    | \.mypy_cache
+    | \.pytest_cache
+    | env
+    | build
+    | dist
+    | __pycache__
+)/
+'''
