@@ -15,6 +15,7 @@ import styles from "./LoginPage.module.css";
 export default function LoginPage() {
     return (
         <main className={styles.main}>
+            <h1>Broccolii</h1>
             <Card>
                 <h2>Login</h2>
                 <LabeledInput type="text" label="Username" />
