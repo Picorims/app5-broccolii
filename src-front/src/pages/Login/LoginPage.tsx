@@ -7,6 +7,7 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+import Button from "../../components/Button/Button";
 import Card from "../../components/Card/Card";
 import LabeledInput from "../../components/LabeledInput/LabeledInput";
 
@@ -17,9 +18,14 @@ export default function LoginPage() {
                 <h2>Login</h2>
                 <LabeledInput type="text" label="Username" />
                 <LabeledInput type="password" label="Password" />
+                <Button type="submit" variant="primary">Login</Button>
             </Card >
             <Card>
                 <h2>Register</h2>
+                <LabeledInput type="text" label="Username" />
+                <LabeledInput type="password" label="Password" />
+                <LabeledInput type="password" label="Confirm Password" />
+                <Button type="submit" variant="primary">Register</Button>
             </Card>
         </>
     );
