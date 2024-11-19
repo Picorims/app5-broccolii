@@ -1,0 +1,22 @@
+.buttonContainer {
+  display: inline-block;
+  cursor: pointer;
+  text-align: center;
+  margin: 10px;
+}
+
+.buttonImage {
+  width: 200px;
+  height: 200px;
+  transition: transform 0.01s ease;  /* Transition très rapide au survol */
+}
+
+.buttonImage:active {
+  transform: scale(1.05);  /* Agrandissement au clic */
+}
+
+.buttonText {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #333;
+}

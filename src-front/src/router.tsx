@@ -10,6 +10,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import FightRoom from "./pages/FightRoom/FightRoom";
+import ClickerPage from "./pages/Clicker/ClickerPage";
 
 export const router = createBrowserRouter([
   {
@@ -23,5 +24,9 @@ export const router = createBrowserRouter([
   {
     path: "/fight",
     element: <FightRoom />,
+  },
+  {
+    path: "/clicker",
+    element: <ClickerPage />,
   },
 ]);
