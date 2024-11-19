@@ -11,6 +11,8 @@
 
 :root {
   --shadow: #0c0e0d99;
+  --error: #fd3b3b;
+  --error-dark: #bc2c2c;
 
   --text-50: #e5ffeb;
   --text-100: #ccffd6;

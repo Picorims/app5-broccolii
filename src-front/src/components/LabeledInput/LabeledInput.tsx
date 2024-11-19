@@ -7,20 +7,31 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+import { FormEvent } from "react";
 import styles from "./LabeledInput.module.css";
 
 export interface Props {
     type: "text" | "password";
     label: string;
+    name?: string;
+    error?: string;
 }
 
-export default function LabeledInput({ type, label }: Props) {
+export default function LabeledInput({ type, label, name, error = "" }: Props) {
+    
+    const onInput = (e: FormEvent<HTMLInputElement>) => {
+        (e.target as HTMLInputElement).setCustomValidity("");
+    }
+    
     return (
         <div>
             <label className={styles.label}>
                 <span>{label}</span>
-                <input type={type} className={styles.input} />
+                <input type={type} className={styles.input} name={name} onInput={onInput} />
             </label>
+            {(error !== "") && (
+                <span className={styles.error}>{error}</span>
+            )}
         </div>
     );
 };

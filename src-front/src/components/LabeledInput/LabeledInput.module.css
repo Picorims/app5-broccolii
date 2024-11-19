@@ -25,3 +25,15 @@
     border: var(--border-s) solid var(--background-800);
     border-radius: var(--border-radius-s);
 }
+
+.input:invalid {
+    color: var(--error);
+}
+
+.error {
+    padding: 0.1em 0.5em;
+    background-color: var(--background-800);
+    color: var(--error);
+    font-weight: bold;
+    border-radius: var(--border-radius-s);
+}
