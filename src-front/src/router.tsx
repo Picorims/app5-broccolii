@@ -9,7 +9,7 @@
 
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
-import FightRoom from './pages/fight_room';
+import FightRoom from './pages/FightRoom';
 
 export const router = createBrowserRouter([
     {
