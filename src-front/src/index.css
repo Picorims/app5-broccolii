@@ -13,13 +13,15 @@
 
 * {
   font-family: "EnterCommand", sans-serif;
+  box-sizing: border-box;
 }
 
 :root {
   line-height: 1.5;
   font-weight: 400;
+  font-size: 1.2rem;
 
-  color-scheme: light dark;
+  color-scheme: dark;
   color: var(--text-950);
   background-color: var(--background-50);
 

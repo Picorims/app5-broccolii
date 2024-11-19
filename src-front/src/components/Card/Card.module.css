@@ -1,10 +1,10 @@
 .container {
-    background-color: var(--background-200);
+    background-color: var(--primary-300);
     margin: var(--spacing-l);
     padding: var(--spacing-m);
     border-radius: var(--border-radius-m);
     box-shadow: 0 8px 1px -4px var(--shadow-800);
-    border: var(--border-s) solid var(--background-300);
+    border: var(--border-ms) solid var(--background-950);
 }
 
 .container h2 {

@@ -8,12 +8,15 @@
 */
 
 import Card from "../../components/Card/Card";
+import LabeledInput from "../../components/LabeledInput/LabeledInput";
 
 export default function LoginPage() {
     return (
         <>
             <Card>
                 <h2>Login</h2>
+                <LabeledInput type="text" label="Username" />
+                <LabeledInput type="password" label="Password" />
             </Card >
             <Card>
                 <h2>Register</h2>
