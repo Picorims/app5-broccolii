@@ -6,14 +6,14 @@ import os
 
 
 
-file_to_delete = "broccolli.db"
-if os.path.exists(file_to_delete):
-    os.remove(file_to_delete)
-    print(f"The {file_to_delete} file was successfully deleted.")
+db_name = "broccolii.db"
+if os.path.exists(db_name):
+    os.remove(db_name)
+    print(f"The {db_name} file was successfully deleted.")
 else:
-    print(f"The {file_to_delete} file doesn't exist.")
+    print(f"The {db_name} file doesn't exist.")
 
-connection = sqlite3.connect('broccolli.db')
+connection = sqlite3.connect(db_name)
 
 cursor = connection.cursor()
 print("Connected to the database")
@@ -40,7 +40,7 @@ sql_command = """
        id INTEGER PRIMARY KEY AUTOINCREMENT,
        broccolis INT DEFAULT 0,
        username VARCHAR(50) NOT NULL,
-       password VARCHAR(50) NOT NULL,
+       password VARCHAR(256) NOT NULL,
        UNIQUE(username)
     );
 """
