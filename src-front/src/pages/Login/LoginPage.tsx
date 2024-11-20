@@ -37,18 +37,10 @@ export default function LoginPage() {
     const password = data.get("password");
     const confirmPassword = data.get("confirm_password");
 
-    const confirmPwdInput = e.currentTarget.querySelector(
-      "input[name=confirm_password]",
-    ) as HTMLInputElement;
     setRegisterPasswordError("");
 
     if (password !== confirmPassword) {
       console.error("Passwords do not match");
-      if (!confirmPwdInput) {
-        alert("Passwords do not match");
-      }
-      confirmPwdInput.setCustomValidity("Passwords do not match");
-      confirmPwdInput.reportValidity();
       setRegisterPasswordError("Passwords do not match");
       return;
     }
