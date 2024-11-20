@@ -15,9 +15,10 @@ export interface Props {
   label: string;
   name?: string;
   error?: string;
+  required?: boolean;
 }
 
-export default function LabeledInput({ type, label, name, error = "" }: Props) {
+export default function LabeledInput({ type, label, name, error = "", required = false }: Props) {
   const onInput = (e: FormEvent<HTMLInputElement>) => {
     (e.target as HTMLInputElement).setCustomValidity("");
   };
@@ -41,6 +42,7 @@ export default function LabeledInput({ type, label, name, error = "" }: Props) {
           name={name}
           onInput={onInput}
           ref={inputRef}
+          required={required}
         />
       </label>
       {error !== "" && <span className={styles.error}>{error}</span>}
