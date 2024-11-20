@@ -1,11 +1,39 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Application, Assets, Sprite } from 'pixi.js';
+import { Application } from 'pixi.js';
+import * as PIXI from 'pixi.js';
+
+interface Word {
+  text: string;
+  x: number;
+  y: number;
+  vecX: number;
+  vecY: number;
+  pixiText: PIXI.Text
+}
+
 
 export default function WordCloud() {
   const refCanvas = useRef<HTMLDivElement>(null);
   const refContainer = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width:0, height:0 })
+  const refWords = useRef<Word[]>([]);
+
   
+  function updateVec(word:Word) {
+    let centerX = containerSize.width/2
+    let centerY = containerSize.height/2
+    word.vecX = centerX - word.x;
+    word.vecY = centerY - word.y;
+    
+    refWords.current.forEach(currWord => {
+      if (currWord != word) {
+        word.vecX += (word.x - currWord.x)*0.3;
+        word.vecY += (word.y - currWord.y)*0.3;
+      }
+    });
+    return word;
+  }
+
   const init = useCallback(async () => {
     const app = new Application();
 
@@ -23,19 +51,39 @@ export default function WordCloud() {
       refCanvas.current.appendChild(app.canvas);
     }
 
-    const texture = await Assets.load('https://pixijs.com/assets/bunny.png');
+    refWords.current = [
+      { text: "word1", x: 100, y: 100, vecX: 0, vecY: 0, pixiText: new PIXI.Text({text: "React"}) },
+      { text: "word2", x: 200, y: 200, vecX: 0, vecY: 0, pixiText: new PIXI.Text({text: "PIXI.js"}) },
+      { text: "word3", x: 300, y: 300, vecX: 0, vecY: 0, pixiText: new PIXI.Text({text: "TypeScript"}) }
+    ];
+    
+    refWords.current.forEach(word => {
+      word.pixiText.style = {
+        fontFamily: 'Arial',
+        fontSize: 24,
+        fill: 0xffffff
+      };
+      word.pixiText.position.set(word.x, word.y);
+      app.stage.addChild(word.pixiText);
+    });
+    
+    
 
-    const bunny = new Sprite(texture);
-
-    app.stage.addChild(bunny);
-
-    bunny.anchor.set(0.5);
-
-    bunny.x = app.screen.width / 2;
-    bunny.y = app.screen.height / 2;
 
     app.ticker.add((time) => {
-      bunny.rotation += 0.1 * time.deltaTime;
+      
+      let centerX = containerSize.width/2
+      let centerY = containerSize.height/2
+      refWords.current.forEach(word => {
+        //calculate the vectors of words
+        word = updateVec(word);
+
+        //update position of words
+        word.x += word.vecX*time.deltaTime * 0.01;
+        word.y += word.vecY*time.deltaTime * 0.01;
+
+        word.pixiText.position.set(word.x, word.y);
+      });
     });
 
     return app;
