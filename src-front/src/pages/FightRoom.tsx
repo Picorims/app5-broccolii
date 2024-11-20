@@ -1,5 +1,7 @@
+import WorldCloud from "../components/WordCloud/WordCloud";
+
 function FightRoom() {
-  return "salu";
+  return <WorldCloud />;
 }
 
 export default FightRoom;

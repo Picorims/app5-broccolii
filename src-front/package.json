@@ -14,7 +14,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@pixi/react": "^7.1.2",
     "app5-broccolii": "file:",
+    "pixi.js": "^8.5.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^6.28.0",
