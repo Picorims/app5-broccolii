@@ -1121,7 +1121,7 @@ for category_name in words:
 # %% Word & Category insert's verification
 sql_command = """
     WITH RankedWords AS (
-        SELECT w.id, w.word, c.name AS category_name, 
+        SELECT w.id, w.word, c.name AS category_name,
                ROW_NUMBER() OVER (PARTITION BY c.name ORDER BY w.id) AS row_num
         FROM Word w
         JOIN WordCategory wc ON w.id = wc.idWord
