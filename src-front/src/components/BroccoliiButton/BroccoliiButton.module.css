@@ -1,6 +1,7 @@
 .buttonContainer {
   display: inline-block;
   cursor: pointer;
+  position: relative; /* "+1" position */
   text-align: center;
   margin: 10px;
 }
@@ -8,15 +9,38 @@
 .buttonImage {
   width: 200px;
   height: 200px;
-  transition: transform 0.01s ease;  /* Transition très rapide au survol */
+  transition: transform 0.01s ease;  /* Transition when image switchs */
 }
 
 .buttonImage:active {
-  transform: scale(1.05);  /* Agrandissement au clic */
+  transform: scale(1.05);  /* Grow effect on click */
 }
 
 .buttonText {
   margin-top: 10px;
   font-size: 18px;
   color: #333;
+}
+
+/* "+1" style */
+.plusOne {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: bold;
+  color: #19ac08;
+  opacity: 0; /* Hidden by default */
+  animation: floatUp 2s forwards; /* Animation and duration */
+}
+
+/* "+1" animation */
+@keyframes floatUp {
+  0% {
+    transform: translate(-50%, -50%) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(-50px);
+    opacity: 0;
+  }
 }
