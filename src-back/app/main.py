@@ -8,7 +8,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
 from fastapi import FastAPI
+from .web_socket import router as ws_router
 
 app = FastAPI()
-
-import web_socket
+app.include_router(ws_router, prefix="/api/v1")

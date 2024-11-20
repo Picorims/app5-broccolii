@@ -7,11 +7,12 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
-from fastapi import WebSocket
-from main import app
+from fastapi import APIRouter, WebSocket
+
+router = APIRouter()
 
 
-@app.websocket("/api/v1/ws")
+@router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
