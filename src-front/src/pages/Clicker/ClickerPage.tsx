@@ -7,10 +7,9 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-
-import { useState } from 'react';
+import { useState } from "react";
 import BroccoliiButton from "../../components/BroccoliiButton/BroccoliiButton";
-import styles from './ClickerPage.module.css';
+import styles from "./ClickerPage.module.css";
 
 import image1 from "../../assets/broccolii/broccolii(1).png";
 import image2 from "../../assets/broccolii/broccolii(2).png";
@@ -18,13 +17,12 @@ import image3 from "../../assets/broccolii/broccolii(3).png";
 import image4 from "../../assets/broccolii/broccolii(4).png";
 
 const ClickerPage = () => {
-
   // Array of objects representing images and their corresponding texts.
   const items = [
-    { id: 1, image: image1, text: ': )' },
-    { id: 2, image: image2, text: '> 0 <' },
+    { id: 1, image: image1, text: ": )" },
+    { id: 2, image: image2, text: "> 0 <" },
     { id: 3, image: image3, text: '"Woof Woof" in broccolii' },
-    { id: 4, image: image4, text: '.__.' },
+    { id: 4, image: image4, text: ".__." },
   ];
 
   const [currentItem, setCurrentItem] = useState(items[0]);
@@ -42,7 +40,11 @@ const ClickerPage = () => {
   return (
     <div className={styles.container}>
       <h1>Page Clicker</h1>
-      <BroccoliiButton image={currentItem.image} text={currentItem.text} onClick={handleClick} />
+      <BroccoliiButton
+        image={currentItem.image}
+        text={currentItem.text}
+        onClick={handleClick}
+      />
     </div>
   );
 };

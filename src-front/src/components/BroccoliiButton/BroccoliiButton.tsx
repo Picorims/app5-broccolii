@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import styles from './BroccoliiButton.module.css';
+import React, { useState } from "react";
+import styles from "./BroccoliiButton.module.css";
 
 interface BroccoliiButtonProps {
   image: string;
@@ -13,7 +13,11 @@ interface PlusOne {
   left: number;
 }
 
-const BroccoliiButton: React.FC<BroccoliiButtonProps> = ({ image, text, onClick }) => {
+const BroccoliiButton: React.FC<BroccoliiButtonProps> = ({
+  image,
+  text,
+  onClick,
+}) => {
   const [plusOnes, setPlusOnes] = useState<PlusOne[]>([]);
 
   const handleClick = (e: React.MouseEvent<HTMLImageElement>) => {
@@ -28,10 +32,7 @@ const BroccoliiButton: React.FC<BroccoliiButtonProps> = ({ image, text, onClick 
     const top = (clickY / rect.height) * 100;
     const left = (clickX / rect.width) * 100;
 
-    setPlusOnes((prev) => [
-      ...prev,
-      { id, top, left },
-    ]);
+    setPlusOnes((prev) => [...prev, { id, top, left }]);
 
     onClick();
 
@@ -58,7 +59,7 @@ const BroccoliiButton: React.FC<BroccoliiButtonProps> = ({ image, text, onClick 
           style={{ top: `${top}%`, left: `${left}%` }}
         >
           {/* TODO: update to a variable that handle booster effect */}
-          +1  
+          +1
         </span>
       ))}
     </div>
