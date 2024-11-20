@@ -29,12 +29,14 @@ const ClickerPage = () => {
 
   const [currentItem, setCurrentItem] = useState(items[0]);
 
-  // Function to switch to the next image when the button is clicked.
+  // Function to switch to a random image (not the current one) when the button is clicked.
   const handleClick = () => {
-    setCurrentItem((prevItem) => {
-      const nextIndex = (prevItem.id % items.length);
-      return items[nextIndex];
-    });
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * items.length);
+    } while (items[randomIndex].id === currentItem.id); // Ensure it's not the current image.
+
+    setCurrentItem(items[randomIndex]);
   };
 
   return (
