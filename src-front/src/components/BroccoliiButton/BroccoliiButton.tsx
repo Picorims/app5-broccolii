@@ -16,24 +16,29 @@ interface PlusOne {
 const BroccoliiButton: React.FC<BroccoliiButtonProps> = ({ image, text, onClick }) => {
   const [plusOnes, setPlusOnes] = useState<PlusOne[]>([]);
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLImageElement>) => {
     const id = Date.now(); // Unique ID for each "+1"
 
-    // Generate random positions for the "+1" inside the image container
-    const randomTop = Math.random() * 80; // Limit to 80% of the container height
-    const randomLeft = Math.random() * 80; // Limit to 80% of the container width
+    // Get the click position relative to the image
+    const rect = (e.target as HTMLImageElement).getBoundingClientRect();
+    const clickX = e.clientX - rect.left; // X coordinate relative to the image
+    const clickY = e.clientY - rect.top; // Y coordinate relative to the image
+
+    // Convert to percentages (for better scaling across different screen sizes)
+    const top = (clickY / rect.height) * 100;
+    const left = (clickX / rect.width) * 100;
 
     setPlusOnes((prev) => [
       ...prev,
-      { id, top: randomTop, left: randomLeft },
+      { id, top, left },
     ]);
 
     onClick();
 
-    // Remove the "+1" after 1 second
+    // Remove the "+1" after 5 seconds
     setTimeout(() => {
       setPlusOnes((prev) => prev.filter((plusOne) => plusOne.id !== id));
-    }, 1000);
+    }, 5000);
   };
 
   return (
@@ -52,7 +57,8 @@ const BroccoliiButton: React.FC<BroccoliiButtonProps> = ({ image, text, onClick 
           className={styles.plusOne}
           style={{ top: `${top}%`, left: `${left}%` }}
         >
-          +1
+          {/* TODO: update to a variable that handle booster effect */}
+          +1  
         </span>
       ))}
     </div>
