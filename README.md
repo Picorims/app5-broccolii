@@ -20,6 +20,7 @@ Requirements:
 
 **for Unix/macOS commands visit https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment**
 
+- Go to the back-end directory: `cd src-back`.
 - Setup a virtual environment:
 ```
 py -m venv env
