@@ -8,21 +8,23 @@
 */
 
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import BroccoliiButton from "../../components/BroccoliiButton/BroccoliiButton";
 import styles from './ClickerPage.module.css';
 
-import image1 from "../../assets/broccolii/image1.png";
-import image2 from "../../assets/broccolii/image2.png";
-import image3 from "../../assets/broccolii/image3.png";
+import image1 from "../../assets/broccolii/broccolii(1).png";
+import image2 from "../../assets/broccolii/broccolii(2).png";
+import image3 from "../../assets/broccolii/broccolii(3).png";
+import image4 from "../../assets/broccolii/broccolii(4).png";
 
 const ClickerPage = () => {
 
   // Array of objects representing images and their corresponding texts.
   const items = [
-    { id: 1, image: image1, text: 'Texte pour image 1' },
-    { id: 2, image: image2, text: 'Texte pour image 2' },
-    { id: 3, image: image3, text: 'Texte pour image 3' },
+    { id: 1, image: image1, text: ': )' },
+    { id: 2, image: image2, text: '> 0 <' },
+    { id: 3, image: image3, text: '"Woof Woof" in broccolii' },
+    { id: 4, image: image4, text: '.__.' },
   ];
 
   const [currentItem, setCurrentItem] = useState(items[0]);

@@ -13,7 +13,7 @@ const BroccoliiButton: React.FC<BroccoliiButtonProps> = ({ image, text, onClick 
 
   const handleClick = () => {
     setIsClicked((prevState) => !prevState);
-    onClick();  // Appeler la fonction onClick passée en prop
+    onClick();
   };
 
   return (
