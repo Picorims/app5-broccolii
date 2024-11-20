@@ -55,9 +55,7 @@ async def create_task(task: TaskCreation):
 
 # Retrieve a task by ID
 @app.get("/tasks/{task_id}", response_model=Task, tags=["Tasks"])
-async def get_task(
-    task_id: str = Path(..., description="The ID of the task to retrieve")
-):
+async def get_task(task_id: str = Path(..., description="The ID of the task to retrieve")):
     # Get the task
     task = next((t for t in tasks if t.id == task_id), None)
     if task is None:
