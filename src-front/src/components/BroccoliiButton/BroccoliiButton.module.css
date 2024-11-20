@@ -1,7 +1,7 @@
 .buttonContainer {
   display: inline-block;
   cursor: pointer;
-  position: relative; /* "+1" position */
+  position: relative;
   text-align: center;
   margin: 10px;
 }
@@ -9,12 +9,16 @@
 .buttonImage {
   width: 200px;
   height: 200px;
-  transition: transform 0.01s ease;
-  user-select: none; /* Discard selection on the image */
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.buttonImage:hover {
+  transform: scale(1.1);
 }
 
 .buttonImage:active {
-  transform: scale(1.05);
+  transform: scale(1);
 }
 
 .plusOne {
