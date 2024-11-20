@@ -36,7 +36,6 @@ export default function LoginPage() {
     const login = data.get("login");
     const password = data.get("password");
     const confirmPassword = data.get("confirm_password");
-    console.log(password, confirmPassword);
 
     const confirmPwdInput = e.currentTarget.querySelector(
       "input[name=confirm_password]",
