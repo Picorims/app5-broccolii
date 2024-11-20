@@ -10,13 +10,9 @@
 import styles from "./Card.module.css";
 
 export interface Props {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export default function Card({ children }: Props) {
-    return (
-        <div className={styles.container}>
-            {children}
-        </div>
-    );
-};
+  return <div className={styles.container}>{children}</div>;
+}

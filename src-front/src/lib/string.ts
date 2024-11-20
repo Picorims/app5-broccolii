@@ -8,5 +8,5 @@
 */
 
 export function classList(...classes: string[]) {
-    return classes.join(" ");
+  return classes.join(" ");
 }

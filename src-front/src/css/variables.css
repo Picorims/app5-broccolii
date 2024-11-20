@@ -1,18 +1,18 @@
 :root {
-    --spacing-xl: 32px;
-    --spacing-l: 24px;
-    --spacing-m: 16px;
-    --spacing-ms: 12px;
-    --spacing-s: 8px;
-    --spacing-xs: 4px;
+  --spacing-xl: 32px;
+  --spacing-l: 24px;
+  --spacing-m: 16px;
+  --spacing-ms: 12px;
+  --spacing-s: 8px;
+  --spacing-xs: 4px;
 
-    --border-radius-l: 16px;
-    --border-radius-m: 8px;
-    --border-radius-s: 4px;
+  --border-radius-l: 16px;
+  --border-radius-m: 8px;
+  --border-radius-s: 4px;
 
-    --border-l: 8px;
-    --border-m: 4px;
-    --border-ms: 3px;
-    --border-s: 2px;
-    --border-xs: 1px;
+  --border-l: 8px;
+  --border-m: 4px;
+  --border-ms: 3px;
+  --border-s: 2px;
+  --border-xs: 1px;
 }

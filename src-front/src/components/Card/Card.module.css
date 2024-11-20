@@ -1,31 +1,31 @@
 .container {
-    width: 360px;
-    margin: var(--spacing-l);
-    padding: var(--spacing-m);
-    
-    border: var(--border-ms) solid var(--primary-500);
-    border-radius: var(--border-radius-m);
-    
-    background-color: var(--primary-600);
-    box-shadow: 0 8px 1px -4px var(--shadow);
-    
-    text-align: left;
+  width: 360px;
+  margin: var(--spacing-l);
+  padding: var(--spacing-m);
+
+  border: var(--border-ms) solid var(--primary-500);
+  border-radius: var(--border-radius-m);
+
+  background-color: var(--primary-600);
+  box-shadow: 0 8px 1px -4px var(--shadow);
+
+  text-align: left;
 }
 
 .container h2 {
-    font-size: 2.5em;
-    line-height: 1.1;
-    margin-top: 0;
-    margin-bottom: var(--spacing-m);
+  font-size: 2.5em;
+  line-height: 1.1;
+  margin-top: 0;
+  margin-bottom: var(--spacing-m);
 }
 
 @media screen and (max-width: 460px) {
-    .container {
-        width: 100%;
-    }
+  .container {
+    width: 100%;
+  }
 }
 @media screen and (min-width: 461px) and (max-width: 900px) {
-    .container {
-        width: 70%;
-    }
+  .container {
+    width: 70%;
+  }
 }
