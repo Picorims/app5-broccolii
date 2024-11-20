@@ -7,14 +7,12 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import "./index.css";
-import { RouterProvider } from "react-router-dom";
-import { router } from "./router.tsx";
+import styles from "./Card.module.css";
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
-);
+export interface Props {
+  children: React.ReactNode;
+}
+
+export default function Card({ children }: Props) {
+  return <div className={styles.container}>{children}</div>;
+}
