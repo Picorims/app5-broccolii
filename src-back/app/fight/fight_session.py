@@ -31,11 +31,30 @@ class FightSession():
         if name in self._players_sessions:
             raise Exception("This player already has a session.")
         self._players_sessions[name] = session
-        
+    
+    def player_has_session(self, name):
+        return name in self._players_sessions
+    
     def remove_player_session(self, name):
         if name not in self._players_sessions:
             raise Exception("This player does not have a session.")
         self._players_sessions.pop(name, None)
+        
+    async def close_if_player_not_allowed(self, name, websocket):
+        """If the player is allowed, do nothing and return False. Otherwise, send an error and close the connection, and return True.
+
+        Args:
+            name (string): userID
+            websocket (WebSocket): socket to eventually close
+
+        Returns:
+            bool: session closed
+        """
+        if name not in self._players:
+            await self._send_error_event(websocket, "Player not in fight session.")
+            await websocket.close()
+            return True
+        return False
         
     async def handle_event(self, event, websocket: WebSocket):
         if f"type" not in event:
@@ -49,8 +68,14 @@ class FightSession():
             await self._send_error_event(websocket, "Non matching fight session.")
             await websocket.close()
             return
-        if event["userID"] not in self._players:
-            await self._send_error_event(websocket, "Player not in fight session.")
+        if await self.close_if_player_not_allowed(event["userID"], websocket):
+            return
+        
+        if not self.player_has_session(event["userID"]):
+            self.add_player_session(websocket, event["userID"])
+            
+        if not (self._players_sessions[event["userID"]] == websocket):
+            await self._send_error_event(websocket, "Player already has an open session.")
             await websocket.close()
             return
         
@@ -92,7 +117,7 @@ async def websocket_endpoint(fightId, websocket: WebSocket):
                     await websocket.send_text(build_json_event("error", payload))
                     await websocket.close()
                     break
-                else:    
+                else:
                     await sessions[fightId].handle_event(data_obj, websocket)
     except WebSocketDisconnect:
         print("Client disconnected")
