@@ -16,3 +16,17 @@
 .boostercard:hover .boosterImage {
   transform: scale(1.1); /* Effet d'agrandissement au survol */
 }
+
+.statsContainer {
+    position: fixed;
+    left: 20px; /* Distance du bord gauche */
+    top: 50%; /* Centrage vertical */
+    transform: translateY(-50%); /* Ajuste le centrage */
+    z-index: 1000; /* Au-dessus des autres éléments */
+  }
+  
+.statsImage {
+    width: 150px; /* Taille de l'image des statistiques */
+    height: auto;
+    transition: opacity 0.2s ease-in-out;
+}
