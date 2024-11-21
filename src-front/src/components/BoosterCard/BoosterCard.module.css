@@ -5,6 +5,7 @@
   align-items: flex-end;
   bottom: 10px;
   z-index: 1000;
+  user-select: none;
 }
 
 .boostercard {
@@ -52,4 +53,26 @@
   height: auto;
   transform: translateX(90%);
   transition: opacity 0.1s ease-in-out;
+}
+
+/* Croix pour fermer une carte */
+.closeButton {
+  position: absolute;
+  background-color: black;
+  color: #dbf5dc;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 1100;
+  justify-content: center;
+  align-items: center;
+}
+
+.closeButton:hover {
+  background-color: red;
 }

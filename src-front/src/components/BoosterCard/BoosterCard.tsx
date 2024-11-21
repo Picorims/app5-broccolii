@@ -6,6 +6,8 @@ import beetrootImage from "../../assets/boosterCard/beetrootImage.png";
 import butternutImage from "../../assets/boosterCard/ButternutImage.png";
 import carrotImage from "../../assets/boosterCard/CarrotImage.png";
 
+import emptyCardImage from "../../assets/boosterCard/emptyCardImage.png";
+
 import beetrootStatsImage from "../../assets/boosterCard/beetrootStatsImage.png";
 import butternutStatsImage from "../../assets/boosterCard/ButternutStatsImage.png";
 import carrotStatsImage from "../../assets/boosterCard/CarrotStatsImage.png";
@@ -14,7 +16,26 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
   const [visibleStats, setIsStatsVisible] = useState<string | null>(null); // Show or Hide stats
   const [animating, setAnimating] = useState<boolean>(false); // Show and Hide stats animations
 
+  // State to manage the current images for each card
+  const initialImages = {
+    butternut: butternutImage,
+    beetroot: beetrootImage,
+    carrot: carrotImage,
+  };
+
+  const [cardImages, setCardImages] = useState(initialImages);
+
   const handleImageClick = (cardName: string) => {
+    // If the clicked image is emptyCardImage, reset to the original image
+    if (cardImages[cardName as keyof typeof cardImages] === emptyCardImage) {
+      setCardImages((prevImages) => ({
+        ...prevImages,
+        [cardName]: initialImages[cardName as keyof typeof initialImages],
+      }));
+      return;
+    }
+
+    // Otherwise, toggle stats display
     if (visibleStats === cardName) {
       setAnimating(true);
       setTimeout(() => {
@@ -26,38 +47,76 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
     }
   };
 
+  const handleRemoveCard = (cardName: string) => {
+    setCardImages((prevImages) => ({
+      ...prevImages,
+      [cardName]: emptyCardImage, // Replace the image with the empty card
+    }));
+  };
+
   return (
     <div className={styles.boosterContainer}>
       {/* Booster #1 - Butternut */}
-      <div
-        className={styles.boostercard}
-        onClick={() => handleImageClick("butternut")}
-      >
+      <div className={styles.boostercard}>
         <img
-          src={butternutImage}
+          src={cardImages.butternut}
           alt="Butternut"
           className={styles.boosterImage}
+          onClick={() => handleImageClick("butternut")}
         />
+        {cardImages.butternut !== emptyCardImage && (
+          <button
+            className={styles.closeButton}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent triggering the card click
+              handleRemoveCard("butternut");
+            }}
+          >
+            ✖
+          </button>
+        )}
       </div>
 
       {/* Booster #2 - Beetroot */}
-      <div
-        className={styles.boostercard}
-        onClick={() => handleImageClick("beetroot")}
-      >
+      <div className={styles.boostercard}>
         <img
-          src={beetrootImage}
+          src={cardImages.beetroot}
           alt="Beetroot"
           className={styles.boosterImage}
+          onClick={() => handleImageClick("beetroot")}
         />
+        {cardImages.beetroot !== emptyCardImage && (
+          <button
+            className={styles.closeButton}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent triggering the card click
+              handleRemoveCard("beetroot");
+            }}
+          >
+            ✖
+          </button>
+        )}
       </div>
 
       {/* Booster #3 - Carrot */}
-      <div
-        className={styles.boostercard}
-        onClick={() => handleImageClick("carrot")}
-      >
-        <img src={carrotImage} alt="Carrot" className={styles.boosterImage} />
+      <div className={styles.boostercard}>
+        <img
+          src={cardImages.carrot}
+          alt="Carrot"
+          className={styles.boosterImage}
+          onClick={() => handleImageClick("carrot")}
+        />
+        {cardImages.carrot !== emptyCardImage && (
+          <button
+            className={styles.closeButton}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent triggering the card click
+              handleRemoveCard("carrot");
+            }}
+          >
+            ✖
+          </button>
+        )}
       </div>
 
       {/* Stats display or hidden OnClick */}
@@ -66,8 +125,8 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
           visibleStats === "butternut" && !animating
             ? styles.show
             : animating && visibleStats === "butternut"
-              ? styles.hide
-              : ""
+            ? styles.hide
+            : ""
         }`}
       >
         {visibleStats === "butternut" && (
@@ -84,8 +143,8 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
           visibleStats === "beetroot" && !animating
             ? styles.show
             : animating && visibleStats === "beetroot"
-              ? styles.hide
-              : ""
+            ? styles.hide
+            : ""
         }`}
       >
         {visibleStats === "beetroot" && (
@@ -102,8 +161,8 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
           visibleStats === "carrot" && !animating
             ? styles.show
             : animating && visibleStats === "carrot"
-              ? styles.hide
-              : ""
+            ? styles.hide
+            : ""
         }`}
       >
         {visibleStats === "carrot" && (
