@@ -1,8 +1,17 @@
+/* Conteneur principal des cartes */
+.boosterContainer {
+  display: flex; /* Aligne les cartes horizontalement */
+  justify-content: center; /* Centre les cartes */
+  align-items: flex-end; /* Positionne les cartes en bas */
+  bottom: 10px; /* Place les cartes en bas de la page */
+  z-index: 1000;
+}
+
 .boostercard {
-    position: fixed;
   bottom: 10px; /* Ajustez la marge en bas */
   left: 50%; /* Place le centre du conteneur au milieu */
-  transform: translateX(-50%); /* Décale de la moitié de la largeur pour un vrai centrage */
+  margin: 0 15px; /* Espace entre les cartes */
+  transform: translateX-(-50%); /* Décale de la moitié de la largeur pour un vrai centrage */
   cursor: pointer;
   z-index: 1000; /* Assurez-vous que le composant est au-dessus d'autres éléments */
 }
@@ -26,7 +35,9 @@
   }
   
 .statsImage {
-    width: 150px; /* Taille de l'image des statistiques */
+    width: 100%;
+    max-width: 200px;
     height: auto;
+    transform: translateX(90%); /* Ajuste le centrage */
     transition: opacity 0.2s ease-in-out;
 }
