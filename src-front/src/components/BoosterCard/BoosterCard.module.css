@@ -26,13 +26,24 @@
   transform: scale(1.1); /* Effet d'agrandissement au survol */
 }
 
+/* Conteneur des stats avec animation */
 .statsContainer {
-    position: fixed;
-    left: 20px; /* Distance du bord gauche */
-    top: 50%; /* Centrage vertical */
-    transform: translateY(-50%); /* Ajuste le centrage */
-    z-index: 1000; /* Au-dessus des autres éléments */
-  }
+  position: fixed;
+  left: 20px; /* Distance du bord gauche */
+  top: 30%; /* Centrage vertical */
+  opacity: 0; /* Rendre invisible au départ */
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* Transition pour le popup */
+  z-index: 1000; /* Au-dessus des autres éléments */
+}
+
+.statsContainer.show {
+  opacity: 1; /* Rend visible */
+}
+
+.statsContainer.hide {
+  opacity: 0; /* Disparition visuelle */
+}
+
   
 .statsImage {
     width: 100%;

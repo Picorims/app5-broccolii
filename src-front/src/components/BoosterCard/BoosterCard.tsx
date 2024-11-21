@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "./BoosterCard.module.css"; // Importation du fichier CSS pour la mise en page.
+import styles from "./BoosterCard.module.css";
 
 // Importation des images
 import beetrootImage from "../../assets/boosterCard/beetrootImage.png";
@@ -12,9 +12,18 @@ import carrotStatsImage from "../../assets/boosterCard/CarrotStatsImage.png";
 
 const BoosterCard: React.FC<{ onClick: () => void }> = () => {
   const [visibleStats, setIsStatsVisible] = useState<string | null>(null); // État pour afficher/cacher les statistiques
+  const [animating, setAnimating] = useState<boolean>(false); // État pour gérer l'animation
 
   const handleImageClick = (cardName: string) => {
-    setIsStatsVisible((prev) => (prev === cardName ? null : cardName)); // Active ou désactive l'affichage des stats
+    if (visibleStats === cardName) {
+      setAnimating(true);
+      setTimeout(() => {
+        setIsStatsVisible(null); // Cache les stats après l'animation
+        setAnimating(false);
+      }, 300); // Durée égale au temps de transition (0.3s)
+    } else {
+      setIsStatsVisible(cardName);
+    }
   };
 
   return (
@@ -44,21 +53,59 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
       </div>
 
       {/* Stats affichées conditionnellement */}
-      {visibleStats === "butternut" && (
-        <div className={styles.statsContainer}>
-          <img src={butternutStatsImage} alt="Butternut Stats" className={styles.statsImage} />
-        </div>
-      )}
-      {visibleStats === "beetroot" && (
-        <div className={styles.statsContainer}>
-          <img src={beetrootStatsImage} alt="Beetroot Stats" className={styles.statsImage} />
-        </div>
-      )}
-      {visibleStats === "carrot" && (
-        <div className={styles.statsContainer}>
-          <img src={carrotStatsImage} alt="Carrot Stats" className={styles.statsImage} />
-        </div>
-      )}
+      <div
+        className={`${styles.statsContainer} ${
+          visibleStats === "butternut" && !animating
+            ? styles.show
+            : animating && visibleStats === "butternut"
+            ? styles.hide
+            : ""
+        }`}
+      >
+        {visibleStats === "butternut" && (
+          <img
+            src={butternutStatsImage}
+            alt="Butternut Stats"
+            className={styles.statsImage}
+          />
+        )}
+      </div>
+
+      <div
+        className={`${styles.statsContainer} ${
+          visibleStats === "beetroot" && !animating
+            ? styles.show
+            : animating && visibleStats === "beetroot"
+            ? styles.hide
+            : ""
+        }`}
+      >
+        {visibleStats === "beetroot" && (
+          <img
+            src={beetrootStatsImage}
+            alt="Beetroot Stats"
+            className={styles.statsImage}
+          />
+        )}
+      </div>
+
+      <div
+        className={`${styles.statsContainer} ${
+          visibleStats === "carrot" && !animating
+            ? styles.show
+            : animating && visibleStats === "carrot"
+            ? styles.hide
+            : ""
+        }`}
+      >
+        {visibleStats === "carrot" && (
+          <img
+            src={carrotStatsImage}
+            alt="Carrot Stats"
+            className={styles.statsImage}
+          />
+        )}
+      </div>
     </div>
   );
 };
