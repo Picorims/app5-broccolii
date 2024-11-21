@@ -2,7 +2,6 @@
 import sqlite3
 
 
-
 db_name = "broccolii.db"
 connection = sqlite3.connect(db_name)
 cursor = connection.cursor()
@@ -13,10 +12,11 @@ class Category:
     def __init__(self, id, name):
         self.id = id
         self.name = name.capitalize()
-    
+
     def PrintCategory(self):
-        print(f"{self.id}: {self.name}");
-        
+        print(f"{self.id}: {self.name}")
+
+
 class Word:
     def __init__(self, id, name):
         self.id = id
@@ -24,14 +24,16 @@ class Word:
         self.category = []
 
     def GetWord(self):
-        return self.name.capitalize();
+        return self.name.capitalize()
 
     def AddCategory(self, categoryId):
-        categoryName = cursor.execute(f"SELECT name FROM Category WHERE id = {categoryId}").fetchone()[0]
-        self.category.append(Category(categoryId, categoryName));
+        categoryName = cursor.execute(
+            f"SELECT name FROM Category WHERE id = {categoryId}"
+        ).fetchone()[0]
+        self.category.append(Category(categoryId, categoryName))
 
     def WordInCategory(self, category):
-        return category in self.category;
+        return category in self.category
 
     def PrintCategory(self):
         for i in self.category:
@@ -42,8 +44,9 @@ class Word:
         self.PrintCategory()
 
     def RemoveCategory(self, category):
-        if(self.WordInCategory(category)):
+        if self.WordInCategory(category):
             self.category.remove(category)
+
 
 sql_command = """
     SELECT w.id, w.word, c.id AS categoryId
@@ -65,7 +68,7 @@ for word in query:
 for word in words:
     if len(word.category) > 1:
         word.PrintWord()
-        
+
 
 cursor.execute("SELECT id, name FROM Category;")
 query = cursor.fetchall()
@@ -84,13 +87,14 @@ class Card:
         self.isNegative = isNegative
         self.adding = adding
         self.multiplyBy = multiplyBy
-    
+
     def PrintCard(self):
         negative = "Negative " if self.isNegative else ""
-        print(f"{self.id}: {negative}{self.name} - {self.rarity}");
-        print(f" {self.effect}");
-        print(f" Adds: {self.adding} - Multiplies by: {self.multiplyBy}");
-        
+        print(f"{self.id}: {negative}{self.name} - {self.rarity}")
+        print(f" {self.effect}")
+        print(f" Adds: {self.adding} - Multiplies by: {self.multiplyBy}")
+
+
 cursor.execute("SELECT id, name, effect, rarity, isNegative, adding, multiplyBy FROM Card;")
 query = cursor.fetchall()
 cards = [Card(*card) for card in query]
@@ -98,17 +102,13 @@ cards = [Card(*card) for card in query]
 for card in cards:
     card.PrintCard()
 
+
 class Account:
     def __init__(self, id, broccolis, username, upgrades):
         self.id = id
         self.broccolis = broccolis
         self.username = username
         self.upgrades = upgrades
- 
-        
-        
-        
-        
-        
-        
-connection.close();
+
+
+connection.close()
