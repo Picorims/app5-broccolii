@@ -15,6 +15,7 @@ export default function TempWebSocketFight() {
     const [error, setError] = useState("");
 
     useEffect(() => {
+        setError("");
         console.log("Initializing session...");
         fightSession.current = new FightSession("alice", "test", () => {
             console.log("WebSocket open. Getting state...");
@@ -29,7 +30,7 @@ export default function TempWebSocketFight() {
         return () => {
             fightSession.current?.close();
         }
-    });
+    }, [error]);
 
     return <div>
         <h1>WebSocket Testing (temporary)</h1>
