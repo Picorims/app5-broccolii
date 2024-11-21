@@ -40,7 +40,6 @@ const ClickerPage = () => {
 
   const handleBoosterClick = () => {
     console.log("BoosterCard clicked!");
-    // Vous pouvez ajouter une action ici (par exemple, navigation, affichage modal, etc.)
   };
 
   return (

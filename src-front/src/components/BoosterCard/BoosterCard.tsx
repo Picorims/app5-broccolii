@@ -11,16 +11,16 @@ import butternutStatsImage from "../../assets/boosterCard/ButternutStatsImage.pn
 import carrotStatsImage from "../../assets/boosterCard/CarrotStatsImage.png";
 
 const BoosterCard: React.FC<{ onClick: () => void }> = () => {
-  const [visibleStats, setIsStatsVisible] = useState<string | null>(null); // État pour afficher/cacher les statistiques
-  const [animating, setAnimating] = useState<boolean>(false); // État pour gérer l'animation
+  const [visibleStats, setIsStatsVisible] = useState<string | null>(null); // Show or Hide stats
+  const [animating, setAnimating] = useState<boolean>(false); // Show and Hide stats animations
 
   const handleImageClick = (cardName: string) => {
     if (visibleStats === cardName) {
       setAnimating(true);
       setTimeout(() => {
-        setIsStatsVisible(null); // Cache les stats après l'animation
+        setIsStatsVisible(null);
         setAnimating(false);
-      }, 300); // Durée égale au temps de transition (0.3s)
+      }, 200); // Transition duration (0.2s)
     } else {
       setIsStatsVisible(cardName);
     }
@@ -28,7 +28,7 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
 
   return (
     <div className={styles.boosterContainer}>
-      {/* Carte gauche - Butternut */}
+      {/* Booster #1 - Butternut */}
       <div
         className={styles.boostercard}
         onClick={() => handleImageClick("butternut")}
@@ -40,7 +40,7 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
         />
       </div>
 
-      {/* Carte centrale - Beetroot */}
+      {/* Booster #2 - Beetroot */}
       <div
         className={styles.boostercard}
         onClick={() => handleImageClick("beetroot")}
@@ -52,7 +52,7 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
         />
       </div>
 
-      {/* Carte droite - Carrot */}
+      {/* Booster #3 - Carrot */}
       <div
         className={styles.boostercard}
         onClick={() => handleImageClick("carrot")}
@@ -60,7 +60,7 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
         <img src={carrotImage} alt="Carrot" className={styles.boosterImage} />
       </div>
 
-      {/* Stats affichées conditionnellement */}
+      {/* Stats display or hidden OnClick */}
       <div
         className={`${styles.statsContainer} ${
           visibleStats === "butternut" && !animating
