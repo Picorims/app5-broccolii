@@ -8,10 +8,11 @@
 */
 
 import { getEnv } from "../environment";
+import { JsonLike, JsonObject } from "./types";
 
 type ClientEvent = "requestGameState";
-type ServerEvent = "sendGameState";
-type EventType = ClientEvent;
+type ServerEvent = "sendGameState" | "error";
+type EventType = ClientEvent | ServerEvent;
 
 interface BaseEventParams {
     type: EventType;
@@ -23,6 +24,10 @@ type RequestGameStateEvent = Record<string, never>; // empty
 
 type Event<T> = T extends "requestGameState" ? RequestGameStateEvent : never;
 
+interface ErrorResponse {
+    message: string;
+}
+
 /**
  * Handles the backend communication for a fight session.
  */
@@ -31,6 +36,7 @@ export class FightSession {
     private fightID: string;
     private ws: WebSocket;
     private ready = false;
+    private onError: (msg: string) => void = () => { };
 
     /**
      * Open the connection.
@@ -90,8 +96,28 @@ export class FightSession {
         this.ws.send(JSON.stringify(event));
     }
 
-    private handleEvent(event: object) {
-        console.log("received", event)
+    private handleEvent(event: JsonLike) {
+        console.log("received", event);
+        if (!event || typeof event !== "object") {
+            throw new Error("Invalid data.");
+        }
+        const e = event as JsonObject
+        if (!e["type"]) {
+            throw new Error("No event type specified by the server in the received data.");
+        }
+
+        const eventType = e["type"] as ServerEvent;
+        switch (eventType) {
+            case "error": {
+                const payload = e as unknown as ErrorResponse;
+                this.onError(payload.message);
+                break;
+            }
+        }
+    }
+
+    onErrorThen(f: (msg: string) => void) {
+        this.onError = f;
     }
 
     close() {

@@ -7,17 +7,24 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { FightSession } from "../../lib/fight_session"
 
 export default function TempWebSocketFight() {
     const fightSession = useRef<FightSession | null>(null);
+    const [error, setError] = useState("");
 
     useEffect(() => {
+        console.log("Initializing session...");
         fightSession.current = new FightSession("alice", "test", () => {
             console.log("WebSocket open. Getting state...");
             fightSession.current?.requestGameState();
         });
+
+        const session = fightSession.current;
+        session.onErrorThen((err) => {
+            setError(err);
+        })
 
         return () => {
             fightSession.current?.close();
@@ -26,5 +33,9 @@ export default function TempWebSocketFight() {
 
     return <div>
         <h1>WebSocket Testing (temporary)</h1>
+        {error !== "" && <div>
+            <h2>Error</h2>
+            <p>{error}</p>
+        </div>}
     </div>
 };
