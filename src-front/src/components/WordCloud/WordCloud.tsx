@@ -4,11 +4,19 @@ import * as PIXI from 'pixi.js';
 
 interface Word {
   text: string;
+  position: Vector;
+  speed: Vector;
+  pixiText: PIXI.Text
+}
+
+interface Vector {
   x: number;
   y: number;
-  vecX: number;
-  vecY: number;
-  pixiText: PIXI.Text
+}
+
+interface Point {
+  x: number;
+  y: number;
 }
 
 
@@ -22,16 +30,21 @@ export default function WordCloud() {
   function updateVec(word:Word) {
     let centerX = containerSize.width/2
     let centerY = containerSize.height/2
-    word.vecX = centerX - word.x;
-    word.vecY = centerY - word.y;
+    word.speed.x = centerX - word.position.x;
+    word.speed.y = centerY - word.position.y;
     
     refWords.current.forEach(currWord => {
       if (currWord != word) {
-        word.vecX += (word.x - currWord.x)*0.3;
-        word.vecY += (word.y - currWord.y)*0.3;
+        [word.speed.x, word.speed.y] = calculateVec(word.position.x, word.position.y, currWord.position.x, currWord.position.y, 0.3);
       }
     });
     return word;
+  }
+
+  function calculateVec(x1: number, y1: number, x2: number, y2: number, coef: number) {
+    let x = (x2 - x1)*coef;
+    let y = (y2 - y1)*coef;
+    return [x, y];
   }
 
   const init = useCallback(async () => {
@@ -52,9 +65,9 @@ export default function WordCloud() {
     }
 
     refWords.current = [
-      { text: "word1", x: 100, y: 100, vecX: 0, vecY: 0, pixiText: new PIXI.Text({text: "React"}) },
-      { text: "word2", x: 200, y: 200, vecX: 0, vecY: 0, pixiText: new PIXI.Text({text: "PIXI.js"}) },
-      { text: "word3", x: 300, y: 300, vecX: 0, vecY: 0, pixiText: new PIXI.Text({text: "TypeScript"}) }
+      { text: "word1", position: {x: 100, y: 100}, speed: {x: 0, y: 0}, pixiText: new PIXI.Text({text: "React"}) },
+      { text: "word2", position: {x: 200, y: 200}, speed: {x: 0, y: 0}, pixiText: new PIXI.Text({text: "PIXI.js"}) },
+      { text: "word3", position: {x: 300, y: 300}, speed: {x: 0, y: 0}, pixiText: new PIXI.Text({text: "TypeScript"}) }
     ];
     
     refWords.current.forEach(word => {
@@ -63,7 +76,7 @@ export default function WordCloud() {
         fontSize: 24,
         fill: 0xffffff
       };
-      word.pixiText.position.set(word.x, word.y);
+      word.pixiText.position.set(word.position.x, word.position.y);
       app.stage.addChild(word.pixiText);
     });
     
@@ -71,18 +84,16 @@ export default function WordCloud() {
 
 
     app.ticker.add((time) => {
-      
-      let centerX = containerSize.width/2
-      let centerY = containerSize.height/2
+      //let center:Point = {containerSize.width/2, containerSize.width/2}
       refWords.current.forEach(word => {
         //calculate the vectors of words
         word = updateVec(word);
 
         //update position of words
-        word.x += word.vecX*time.deltaTime * 0.01;
-        word.y += word.vecY*time.deltaTime * 0.01;
+        word.position.x += word.speed.x*time.deltaTime * 0.01;
+        word.position.y += word.speed.y*time.deltaTime * 0.01;
 
-        word.pixiText.position.set(word.x, word.y);
+        word.pixiText.position.set(word.position.x, word.position.y);
       });
     });
 
