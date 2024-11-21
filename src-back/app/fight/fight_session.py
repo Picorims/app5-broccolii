@@ -57,6 +57,20 @@ class FightSession():
         return False
         
     async def handle_event(self, event, websocket: WebSocket):
+        """handle event. Returns False if the session was closed.
+
+        Args:
+            event (json): event object
+            websocket (WebSocket): websocket to send data to
+
+        Raises:
+            Exception: Non existent type.
+            Exception: Missing Fight ID.
+            Exception: Missing User ID.
+
+        Returns:
+            bool: if the websocket was closed.
+        """
         if f"type" not in event:
             raise Exception("Non existent type.")
         if f"fightID" not in event:
@@ -67,20 +81,23 @@ class FightSession():
         if not event["fightID"] == self._fight_id:
             await self._send_error_event(websocket, "Non matching fight session.")
             await websocket.close()
-            return
+            return False
         if await self.close_if_player_not_allowed(event["userID"], websocket):
-            return
+            return False
         
         if not self.player_has_session(event["userID"]):
             self.add_player_session(websocket, event["userID"])
             
         if not (self._players_sessions[event["userID"]] == websocket):
             await self._send_error_event(websocket, "Player already has an open session.")
+            self.remove_player_session(event["userID"])
             await websocket.close()
-            return
+            return False
         
         if event["type"] == "requestGameState":
             await self._handle_request_game_state(websocket)
+            
+        return True
             
     async def _handle_request_game_state(self, websocket: WebSocket):
         state = {}    
@@ -103,6 +120,7 @@ sessions["test"] = FightSession("test", ["alice", "bob"])
         
 @router.websocket("/fight/{fightId}/ws")
 async def websocket_endpoint(fightId, websocket: WebSocket):
+    print(f"new connection to {fightId}")
     await websocket.accept()
     user = None
     try:
@@ -118,7 +136,9 @@ async def websocket_endpoint(fightId, websocket: WebSocket):
                     await websocket.close()
                     break
                 else:
-                    await sessions[fightId].handle_event(data_obj, websocket)
+                    websocket_closed = await sessions[fightId].handle_event(data_obj, websocket)
+                    if websocket_closed:
+                        break
     except WebSocketDisconnect:
         print("Client disconnected")
         try:
