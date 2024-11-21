@@ -9,9 +9,12 @@ interface Word {
   pixiText: PIXI.Text
 }
 
-interface Vector {
-  x: number;
-  y: number;
+class Vector {
+  constructor(public x: number, public y: number) {}
+
+  add(other: Vector): Vector {
+    return new Vector(this.x + other.x, this.y + other.y);
+  }
 }
 
 interface Point {
@@ -27,24 +30,31 @@ export default function WordCloud() {
   const refWords = useRef<Word[]>([]);
 
   
-  function updateVec(word:Word) {
-    let centerX = containerSize.width/2
-    let centerY = containerSize.height/2
-    word.speed.x = centerX - word.position.x;
-    word.speed.y = centerY - word.position.y;
+  function updateSpeed(word:Word) {
+    let center:Point = {x: containerSize.width/2, y: containerSize.width/2}
+    
+    //calculate the speed caused by the center gravity
+    //word.speed = {x: center.x - word.position.x, y: center.y - word.position.y}
+    console.log("before : " + word.speed.x);
+    word.speed = calculateVec(center.x, word.position.x, center.y, word.position.y, 100)
+    console.log("after  : " + word.speed.x);
+    
+    console.log("SEXE");
     
     refWords.current.forEach(currWord => {
       if (currWord != word) {
-        [word.speed.x, word.speed.y] = calculateVec(word.position.x, word.position.y, currWord.position.x, currWord.position.y, 0.3);
+        word.speed = calculateVec(word.position.x, word.position.y, currWord.position.x, currWord.position.y, 0.3);
       }
     });
     return word;
   }
+  
 
   function calculateVec(x1: number, y1: number, x2: number, y2: number, coef: number) {
     let x = (x2 - x1)*coef;
     let y = (y2 - y1)*coef;
-    return [x, y];
+    let res = new Vector(x, y)
+    return res;
   }
 
   const init = useCallback(async () => {
@@ -65,9 +75,9 @@ export default function WordCloud() {
     }
 
     refWords.current = [
-      { text: "word1", position: {x: 100, y: 100}, speed: {x: 0, y: 0}, pixiText: new PIXI.Text({text: "React"}) },
-      { text: "word2", position: {x: 200, y: 200}, speed: {x: 0, y: 0}, pixiText: new PIXI.Text({text: "PIXI.js"}) },
-      { text: "word3", position: {x: 300, y: 300}, speed: {x: 0, y: 0}, pixiText: new PIXI.Text({text: "TypeScript"}) }
+      { text: "word1", position: new Vector(100, 100), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "React"}) },
+      { text: "word2", position: new Vector(200, 200), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "PIXI.js"}) },
+      { text: "word3", position: new Vector(300, 300), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "TypeScript"}) }
     ];
     
     refWords.current.forEach(word => {
@@ -84,10 +94,10 @@ export default function WordCloud() {
 
 
     app.ticker.add((time) => {
-      //let center:Point = {containerSize.width/2, containerSize.width/2}
+
       refWords.current.forEach(word => {
-        //calculate the vectors of words
-        word = updateVec(word);
+        //calculate the speed vectors of words
+        word = updateSpeed(word);
 
         //update position of words
         word.position.x += word.speed.x*time.deltaTime * 0.01;
