@@ -1,21 +1,19 @@
-/* Conteneur principal des cartes */
+/* BoosterCard */
 .boosterContainer {
-  display: flex; /* Aligne les cartes horizontalement */
-  justify-content: center; /* Centre les cartes */
-  align-items: flex-end; /* Positionne les cartes en bas */
-  bottom: 10px; /* Place les cartes en bas de la page */
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  bottom: 10px;
   z-index: 1000;
 }
 
 .boostercard {
-  bottom: 10px; /* Ajustez la marge en bas */
-  left: 50%; /* Place le centre du conteneur au milieu */
-  margin: 0 15px; /* Espace entre les cartes */
-  transform: translateX-(
-    -50%
-  ); /* Décale de la moitié de la largeur pour un vrai centrage */
+  bottom: 10px;
+  left: 50%;
+  margin: 0 15px;
+  transform: translateX-(-50%);
   cursor: pointer;
-  z-index: 1000; /* Assurez-vous que le composant est au-dessus d'autres éléments */
+  z-index: 1000;
 }
 
 .boosterImage {
@@ -25,33 +23,33 @@
 }
 
 .boostercard:hover .boosterImage {
-  transform: scale(1.1); /* Effet d'agrandissement au survol */
+  transform: scale(1.1);
 }
 
-/* Conteneur des stats avec animation */
+/* BoosterStatsCard */
 .statsContainer {
   position: fixed;
-  left: 20px; /* Distance du bord gauche */
-  top: 30%; /* Centrage vertical */
-  opacity: 0; /* Rendre invisible au départ */
+  left: 20px;
+  top: 30%;
+  opacity: 0;
   transition:
-    transform 0.3s ease-out,
-    opacity 0.3s ease-out; /* Transition pour le popup */
-  z-index: 1000; /* Au-dessus des autres éléments */
+    transform 0.2s ease-out,
+    opacity 0.2s ease-out;
+  z-index: 1000;
 }
 
 .statsContainer.show {
-  opacity: 1; /* Rend visible */
+  opacity: 1;
 }
 
 .statsContainer.hide {
-  opacity: 0; /* Disparition visuelle */
+  opacity: 0;
 }
 
 .statsImage {
   width: 100%;
   max-width: 200px;
   height: auto;
-  transform: translateX(90%); /* Ajuste le centrage */
-  transition: opacity 0.2s ease-in-out;
+  transform: translateX(90%);
+  transition: opacity 0.1s ease-in-out;
 }
