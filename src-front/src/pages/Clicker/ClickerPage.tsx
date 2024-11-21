@@ -9,6 +9,7 @@
 
 import { useState } from "react";
 import BroccoliiButton from "../../components/BroccoliiButton/BroccoliiButton";
+import BoosterCard from "../../components/BoosterCard/BoosterCard";
 import styles from "./ClickerPage.module.css";
 
 import image1 from "../../assets/broccolii/broccolii(1).png";
@@ -28,7 +29,7 @@ const ClickerPage = () => {
   const [currentItem, setCurrentItem] = useState(items[0]);
 
   // Function to switch to a random image (not the current one) when the button is clicked.
-  const handleClick = () => {
+  const handleBroccoliiClick = () => {
     let randomIndex;
     do {
       randomIndex = Math.floor(Math.random() * items.length);
@@ -37,14 +38,21 @@ const ClickerPage = () => {
     setCurrentItem(items[randomIndex]);
   };
 
+  const handleBoosterClick = () => {
+    console.log("BoosterCard clicked!");
+    // Vous pouvez ajouter une action ici (par exemple, navigation, affichage modal, etc.)
+  };
+
   return (
     <div className={styles.container}>
       <h1>Page Clicker</h1>
       <BroccoliiButton
         image={currentItem.image}
         text={currentItem.text}
-        onClick={handleClick}
+        onClick={handleBroccoliiClick}
       />
+
+      <BoosterCard onClick={handleBoosterClick} />
     </div>
   );
 };
