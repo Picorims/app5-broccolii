@@ -9,6 +9,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from fastapi import FastAPI
 from .web_socket import router as ws_router
+from .fight.fight_session import router as fight_router
 
 app = FastAPI()
 app.include_router(ws_router, prefix="/api/v1")
+app.include_router(fight_router, prefix="/api/v1")
