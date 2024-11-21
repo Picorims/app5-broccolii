@@ -11,17 +11,22 @@ interface Word {
   mass: number;
 }
 
-function addWord() {
-  //TODO code this function
-
-}
-
 export default function WordCloud() {
   const refCanvas = useRef<HTMLDivElement>(null);
   const refContainer = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width:0, height:0 })
   const refWords = useRef<Word[]>([]);
+  let [inputValue, setInputValue] = useState("");
+  
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setInputValue(event.target.value);
+  }
+  
 
+  function deleteWord(index: number) {
+    refWords.current[index].pixiText.removeFromParent();
+    refWords.current.splice(index, 1);
+  }
   
   function updateSpeed(word:Word) {
     let center:Point = {x: containerSize.width/2, y: containerSize.width/2}
@@ -34,9 +39,7 @@ export default function WordCloud() {
     refWords.current.forEach(currWord => {
       if (currWord != word) {
         let interForce = calculateVecSquared(word.position.x, word.position.y, currWord.position.x, currWord.position.y, 500)
-        
         word.speed = word.speed.add(interForce);
-        
       }
     });
 
@@ -67,8 +70,6 @@ export default function WordCloud() {
       { text: "", position: new Vector(500, 300), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "word4"}), mass:13 },
       { text: "", position: new Vector(400, 500), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "word5"}), mass:14 },
       { text: "", position: new Vector(300, 600), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "word6"}), mass:15 },
-      
-      
     ];
     
     refWords.current.forEach(word => {
@@ -133,9 +134,53 @@ export default function WordCloud() {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
+  //function that tracks the keypresses
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+  
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, []);
+
+
+  const handleKeyPress = useCallback((event: KeyboardEvent) => {
+    if (event.code === 'Enter') {
+      for (let i = 0; i < refWords.current.length; i++) {
+        const word = refWords.current[i];
+        if (word.pixiText.text === inputValue) {
+          deleteWord(i);
+          setInputValue("");
+        }
+      }
+    }
+  }, [inputValue]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [handleKeyPress]);
+
+
   return <>
-    <div ref={refContainer} style={{ width: "700px", height: "700px" }}>
-      <div ref={refCanvas}></div>
-    </div>
-  </>;
+  <div ref={refContainer} style={{ width: "700px", height: "700px", position: "relative" }}>
+    <div ref={refCanvas}></div>
+    <input
+      type="text"
+      value={inputValue}
+      onChange={handleInputChange}
+      style={{
+        position: "absolute",
+        left: "10px",
+        top: "10px",
+        zIndex: 1000,
+        padding: "5px",
+        fontSize: "16px"
+      }}
+    />
+  </div>
+</>
 }
