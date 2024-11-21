@@ -11,7 +11,9 @@
   bottom: 10px; /* Ajustez la marge en bas */
   left: 50%; /* Place le centre du conteneur au milieu */
   margin: 0 15px; /* Espace entre les cartes */
-  transform: translateX-(-50%); /* Décale de la moitié de la largeur pour un vrai centrage */
+  transform: translateX-(
+    -50%
+  ); /* Décale de la moitié de la largeur pour un vrai centrage */
   cursor: pointer;
   z-index: 1000; /* Assurez-vous que le composant est au-dessus d'autres éléments */
 }
@@ -32,7 +34,9 @@
   left: 20px; /* Distance du bord gauche */
   top: 30%; /* Centrage vertical */
   opacity: 0; /* Rendre invisible au départ */
-  transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* Transition pour le popup */
+  transition:
+    transform 0.3s ease-out,
+    opacity 0.3s ease-out; /* Transition pour le popup */
   z-index: 1000; /* Au-dessus des autres éléments */
 }
 
@@ -44,11 +48,10 @@
   opacity: 0; /* Disparition visuelle */
 }
 
-  
 .statsImage {
-    width: 100%;
-    max-width: 200px;
-    height: auto;
-    transform: translateX(90%); /* Ajuste le centrage */
-    transition: opacity 0.2s ease-in-out;
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  transform: translateX(90%); /* Ajuste le centrage */
+  transition: opacity 0.2s ease-in-out;
 }

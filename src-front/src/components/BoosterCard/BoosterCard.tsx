@@ -33,7 +33,11 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
         className={styles.boostercard}
         onClick={() => handleImageClick("butternut")}
       >
-        <img src={butternutImage} alt="Butternut" className={styles.boosterImage} />
+        <img
+          src={butternutImage}
+          alt="Butternut"
+          className={styles.boosterImage}
+        />
       </div>
 
       {/* Carte centrale - Beetroot */}
@@ -41,7 +45,11 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
         className={styles.boostercard}
         onClick={() => handleImageClick("beetroot")}
       >
-        <img src={beetrootImage} alt="Beetroot" className={styles.boosterImage} />
+        <img
+          src={beetrootImage}
+          alt="Beetroot"
+          className={styles.boosterImage}
+        />
       </div>
 
       {/* Carte droite - Carrot */}
@@ -58,8 +66,8 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
           visibleStats === "butternut" && !animating
             ? styles.show
             : animating && visibleStats === "butternut"
-            ? styles.hide
-            : ""
+              ? styles.hide
+              : ""
         }`}
       >
         {visibleStats === "butternut" && (
@@ -76,8 +84,8 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
           visibleStats === "beetroot" && !animating
             ? styles.show
             : animating && visibleStats === "beetroot"
-            ? styles.hide
-            : ""
+              ? styles.hide
+              : ""
         }`}
       >
         {visibleStats === "beetroot" && (
@@ -94,8 +102,8 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
           visibleStats === "carrot" && !animating
             ? styles.show
             : animating && visibleStats === "carrot"
-            ? styles.hide
-            : ""
+              ? styles.hide
+              : ""
         }`}
       >
         {visibleStats === "carrot" && (
