@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Stage, Text } from '@pixi/react';
-import * as PIXI from 'pixi.js';
+import React, { useState, useEffect } from "react";
+import { Stage, Text } from "@pixi/react";
+import * as PIXI from "pixi.js";
 
 interface WordPosition {
   text: string;
@@ -15,15 +15,14 @@ interface WordCloudProps {
 }
 
 const WordCloud: React.FC<WordCloudProps> = ({
-  words = [], 
-  width = 800, 
-  height = 600 
+  words = [],
+  width = 800,
+  height = 600,
 }) => {
-  
   const [wordPositions, setWordPositions] = useState<WordPosition[]>([]);
 
   useEffect(() => {
-    const positions: WordPosition[] = words.map(word => ({
+    const positions: WordPosition[] = words.map((word) => ({
       text: word,
       x: Math.random() * (width - 100), // Subtracting 100 to keep words within bounds
       y: Math.random() * (height - 30), // Subtracting 30 to keep words within bounds
@@ -31,19 +30,20 @@ const WordCloud: React.FC<WordCloudProps> = ({
     setWordPositions(positions);
   }, [words, width, height]);
 
-  function moveWord(wordToMove:WordPosition, dx:number, dy:number){
-    setWordPositions(prevPositions => prevPositions.map(word => 
-        word === wordToMove 
+  function moveWord(wordToMove: WordPosition, dx: number, dy: number) {
+    setWordPositions((prevPositions) =>
+      prevPositions.map((word) =>
+        word === wordToMove
           ? { ...word, x: word.x + dx, y: word.y + dy }
-          : word
-      )
+          : word,
+      ),
     );
   }
 
   return (
     <Stage width={width} height={height} options={{ background: 0x1099bb }}>
       {wordPositions.map((word, index) => (
-        <Text 
+        <Text
           key={index}
           text={word.text}
           x={word.x}
@@ -52,7 +52,6 @@ const WordCloud: React.FC<WordCloudProps> = ({
             new PIXI.TextStyle({
               fill: 0xffffff,
               fontSize: 20,
-              
             })
           }
           interactive={true}
@@ -63,9 +62,15 @@ const WordCloud: React.FC<WordCloudProps> = ({
   );
 };
 
-
 function App() {
-  const words = ['React', 'JavaScript', 'PixiJS', 'WordCloud', 'Dynamic', 'Random'];
+  const words = [
+    "React",
+    "JavaScript",
+    "PixiJS",
+    "WordCloud",
+    "Dynamic",
+    "Random",
+  ];
 
   return (
     <div className="App">

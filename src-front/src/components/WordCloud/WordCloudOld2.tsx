@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Application, Text } from 'pixi.js';
-import * as PIXI from 'pixi.js';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Application, Text } from "pixi.js";
+import * as PIXI from "pixi.js";
 
 interface Word {
   text: string;
@@ -22,29 +22,50 @@ export default function WordCloud() {
 
     if (refContainer.current) {
       await app.init({
-        background: '#1099bb',
+        background: "#1099bb",
         resizeTo: refContainer.current,
         width: containerSize.width,
-        height: containerSize.height
+        height: containerSize.height,
       });
     }
     app.canvas.id = "pixi-canvas";
-    
+
     if (refCanvas.current) {
       refCanvas.current.appendChild(app.canvas);
     }
 
     wordsRef.current = [
-      { text: "React", x: 100, y: 100, vecX: 1, vecY: 1, pixiText: new PIXI.Text("React") },
-      { text: "PIXI.js", x: 200, y: 200, vecX: -1, vecY: 1, pixiText: new PIXI.Text("PIXI.js") },
-      { text: "TypeScript", x: 300, y: 300, vecX: 1, vecY: -1, pixiText: new PIXI.Text("TypeScript") }
+      {
+        text: "React",
+        x: 100,
+        y: 100,
+        vecX: 1,
+        vecY: 1,
+        pixiText: new PIXI.Text("React"),
+      },
+      {
+        text: "PIXI.js",
+        x: 200,
+        y: 200,
+        vecX: -1,
+        vecY: 1,
+        pixiText: new PIXI.Text("PIXI.js"),
+      },
+      {
+        text: "TypeScript",
+        x: 300,
+        y: 300,
+        vecX: 1,
+        vecY: -1,
+        pixiText: new PIXI.Text("TypeScript"),
+      },
     ];
 
-    wordsRef.current.forEach(word => {
+    wordsRef.current.forEach((word) => {
       word.pixiText.style = {
-        fontFamily: 'Arial',
+        fontFamily: "Arial",
         fontSize: 24,
-        fill: 0xffffff
+        fill: 0xffffff,
       };
       word.pixiText.position.set(word.x, word.y);
       app.stage.addChild(word.pixiText);
@@ -53,7 +74,7 @@ export default function WordCloud() {
     app.ticker.add((time) => {
       let centerX = containerSize.width / 2;
       let centerY = containerSize.height / 2;
-      wordsRef.current.forEach(word => {
+      wordsRef.current.forEach((word) => {
         word.vecX = word.x - centerX;
         word.vecY = word.y - centerY;
 
@@ -88,7 +109,7 @@ export default function WordCloud() {
       if (refContainer.current) {
         setContainerSize({
           width: refContainer.current.clientWidth,
-          height: refContainer.current.clientHeight
+          height: refContainer.current.clientHeight,
         });
       }
     };

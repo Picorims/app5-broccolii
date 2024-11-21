@@ -1,5 +1,8 @@
 export class Vector {
-  constructor(public x: number, public y: number) {
+  constructor(
+    public x: number,
+    public y: number,
+  ) {
     this.x = x;
     this.y = y;
   }
@@ -9,7 +12,7 @@ export class Vector {
   }
 
   mult(coef: number): Vector {
-    return new Vector(this.x*coef, this.y*coef);
+    return new Vector(this.x * coef, this.y * coef);
   }
 }
 
@@ -18,18 +21,28 @@ export interface Point {
   y: number;
 }
 
+export function calculateVec(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  coef: number,
+) {
+  let x = (x2 - x1) * coef;
+  let y = (y2 - y1) * coef;
 
-
-export function calculateVec(x1: number, y1: number, x2: number, y2: number, coef: number) {
-  let x = (x2 - x1)*coef;
-  let y = (y2 - y1)*coef;
-  
   let res = new Vector(x, y);
-  
+
   return res;
 }
 
-export function calculateVecSquared(x1: number, y1: number, x2: number, y2: number, coef: number) {
+export function calculateVecSquared(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  coef: number,
+) {
   const dx = x2 - x1;
   const dy = y2 - y1;
   const distanceSquared = dx * dx + dy * dy;
@@ -43,15 +56,15 @@ export function calculateVecSquared(x1: number, y1: number, x2: number, y2: numb
   if (distanceSquared > repulsionRadius * repulsionRadius) {
     return new Vector(0, 0);
   }
-  
+
   const distance = Math.sqrt(distanceSquared);
-  
+
   // Calculate repulsion force (increases as objects get closer)
   const forceMagnitude = coef * (1 - distance / repulsionRadius);
-  
+
   // Calculate force components (negative to repel)
   const fx = -(dx / distance) * forceMagnitude;
   const fy = -(dy / distance) * forceMagnitude;
-  
+
   return new Vector(fx, fy);
 }
