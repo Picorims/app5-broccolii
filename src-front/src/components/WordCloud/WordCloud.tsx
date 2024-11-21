@@ -1,27 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Application } from 'pixi.js';
 import * as PIXI from 'pixi.js';
+import { Vector, Point, calculateVec, calculateVecSquared } from '../../lib/vectorsUtility';
 
 interface Word {
   text: string;
   position: Vector;
   speed: Vector;
-  pixiText: PIXI.Text
+  pixiText: PIXI.Text;
+  mass: number;
 }
 
-class Vector {
-  constructor(public x: number, public y: number) {}
+function addWord() {
+  //TODO code this function
 
-  add(other: Vector): Vector {
-    return new Vector(this.x + other.x, this.y + other.y);
-  }
 }
-
-interface Point {
-  x: number;
-  y: number;
-}
-
 
 export default function WordCloud() {
   const refCanvas = useRef<HTMLDivElement>(null);
@@ -34,27 +27,20 @@ export default function WordCloud() {
     let center:Point = {x: containerSize.width/2, y: containerSize.width/2}
     
     //calculate the speed caused by the center gravity
-    //word.speed = {x: center.x - word.position.x, y: center.y - word.position.y}
-    console.log("before : " + word.speed.x);
-    word.speed = calculateVec(center.x, word.position.x, center.y, word.position.y, 100)
-    console.log("after  : " + word.speed.x);
+    let centerForce = calculateVec(word.position.x, word.position.y, center.x, center.y, 0.5*word.mass);
+    word.speed = centerForce;
     
-    console.log("SEXE");
-    
+    //add the speed caused by the gravity of the other words
     refWords.current.forEach(currWord => {
       if (currWord != word) {
-        word.speed = calculateVec(word.position.x, word.position.y, currWord.position.x, currWord.position.y, 0.3);
+        let interForce = calculateVecSquared(word.position.x, word.position.y, currWord.position.x, currWord.position.y, 500)
+        
+        word.speed = word.speed.add(interForce);
+        
       }
     });
-    return word;
-  }
-  
 
-  function calculateVec(x1: number, y1: number, x2: number, y2: number, coef: number) {
-    let x = (x2 - x1)*coef;
-    let y = (y2 - y1)*coef;
-    let res = new Vector(x, y)
-    return res;
+    return word;
   }
 
   const init = useCallback(async () => {
@@ -75,9 +61,14 @@ export default function WordCloud() {
     }
 
     refWords.current = [
-      { text: "word1", position: new Vector(100, 100), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "React"}) },
-      { text: "word2", position: new Vector(200, 200), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "PIXI.js"}) },
-      { text: "word3", position: new Vector(300, 300), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "TypeScript"}) }
+      { text: "", position: new Vector(100, 200), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "word1"}), mass:10 },
+      { text: "", position: new Vector(300, 100), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "word2"}), mass:11 },
+      { text: "", position: new Vector(500, 200), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "word3"}), mass:12 },
+      { text: "", position: new Vector(500, 300), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "word4"}), mass:13 },
+      { text: "", position: new Vector(400, 500), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "word5"}), mass:14 },
+      { text: "", position: new Vector(300, 600), speed: new Vector(0, 0), pixiText: new PIXI.Text({text: "word6"}), mass:15 },
+      
+      
     ];
     
     refWords.current.forEach(word => {
@@ -92,17 +83,16 @@ export default function WordCloud() {
     
     
 
-
+    //render loop
     app.ticker.add((time) => {
 
       refWords.current.forEach(word => {
-        //calculate the speed vectors of words
+        //update the speed of words
         word = updateSpeed(word);
 
-        //update position of words
-        word.position.x += word.speed.x*time.deltaTime * 0.01;
-        word.position.y += word.speed.y*time.deltaTime * 0.01;
-
+        //update the position of words
+        word.position = word.position.add(word.speed.mult(time.deltaTime * 0.01))
+        
         word.pixiText.position.set(word.position.x, word.position.y);
       });
     });
