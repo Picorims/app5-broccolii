@@ -72,8 +72,8 @@ export default function WordCloud() {
     });
 
     app.ticker.add((time) => {
-      let centerX = containerSize.width / 2;
-      let centerY = containerSize.height / 2;
+      const centerX = containerSize.width / 2;
+      const centerY = containerSize.height / 2;
       wordsRef.current.forEach((word) => {
         word.vecX = word.x - centerX;
         word.vecY = word.y - centerY;

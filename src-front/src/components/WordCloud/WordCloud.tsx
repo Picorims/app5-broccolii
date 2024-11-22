@@ -21,7 +21,7 @@ export default function WordCloud() {
   const refContainer = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const refWords = useRef<Word[]>([]);
-  let [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState("");
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setInputValue(event.target.value);
@@ -33,13 +33,13 @@ export default function WordCloud() {
   }
 
   function updateSpeed(word: Word) {
-    let center: Point = {
+    const center: Point = {
       x: containerSize.width / 2,
       y: containerSize.width / 2,
     };
 
     //calculate the speed caused by the center gravity
-    let centerForce = calculateVec(
+    const centerForce = calculateVec(
       word.position.x,
       word.position.y,
       center.x,
@@ -51,7 +51,7 @@ export default function WordCloud() {
     //add the speed caused by the gravity of the other words
     refWords.current.forEach((currWord) => {
       if (currWord != word) {
-        let interForce = calculateVecSquared(
+        const interForce = calculateVecSquared(
           word.position.x,
           word.position.y,
           currWord.position.x,

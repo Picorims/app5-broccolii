@@ -28,10 +28,10 @@ export function calculateVec(
   y2: number,
   coef: number,
 ) {
-  let x = (x2 - x1) * coef;
-  let y = (y2 - y1) * coef;
+  const x = (x2 - x1) * coef;
+  const y = (y2 - y1) * coef;
 
-  let res = new Vector(x, y);
+  const res = new Vector(x, y);
 
   return res;
 }
