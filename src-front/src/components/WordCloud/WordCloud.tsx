@@ -32,38 +32,39 @@ export default function WordCloud() {
     refWords.current.splice(index, 1);
   }
 
-  function updateSpeed(word: Word) {
-    const center: Point = {
-      x: containerSize.width / 2,
-      y: containerSize.width / 2,
-    };
+  const updateSpeed = useCallback(
+    (word: Word) => {
+      const center: Point = {
+        x: containerSize.width / 2,
+        y: containerSize.width / 2,
+      };
 
-    //calculate the speed caused by the center gravity
-    const centerForce = calculateVec(
-      word.position.x,
-      word.position.y,
-      center.x,
-      center.y,
-      0.5 * word.mass,
-    );
-    word.speed = centerForce;
+      const centerForce = calculateVec(
+        word.position.x,
+        word.position.y,
+        center.x,
+        center.y,
+        0.5 * word.mass,
+      );
+      word.speed = centerForce;
 
-    //add the speed caused by the gravity of the other words
-    refWords.current.forEach((currWord) => {
-      if (currWord != word) {
-        const interForce = calculateVecSquared(
-          word.position.x,
-          word.position.y,
-          currWord.position.x,
-          currWord.position.y,
-          500,
-        );
-        word.speed = word.speed.add(interForce);
-      }
-    });
+      refWords.current.forEach((currWord) => {
+        if (currWord != word) {
+          const interForce = calculateVecSquared(
+            word.position.x,
+            word.position.y,
+            currWord.position.x,
+            currWord.position.y,
+            500,
+          );
+          word.speed = word.speed.add(interForce);
+        }
+      });
 
-    return word;
-  }
+      return word;
+    },
+    [containerSize],
+  );
 
   const init = useCallback(async () => {
     const app = new Application();
@@ -153,19 +154,20 @@ export default function WordCloud() {
     });
 
     return app;
-  }, [containerSize]);
+  }, [containerSize, updateSpeed]);
 
   //cleanup function that erases the canvas when the page unmounts
   useEffect(() => {
     const app = init();
+    const currentRefCanvas = refCanvas.current;
 
     return () => {
       app.then((appV) => {
         appV.destroy();
-        if (refCanvas.current) {
-          const canvas = refCanvas.current.querySelector("#pixi-canvas");
+        if (currentRefCanvas) {
+          const canvas = currentRefCanvas.querySelector("#pixi-canvas");
           if (canvas) {
-            refCanvas.current.removeChild(canvas);
+            currentRefCanvas.removeChild(canvas);
           }
         }
       });
@@ -190,14 +192,6 @@ export default function WordCloud() {
   }, []);
 
   //function that tracks the keypresses
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-    };
-  }, []);
-
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       if (event.code === "Enter") {
