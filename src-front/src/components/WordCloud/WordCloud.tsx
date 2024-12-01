@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Application } from "pixi.js";
 import * as PIXI from "pixi.js";
+import './WordCloud.css'
+
 import {
   Vector,
   Point,
@@ -8,12 +10,41 @@ import {
   calculateVecSquared,
 } from "../../lib/vectorsUtility";
 
-interface Word {
-  text: string;
-  position: Vector;
-  speed: Vector;
-  pixiText: PIXI.Text;
-  mass: number;
+class Word {
+  private pixiText: PIXI.Text;
+  public speed: Vector;
+
+  constructor(
+    private text: string,
+    private position: Point,
+    public mass: number
+  ) {
+    this.pixiText = new PIXI.Text({ text: text })
+    this. speed = new Vector(0, 0);
+  }
+
+  setText(word: string) {
+    this.text = word;
+    this.pixiText.text = word;
+  }
+  
+  getText() {
+    return this.text;
+  }
+  
+  getPixiText() {
+    return this.pixiText;
+  }
+
+  getPosition() {
+    return this.position;
+  }
+
+  setPosition(position: Point) {
+    this.position = position;
+    this.pixiText.position.set(this.position.x, this.position.y);
+  }
+  
 }
 
 export default function WordCloud() {
@@ -28,20 +59,28 @@ export default function WordCloud() {
   }
 
   function deleteWord(index: number) {
-    refWords.current[index].pixiText.removeFromParent();
+    refWords.current[index].getPixiText().removeFromParent();
     refWords.current.splice(index, 1);
+  }
+
+  function addWord(word: Word) {
+    refWords.current.push(word);
+  }
+
+  function clearWords() {
+    refWords.current.forEach(word => {
+      word.getPixiText().removeFromParent();
+    });
+    refWords.current = [];
   }
 
   const updateSpeed = useCallback(
     (word: Word) => {
-      const center: Point = {
-        x: containerSize.width / 2,
-        y: containerSize.width / 2,
-      };
+      const center = new Point(containerSize.width / 2, containerSize.height / 2);
 
       const centerForce = calculateVec(
-        word.position.x,
-        word.position.y,
+        word.getPosition().x,
+        word.getPosition().y,
         center.x,
         center.y,
         0.5 * word.mass,
@@ -51,10 +90,10 @@ export default function WordCloud() {
       refWords.current.forEach((currWord) => {
         if (currWord != word) {
           const interForce = calculateVecSquared(
-            word.position.x,
-            word.position.y,
-            currWord.position.x,
-            currWord.position.y,
+            word.getPosition().x,
+            word.getPosition().y,
+            currWord.getPosition().x,
+            currWord.getPosition().y,
             500,
           );
           word.speed = word.speed.add(interForce);
@@ -68,7 +107,7 @@ export default function WordCloud() {
 
   const init = useCallback(async () => {
     const app = new Application();
-
+    
     if (refContainer.current) {
       await app.init({
         background: "#1099bb",
@@ -83,59 +122,25 @@ export default function WordCloud() {
       refCanvas.current.appendChild(app.canvas);
     }
 
-    refWords.current = [
-      {
-        text: "",
-        position: new Vector(100, 200),
-        speed: new Vector(0, 0),
-        pixiText: new PIXI.Text({ text: "word1" }),
-        mass: 10,
-      },
-      {
-        text: "",
-        position: new Vector(300, 100),
-        speed: new Vector(0, 0),
-        pixiText: new PIXI.Text({ text: "word2" }),
-        mass: 11,
-      },
-      {
-        text: "",
-        position: new Vector(500, 200),
-        speed: new Vector(0, 0),
-        pixiText: new PIXI.Text({ text: "word3" }),
-        mass: 12,
-      },
-      {
-        text: "",
-        position: new Vector(500, 300),
-        speed: new Vector(0, 0),
-        pixiText: new PIXI.Text({ text: "word4" }),
-        mass: 13,
-      },
-      {
-        text: "",
-        position: new Vector(400, 500),
-        speed: new Vector(0, 0),
-        pixiText: new PIXI.Text({ text: "word5" }),
-        mass: 14,
-      },
-      {
-        text: "",
-        position: new Vector(300, 600),
-        speed: new Vector(0, 0),
-        pixiText: new PIXI.Text({ text: "word6" }),
-        mass: 15,
-      },
-    ];
 
+    clearWords(); //deletes words from previous renders
+    let canvasSizeX = containerSize.width;
+    let canvasSizeY = containerSize.height;
+
+    let weightDisparity = 5;
+    for (let i = 0; i < 30; i++) {
+      addWord(new Word("word" + i, new Point(Math.random()*canvasSizeX, Math.random()*canvasSizeY), 10 + weightDisparity*Math.random()));
+      
+    }
+    
     refWords.current.forEach((word) => {
-      word.pixiText.style = {
+      word.getPixiText().style = {  //TODO replace by a new class method setStyle ?
         fontFamily: "Arial",
         fontSize: 24,
         fill: 0xffffff,
       };
-      word.pixiText.position.set(word.position.x, word.position.y);
-      app.stage.addChild(word.pixiText);
+      word.setPosition(new Vector(word.getPosition().x, word.getPosition().y));
+      app.stage.addChild(word.getPixiText());
     });
 
     //render loop
@@ -145,11 +150,7 @@ export default function WordCloud() {
         word = updateSpeed(word);
 
         //update the position of words
-        word.position = word.position.add(
-          word.speed.mult(time.deltaTime * 0.01),
-        );
-
-        word.pixiText.position.set(word.position.x, word.position.y);
+        word.setPosition(word.getPosition().add(word.speed.mult(time.deltaTime * 0.01)));
       });
     });
 
@@ -160,7 +161,7 @@ export default function WordCloud() {
   useEffect(() => {
     const app = init();
     const currentRefCanvas = refCanvas.current;
-
+    
     return () => {
       app.then((appV) => {
         appV.destroy();
@@ -191,13 +192,14 @@ export default function WordCloud() {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
-  //function that tracks the keypresses
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       if (event.code === "Enter") {
-        for (let i = 0; i < refWords.current.length; i++) {
+        
+        for (let i = refWords.current.length-1; i >= 0; i--) {
           const word = refWords.current[i];
-          if (word.pixiText.text === inputValue) {
+          
+          if (word.getText() === inputValue) {
             deleteWord(i);
             setInputValue("");
           }
@@ -207,6 +209,7 @@ export default function WordCloud() {
     [inputValue],
   );
 
+  //function that tracks the keypresses
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
 
@@ -219,7 +222,11 @@ export default function WordCloud() {
     <>
       <div
         ref={refContainer}
-        style={{ width: "700px", height: "700px", position: "relative" }}
+        style={{ 
+          width: "100vw",
+          height: "100vh",
+          position: "relative", // Keeps input positioned correctly
+        }}
       >
         <div ref={refCanvas}></div>
         <input
