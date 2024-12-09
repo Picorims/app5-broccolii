@@ -33,5 +33,5 @@ export const router = createBrowserRouter([
   {
     path: "/ws",
     element: <TempWebSocketFight />,
-  }
+  },
 ]);

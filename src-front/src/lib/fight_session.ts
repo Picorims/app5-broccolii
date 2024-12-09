@@ -15,7 +15,14 @@ type ClientEvent =
   | "submitLetter"
   | "submitEraseLetter"
   | "submit";
-type ServerEvent = "sendGameState" | "error" | "wordsFound" | "scoresUpdated" | "acknowledgeLetter" | "acknowledgeLetterErased" | "acknowledgeSubmit";
+type ServerEvent =
+  | "sendGameState"
+  | "error"
+  | "wordsFound"
+  | "scoresUpdated"
+  | "acknowledgeLetter"
+  | "acknowledgeLetterErased"
+  | "acknowledgeSubmit";
 type EventType = ClientEvent | ServerEvent;
 
 interface BaseEventParams {
@@ -46,30 +53,30 @@ interface ErrorResponse {
 }
 
 interface GameStateResponse {
-    scores: Record<string, number>;
-    availableWords: string[];
-    wordsBestProgress: Record<string, number>;
-    gameEndEpoch: number;
+  scores: Record<string, number>;
+  availableWords: string[];
+  wordsBestProgress: Record<string, number>;
+  gameEndEpoch: number;
 }
 
 interface AcknowledgeLetterResponse {
-    accepted: boolean;
-    currentState: string;
+  accepted: boolean;
+  currentState: string;
 }
 
 type AcknowledgeLetterErasedResponse = AcknowledgeLetterResponse;
 
 interface AcknowledgeSubmitResponse {
-    success: boolean;
-    testedState: string;
+  success: boolean;
+  testedState: string;
 }
 
 interface WordsFoundResponse {
-    words: string[];
+  words: string[];
 }
 
 interface scoresUpdatedResponse {
-    scores: Record<string, number>;
+  scores: Record<string, number>;
 }
 
 /**
@@ -84,9 +91,14 @@ export class FightSession {
   private onError: (msg: string) => void = () => {};
   private onWordsFound: (words: string[]) => void = () => {};
   private onScoresUpdated: (scores: Record<string, number>) => void = () => {};
-  private onAcknowledgeLetter: (accepted: boolean, currentState: string) => void =
-    () => {};
-  private onAcknowledgeLetterErased: (accepted: boolean, currentState: string) => void = () => {};
+  private onAcknowledgeLetter: (
+    accepted: boolean,
+    currentState: string,
+  ) => void = () => {};
+  private onAcknowledgeLetterErased: (
+    accepted: boolean,
+    currentState: string,
+  ) => void = () => {};
   private onAcknowledgeSubmit: (success: boolean, testedState: string) => void =
     () => {};
 
@@ -177,31 +189,31 @@ export class FightSession {
         this.onSendGameState(payload);
         break;
       }
-        case "wordsFound": {
-            const payload = e as unknown as WordsFoundResponse;
-            this.onWordsFound(payload.words);
-            break;
-        }
-        case "scoresUpdated": {
-            const payload = e as unknown as scoresUpdatedResponse;
-            this.onScoresUpdated(payload.scores);
-            break;
-        }
-        case "acknowledgeLetter": {
-            const payload = e as unknown as AcknowledgeLetterResponse;
-            this.onAcknowledgeLetter(payload.accepted, payload.currentState);
-            break;
-        }
-        case "acknowledgeLetterErased": {
-            const payload = e as unknown as AcknowledgeLetterErasedResponse;
-            this.onAcknowledgeLetterErased(payload.accepted, payload.currentState);
-            break;
-        }
-        case "acknowledgeSubmit": {
-            const payload = e as unknown as AcknowledgeSubmitResponse;
-            this.onAcknowledgeSubmit(payload.success, payload.testedState);
-            break;
-        }
+      case "wordsFound": {
+        const payload = e as unknown as WordsFoundResponse;
+        this.onWordsFound(payload.words);
+        break;
+      }
+      case "scoresUpdated": {
+        const payload = e as unknown as scoresUpdatedResponse;
+        this.onScoresUpdated(payload.scores);
+        break;
+      }
+      case "acknowledgeLetter": {
+        const payload = e as unknown as AcknowledgeLetterResponse;
+        this.onAcknowledgeLetter(payload.accepted, payload.currentState);
+        break;
+      }
+      case "acknowledgeLetterErased": {
+        const payload = e as unknown as AcknowledgeLetterErasedResponse;
+        this.onAcknowledgeLetterErased(payload.accepted, payload.currentState);
+        break;
+      }
+      case "acknowledgeSubmit": {
+        const payload = e as unknown as AcknowledgeSubmitResponse;
+        this.onAcknowledgeSubmit(payload.success, payload.testedState);
+        break;
+      }
     }
   }
 
@@ -217,10 +229,14 @@ export class FightSession {
   onScoresUpdatedThen(f: (scores: Record<string, number>) => void) {
     this.onScoresUpdated = f;
   }
-  onAcknowledgeLetterThen(f: (accepted: boolean, currentState: string) => void) {
+  onAcknowledgeLetterThen(
+    f: (accepted: boolean, currentState: string) => void,
+  ) {
     this.onAcknowledgeLetter = f;
   }
-  onAcknowledgeLetterErasedThen(f: (accepted: boolean, currentState: string) => void) {
+  onAcknowledgeLetterErasedThen(
+    f: (accepted: boolean, currentState: string) => void,
+  ) {
     this.onAcknowledgeLetterErased = f;
   }
   onAcknowledgeSubmitThen(f: (success: boolean, testedState: string) => void) {
