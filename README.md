@@ -36,6 +36,11 @@ py -m venv env
 py -m pip install -r requirements.txt
 ```
 
+- Launch the server:
+```
+fastapi run ./app/main.py
+```
+
 - Deactivate the environment:
 ```
 deactivate
