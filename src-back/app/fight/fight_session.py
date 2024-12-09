@@ -116,6 +116,7 @@ class FightSession():
         self._players_typing_history[userID].append(letter)
         currentState = "".join(self._players_typing_history[userID])
         await websocket.send_text(build_json_event("acknowledgeLetter", {"accepted": True, "currentState": currentState }))
+        await self._update_words_best_progress()
         
     async def _handle_erase_letter(self, websocket: WebSocket, userID: str):
         if len(self._players_typing_history[userID]) <= 0:
@@ -125,6 +126,7 @@ class FightSession():
         self._players_typing_history[userID].pop()
         currentState = "".join(self._players_typing_history[userID])
         await websocket.send_text(build_json_event("acknowledgeLetterErased", {"accepted": True, "currentState": currentState }))
+        await self._update_words_best_progress()
         
     async def _handle_submit_word(self, websocket: WebSocket, userID: str):
         currentState = "".join(self._players_typing_history[userID])
@@ -133,7 +135,8 @@ class FightSession():
             self._words_found.append(currentState)
             self._words_to_find.remove(currentState)
             self._scores[userID] += 1
-            self._word_best_progress.pop(currentState, None)
+            self._players_typing_history[userID] = []
+            self._update_words_best_progress()
             await self._broadcast(build_json_event("wordsFound", {"words": [currentState]} ))
             await self._broadcast(build_json_event("scoresUpdated", {"scores": {player: score for player, score in self._scores.items()}}))
             success = True
@@ -148,6 +151,18 @@ class FightSession():
     async def _broadcast(self, msg: str):
         for _, session in self._players_sessions.items():
             await session.send_text(msg)
+            
+    async def _update_words_best_progress(self):
+        self._word_best_progress = {}
+        for player_progress in self._players_typing_history:
+            if (len(player_progress) > 0):
+                for word in self._words_to_find:
+                    if len(word) >= len(player_progress):
+                        if word.startswith(player_progress):
+                            current_best = self._word_best_progress.get(word, 0)
+                            new_best = max(current_best, len(player_progress))
+                            self._word_best_progress[word] = new_best
+        await self._broadcast(build_json_event("sendWordsBestProgress", {"words": self._word_best_progress}))
     
     
         
