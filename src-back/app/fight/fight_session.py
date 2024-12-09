@@ -21,6 +21,7 @@ class FightSession():
         self._fight_id = fight_id
         self._players = [player for player in player_list]
         self._players_sessions = {}
+        self._players_typing_history = {player: [] for player in player_list}
         self._scores = {player: 0 for player in player_list}
         self._words_to_find = ["word", "broccoli", "tomato", "bee", "beekeeper"]
         self._words_found = []
@@ -96,7 +97,10 @@ class FightSession():
         
         if event["type"] == "requestGameState":
             await self._handle_request_game_state(websocket)
-            
+        elif event["type"] == "submitLetter":
+            await self._handle_submit_letter(websocket, event["userID"], event["letter"])
+        else:
+            await self._send_error_event(websocket, "Unknown event type.")
         return True
             
     async def _handle_request_game_state(self, websocket: WebSocket):
@@ -108,12 +112,43 @@ class FightSession():
         
         await websocket.send_text(build_json_event("sendGameState", state))
         
+    async def _handle_submit_letter(self, websocket: WebSocket, userID: str, letter: str):
+        self._players_typing_history[userID].append(letter)
+        currentState = "".join(self._players_typing_history[userID])
+        await websocket.send_text(build_json_event("acknowledgeLetter", {"accepted": True, "currentState": currentState }))
+        
+    async def _handle_erase_letter(self, websocket: WebSocket, userID: str):
+        if len(self._players_typing_history[userID]) <= 0:
+            await self._send_error_event(websocket, "No letter to erase.")
+            return
+        
+        self._players_typing_history[userID].pop()
+        currentState = "".join(self._players_typing_history[userID])
+        await websocket.send_text(build_json_event("acknowledgeLetterErased", {"accepted": True, "currentState": currentState }))
+        
+    async def _handle_submit_word(self, websocket: WebSocket, userID: str):
+        currentState = "".join(self._players_typing_history[userID])
+        success = False
+        if currentState in self._words_to_find:
+            self._words_found.append(currentState)
+            self._words_to_find.remove(currentState)
+            self._scores[userID] += 1
+            self._word_best_progress.pop(currentState, None)
+            await self._broadcast(build_json_event("wordsFound", {"words": [currentState]} ))
+            await self._broadcast(build_json_event("scoresUpdated", {"scores": {player: score for player, score in self._scores.items()}}))
+            success = True
+        await websocket.send_text(build_json_event("acknowledgeSubmit", {"accepted": success, "testedState": currentState}))
+        
     async def _send_error_event(self, websocket: WebSocket, msg: str):
         response = {}
         response["message"] = msg
         event = build_json_event("error", response)
         await websocket.send_text(event)
             
+    async def _broadcast(self, msg: str):
+        for _, session in self._players_sessions.items():
+            await session.send_text(msg)
+    
     
         
 sessions["test"] = FightSession("test", ["alice", "bob"])

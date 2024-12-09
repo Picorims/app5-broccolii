@@ -13,6 +13,10 @@ import { FightSession } from "../../lib/fight_session"
 export default function TempWebSocketFight() {
     const fightSession = useRef<FightSession | null>(null);
     const [error, setError] = useState("");
+    const [scores, setScores] = useState<Record<string, number>>({});
+    const [availableWords, setAvailableWords] = useState<string[]>([]);
+    const [wordsBestProgress, setWordsBestProgress] = useState<Record<string, number>>({});
+    const [gameEndEpoch, setGameEndEpoch] = useState(0);
 
     useEffect(() => {
         setError("");
@@ -25,7 +29,29 @@ export default function TempWebSocketFight() {
         const session = fightSession.current;
         session.onErrorThen((err) => {
             setError(err);
-        })
+        });
+        session.onSendGameStateThen((state) => {
+            console.log("Received state", state);
+            setScores(state.scores);
+            setAvailableWords(state.availableWords);
+            setWordsBestProgress(state.wordsBestProgress);
+            setGameEndEpoch(state.gameEndEpoch);
+        });
+        session.onAcknowledgeLetterThen((accepted, currentState) => {
+            console.log("Letter acknowledged", accepted, currentState);
+        });
+        session.onAcknowledgeLetterErasedThen((accepted, currentState) => {
+            console.log("Letter erased acknowledged", accepted, currentState);
+        });
+        session.onAcknowledgeSubmitThen((success, testedState) => {
+            console.log("Submit acknowledged", success, testedState);
+        });
+        session.onWordsFoundThen((words) => {
+            console.log("Words found", words);
+        });
+        session.onScoresUpdatedThen((scores) => {
+            console.log("Scores updated", scores);
+        });
 
         return () => {
             fightSession.current?.close();
