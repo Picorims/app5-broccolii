@@ -13,6 +13,12 @@ npm ci # like install, but install the exact same versions as the initial instal
 npm run dev -- --open
 ```
 
+#### Formatting
+```bash
+npm run lint
+npm run format
+```
+
 ### Back
 
 Requirements:
@@ -51,6 +57,12 @@ deactivate
 after installation or updates, do:
 ```
 py -m pip freeze > requirements.txt
+```
+
+#### Formatting
+```bash
+flake8 .
+black .
 ```
 
 ## Creating a new version
