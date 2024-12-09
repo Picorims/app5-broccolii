@@ -43,7 +43,8 @@ class FightSession:
         self._players_sessions.pop(name, None)
 
     async def close_if_player_not_allowed(self, name, websocket):
-        """If the player is allowed, do nothing and return False. Otherwise, send an error and close the connection, and return True.
+        """If the player is allowed, do nothing and return False.
+        Otherwise, send an error and close the connection, and return True.
 
         Args:
             name (string): userID
@@ -73,11 +74,11 @@ class FightSession:
         Returns:
             bool: if the websocket was closed.
         """
-        if f"type" not in event:
+        if "type" not in event:
             raise Exception("Non existent type.")
-        if f"fightID" not in event:
+        if "fightID" not in event:
             raise Exception("Missing fight ID")
-        if f"userID" not in event:
+        if "userID" not in event:
             raise Exception("Missing userID")
 
         if not event["fightID"] == self._fight_id:
@@ -197,7 +198,7 @@ async def websocket_endpoint(fightId, websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             data_obj = await get_json(websocket, data)
-            if not data_obj is None:
+            if data_obj is not None:
                 if fightId not in sessions:
                     print(f"Session {fightId} does not exist.")
                     payload = {}
