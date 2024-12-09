@@ -64,5 +64,17 @@ export default function TempWebSocketFight() {
             <h2>Error</h2>
             <p>{error}</p>
         </div>}
+        <p>
+            Scores: {JSON.stringify(scores)}
+        </p>
+        <p>
+            Available words: {availableWords.join(", ")}
+        </p>
+        <p>
+            Words best progress: {JSON.stringify(wordsBestProgress)}
+        </p>
+        <p>
+            Game end epoch: {gameEndEpoch}
+        </p>
     </div>
 };
