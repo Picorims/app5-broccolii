@@ -13,6 +13,12 @@ npm ci # like install, but install the exact same versions as the initial instal
 npm run dev -- --open
 ```
 
+#### Formatting
+```bash
+npm run lint
+npm run format
+```
+
 ### Back
 
 Requirements:
@@ -36,6 +42,11 @@ py -m venv env
 py -m pip install -r requirements.txt
 ```
 
+- Launch the server:
+```
+fastapi run ./app/main.py
+```
+
 - Deactivate the environment:
 ```
 deactivate
@@ -46,6 +57,12 @@ deactivate
 after installation or updates, do:
 ```
 py -m pip freeze > requirements.txt
+```
+
+#### Formatting
+```bash
+flake8 .
+black .
 ```
 
 ## Creating a new version
