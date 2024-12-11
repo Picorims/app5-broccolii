@@ -40,7 +40,7 @@ class Word {
     return this.position;
   }
 
-  setPosition(position: Point) {
+  setPosition(position: Point=new Point(0, 0)) {
     this.position = position;
     this.pixiText.position.set(this.position.x, this.position.y);
   }
@@ -128,7 +128,7 @@ export default function WordCloud() {
     let canvasSizeY = containerSize.height;
 
     let weightDisparity = 5;
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 80; i++) {
       addWord(new Word("word" + i, new Point(Math.random()*canvasSizeX, Math.random()*canvasSizeY), 10 + weightDisparity*Math.random()));
       
     }
@@ -151,6 +151,24 @@ export default function WordCloud() {
 
         //update the position of words
         word.setPosition(word.getPosition().add(word.speed.mult(time.deltaTime * 0.01)));
+
+        //handling out of bounds
+        if (word.getPosition().x < 0) {
+          word.setPosition(new Point(0, word.getPosition().y));
+          word.speed = new Vector(0, word.speed.y);
+        }
+        if (word.getPosition().y < 30) {
+          word.setPosition(new Point(word.getPosition().x, 30));
+          word.speed = new Vector(word.speed.x, 0);
+        }
+        if (word.getPosition().x > containerSize.width) {
+          word.setPosition(new Point(containerSize.width, word.getPosition().y));
+          word.speed = new Vector(0, word.speed.y);
+        }
+        if (word.getPosition().y > containerSize.height-30) {
+          word.setPosition(new Point(word.getPosition().x, containerSize.height-30));
+          word.speed = new Vector(word.speed.x, 0);
+        }
       });
     });
 
