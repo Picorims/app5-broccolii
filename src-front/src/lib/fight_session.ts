@@ -155,6 +155,8 @@ export class FightSession {
     eventType: T,
     eventPayload: Event<T>,
   ) {
+    console.log("dans sendEvent");
+    
     this.assertReady();
     const event: BaseEventParams & Event<T> = {
       type: eventType,
@@ -253,7 +255,9 @@ export class FightSession {
     this.sendEvent("submitEraseLetter", {});
   }
   submitWord() {
+    console.log("appel submit");
     this.sendEvent("submit", {});
+    
   }
 
   close() {

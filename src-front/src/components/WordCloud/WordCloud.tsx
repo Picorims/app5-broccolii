@@ -9,6 +9,7 @@ import {
   calculateVec,
   calculateVecSquared,
 } from "../../lib/vectorsUtility";
+import { FightSession } from "../../lib/fight_session";
 
 class Word {
   private pixiText: PIXI.Text;
@@ -52,6 +53,55 @@ export default function WordCloud() {
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const refWords = useRef<Word[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const [error, setError] = useState("");
+  const [scores, setScores] = useState<Record<string, number>>({});
+  const [availableWords, setAvailableWords] = useState<string[]>([]);
+  const [wordsBestProgress, setWordsBestProgress] = useState<
+    Record<string, number>
+  >({});
+  const [gameEndEpoch, setGameEndEpoch] = useState(0);
+  const fightSession = useRef<FightSession | null>(null);
+
+  //session initialization
+  useEffect(() => {
+    setError("");
+    console.log("Initializing session...");
+    fightSession.current = new FightSession("alice", "test", () => {
+      console.log("WebSocket open. Getting state...");
+      fightSession.current?.requestGameState();
+    });
+
+    const session = fightSession.current;
+    session.onErrorThen((err) => {
+      setError(err);
+    });
+    session.onSendGameStateThen((state) => {
+      console.log("Received state", state);
+      setScores(state.scores);
+      setAvailableWords(state.availableWords);
+      setWordsBestProgress(state.wordsBestProgress);
+      setGameEndEpoch(state.gameEndEpoch);
+    });
+    session.onAcknowledgeLetterThen((accepted, currentState) => {
+      console.log("Letter acknowledged", accepted, currentState);
+    });
+    session.onAcknowledgeLetterErasedThen((accepted, currentState) => {
+      console.log("Letter erased acknowledged", accepted, currentState);
+    });
+    session.onAcknowledgeSubmitThen((success, testedState) => {
+      console.log("Submit acknowledged", success, testedState);
+    });
+    session.onWordsFoundThen((words) => {
+      console.log("Words found", words);
+    });
+    session.onScoresUpdatedThen((scores) => {
+      console.log("Scores updated", scores);
+    });
+
+    return () => {
+      fightSession.current?.close();
+    };
+  }, [error]);
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setInputValue(event.target.value);
@@ -107,6 +157,7 @@ export default function WordCloud() {
     [containerSize],
   );
 
+  //WordCloud initialization
   const init = useCallback(async () => {
     const app = new Application();
 
@@ -129,7 +180,7 @@ export default function WordCloud() {
     const canvasSizeY = containerSize.height;
 
     const weightDisparity = 5;
-    for (let i = 0; i < 80; i++) {
+    /* for (let i = 0; i < 80; i++) {
       addWord(
         new Word(
           "word" + i,
@@ -137,7 +188,18 @@ export default function WordCloud() {
           10 + weightDisparity * Math.random(),
         ),
       );
-    }
+    } */
+
+
+      for (let word of availableWords) {
+        addWord(
+          new Word(
+            word,
+            new Point(Math.random() * canvasSizeX, Math.random() * canvasSizeY),
+            10 + weightDisparity * Math.random(),
+          ),
+        );
+      }
 
     refWords.current.forEach((word) => {
       word.getPixiText().style = {
@@ -230,8 +292,10 @@ export default function WordCloud() {
           const word = refWords.current[i];
 
           if (word.getText() === inputValue) {
-            deleteWord(i);
+            //deleteWord(i);
             setInputValue("");
+
+            fightSession.current?.submitWord()
           }
         }
       }
