@@ -24,9 +24,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     // const data = new FormData(e.currentTarget);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     // const login = data.get("login");
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     // const password = data.get("password");
 
     if (testWs.current) {
@@ -39,7 +37,6 @@ export default function LoginPage() {
     e.preventDefault();
 
     const data = new FormData(e.currentTarget);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     // const login = data.get("login");
     const password = data.get("password");
     const confirmPassword = data.get("confirm_password");

@@ -16,13 +16,16 @@ router = APIRouter()
 if not FRONTEND_DIST.exists():
     print("FRONTEND DIST NOT FOUND, IMPOSSIBLE TO SERVE THE FRONTEND")
 
-@router.get('/{path:path}', )
+
+@router.get(
+    "/{path:path}",
+)
 async def frontend_handler(path: str):
     fp = FRONTEND_DIST / path
     if not fp.exists() or path == "":
         fp = FRONTEND_DIST / "index.html"
     print(fp, "<<<<<<<<<<<<<<<<<<<<<<")
-    
+
     # https://developer.mozilla.org/en-US/docs/Web/HTTP/MIME_types/Common_types
     media_type = "text/html"
     if fp.suffix == ".js":
@@ -33,7 +36,7 @@ async def frontend_handler(path: str):
         media_type = "application/json"
     if fp.suffix == ".png":
         media_type = "image/png"
-    if (fp.suffix == ".jpg" or fp.suffix == ".jpeg"):
+    if fp.suffix == ".jpg" or fp.suffix == ".jpeg":
         media_type = "image/jpeg"
     if fp.suffix == ".ico":
         media_type = "image/x-icon"
@@ -41,7 +44,7 @@ async def frontend_handler(path: str):
         media_type = "image/svg+xml"
     if fp.suffix == ".woff2":
         media_type = "font/woff2"
-    
+
     print(fp.suffix)
     print(media_type, "<<<<<<<<<<<<<<<<<<<<<<")
     return responses.FileResponse(fp, media_type=media_type)
