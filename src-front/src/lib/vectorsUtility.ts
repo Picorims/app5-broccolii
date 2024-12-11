@@ -22,13 +22,12 @@ export class Vector {
 }*/
 
 export class Point {
-
   constructor(
     public x: number,
-    public y: number
+    public y: number,
   ) {}
 
-  add(vector : Vector) {
+  add(vector: Vector) {
     return new Point(this.x + vector.x, this.y + vector.y);
   }
 }
@@ -103,7 +102,8 @@ export function calculateVecSquared2(
   }
 
   // Calculate repulsion force (increases as objects get closer)
-  const forceMagnitude = coef * (1 - Math.sqrt(distanceSquared / repulsionRadiusSquared));
+  const forceMagnitude =
+    coef * (1 - Math.sqrt(distanceSquared / repulsionRadiusSquared));
 
   // Calculate force components (negative to repel)
   const factor = forceMagnitude * Math.sqrt(distanceSquared);
