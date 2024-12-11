@@ -124,10 +124,10 @@ export default function WordCloud() {
 
 
     clearWords(); //deletes words from previous renders
-    let canvasSizeX = containerSize.width;
-    let canvasSizeY = containerSize.height;
+    const canvasSizeX = containerSize.width;
+    const canvasSizeY = containerSize.height;
 
-    let weightDisparity = 5;
+    const weightDisparity = 5;
     for (let i = 0; i < 80; i++) {
       addWord(new Word("word" + i, new Point(Math.random()*canvasSizeX, Math.random()*canvasSizeY), 10 + weightDisparity*Math.random()));
       
