@@ -9,14 +9,29 @@
 
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
+import FightRoom from "./pages/FightRoom/FightRoom";
+import LoginPage from "./pages/Login/LoginPage";
+import ClickerPage from "./pages/Clicker/ClickerPage";
 
 export const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <App />,
-    },
-    {
-        path: "/about",
-        element: <h1>About</h1>,
-    }
+  {
+    path: "/",
+    element: <App />,
+  },
+  {
+    path: "/about",
+    element: <h1>About</h1>,
+  },
+  {
+    path: "/fight",
+    element: <FightRoom />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/clicker",
+    element: <ClickerPage />,
+  },
 ]);
