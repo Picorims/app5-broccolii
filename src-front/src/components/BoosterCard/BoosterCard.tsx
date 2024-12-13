@@ -24,10 +24,10 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
     [beetrootImage]: beetrootStatsImage,
     [carrotImage]: carrotStatsImage,
   };
-  
+
   const [visibleStats, setStatsVisible] = useState<string | null>(null); // Show or Hide stats
   const [animating, setAnimating] = useState<boolean>(false); // Show and Hide stats animations
-  
+
   // State to manage the current images for each card
   const initialImages = {
     booster1: emptyCardImage,
@@ -36,11 +36,13 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
   };
 
   const [cardImages, setCardImages] = useState<{ [key: string]: string }>(
-    initialImages
+    initialImages,
   );
 
   // Manage dropdown visibility for each card
-  const [dropdownVisible, setDropdownVisible] = useState<{[key: string]: boolean;}>({
+  const [dropdownVisible, setDropdownVisible] = useState<{
+    [key: string]: boolean;
+  }>({
     booster1: false,
     booster2: false,
     booster3: false,
@@ -53,7 +55,8 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
         ...prev,
         [cardName]: !prev[cardName],
       }));
-    } else { // Otherwise, toggle stats display
+    } else {
+      // Otherwise, toggle stats display
       toggleStatsVisibility(cardName);
     }
   };
@@ -71,7 +74,10 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
   };
 
   // Handle image selection from dropdown
-  const handleChooseImage = (cardName: string, imageKey: keyof typeof IMAGE_MAP) => {
+  const handleChooseImage = (
+    cardName: string,
+    imageKey: keyof typeof IMAGE_MAP,
+  ) => {
     setCardImages((prev) => ({
       ...prev,
       [cardName]: IMAGE_MAP[imageKey],
@@ -120,7 +126,9 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
                   src={IMAGE_MAP[key as keyof typeof IMAGE_MAP]}
                   alt={key}
                   className={styles.dropdownImage}
-                  onClick={() => handleChooseImage(cardName, key as keyof typeof IMAGE_MAP)}
+                  onClick={() =>
+                    handleChooseImage(cardName, key as keyof typeof IMAGE_MAP)
+                  }
                 />
               ))}
             </div>
@@ -138,8 +146,8 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
               visibleStats === cardName && !animating
                 ? styles.show
                 : animating && visibleStats === cardName
-                ? styles.hide
-                : ""
+                  ? styles.hide
+                  : ""
             }`}
           >
             {visibleStats === cardName && statsImage && (
