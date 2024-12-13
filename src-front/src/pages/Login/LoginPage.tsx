@@ -7,14 +7,17 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Button from "../../components/Button/Button";
 import Card from "../../components/Card/Card";
 import LabeledInput from "../../components/LabeledInput/LabeledInput";
 import styles from "./LoginPage.module.css";
+import { WebSocketConnection } from "../../lib/web_socket";
 
 export default function LoginPage() {
   const [registerPasswordError, setRegisterPasswordError] = useState("");
+
+  const testWs = useRef<WebSocketConnection | null>(null);
 
   const onSubmitLogin = (e: FormEvent<HTMLFormElement>) => {
     console.log("Logging in...");
@@ -25,6 +28,10 @@ export default function LoginPage() {
     const login = data.get("login");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const password = data.get("password");
+
+    if (testWs.current) {
+      testWs.current.sendMessage("Hello from the client");
+    }
   };
 
   const onSubmitRegister = (e: FormEvent<HTMLFormElement>) => {
@@ -45,6 +52,17 @@ export default function LoginPage() {
       return;
     }
   };
+
+  useEffect(() => {
+    testWs.current = new WebSocketConnection();
+    testWs.current.sendMessage("Hello from the client");
+
+    return () => {
+      if (testWs.current) {
+        testWs.current.close();
+      }
+    };
+  });
 
   return (
     <main className={styles.main}>
