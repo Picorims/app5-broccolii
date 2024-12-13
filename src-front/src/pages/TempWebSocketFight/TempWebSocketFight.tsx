@@ -56,6 +56,7 @@ export default function TempWebSocketFight() {
     });
 
     return () => {
+      console.log("CLOSE");
       fightSession.current?.close();
     };
   }, [error]);

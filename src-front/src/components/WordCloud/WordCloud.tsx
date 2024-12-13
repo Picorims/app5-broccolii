@@ -90,6 +90,7 @@ export default function WordCloud() {
     });
     session.onAcknowledgeSubmitThen((success, testedState) => {
       console.log("Submit acknowledged", success, testedState);
+      //réponse de si le mot a été réussi (valeur success)
     });
     session.onWordsFoundThen((words) => {
       console.log("Words found", words);
@@ -99,6 +100,7 @@ export default function WordCloud() {
     });
 
     return () => {
+      console.log("CLOSE");
       fightSession.current?.close();
     };
   }, [error]);
@@ -295,6 +297,9 @@ export default function WordCloud() {
             //deleteWord(i);
             setInputValue("");
 
+            for (let letter of word.getText()) {
+              fightSession.current?.submitLetter(letter)
+            }
             fightSession.current?.submitWord()
           }
         }

@@ -84,9 +84,9 @@ class FightSession:
         if not event["fightID"] == self._fight_id:
             await self._send_error_event(websocket, "Non matching fight session.")
             await websocket.close()
-            return False
+            return True
         if await self.close_if_player_not_allowed(event["userID"], websocket):
-            return False
+            return True
 
         if not self.player_has_session(event["userID"]):
             self.add_player_session(websocket, event["userID"])
@@ -95,7 +95,7 @@ class FightSession:
             await self._send_error_event(websocket, "Player already has an open session.")
             self.remove_player_session(event["userID"])
             await websocket.close()
-            return False
+            return True
 
         if event["type"] == "requestGameState":
             await self._handle_request_game_state(websocket)
@@ -103,7 +103,7 @@ class FightSession:
             await self._handle_submit_letter(websocket, event["userID"], event["letter"])
         else:
             await self._send_error_event(websocket, "Unknown event type.")
-        return True
+        return False
 
     async def _handle_request_game_state(self, websocket: WebSocket):
         state = {}
@@ -246,7 +246,7 @@ def build_json_event(event_type, data):
     Returns:
         str: stringified JSON
     """
-    print(data)
+    #print(data)
     obj = {key: value for key, value in data.items()}
     obj["type"] = event_type
     return json.dumps(obj)

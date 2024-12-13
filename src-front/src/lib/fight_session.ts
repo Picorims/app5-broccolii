@@ -155,7 +155,6 @@ export class FightSession {
     eventType: T,
     eventPayload: Event<T>,
   ) {
-    console.log("dans sendEvent");
     
     this.assertReady();
     const event: BaseEventParams & Event<T> = {
@@ -164,6 +163,7 @@ export class FightSession {
       fightID: this.fightID,
       ...eventPayload,
     };
+    console.log("dans sendEvent", JSON.stringify(event));
     this.ws.send(JSON.stringify(event));
   }
 
@@ -246,6 +246,7 @@ export class FightSession {
   }
 
   submitLetter(letter: string) {
+    console.log("appel submitLETTER");
     if (letter.length !== 1) {
       throw new Error("Invalid letter (only one character is allowed).");
     }
