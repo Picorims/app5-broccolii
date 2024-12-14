@@ -51,11 +51,11 @@ export default function WordCloud() {
   const refCanvas = useRef<HTMLDivElement>(null);
   const refContainer = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [app, setApp] = useState<Application<PIXI.Renderer>>();
   const refWords = useRef<Word[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState("");
   const [scores, setScores] = useState<Record<string, number>>({});
-  const [availableWords, setAvailableWords] = useState<string[]>([]);
   const [wordsBestProgress, setWordsBestProgress] = useState<
     Record<string, number>
   >({});
@@ -64,6 +64,7 @@ export default function WordCloud() {
 
   //session initialization
   useEffect(() => {
+    
     setError("");
     console.log("Initializing session...");
     fightSession.current = new FightSession("alice", "test", () => {
@@ -78,9 +79,12 @@ export default function WordCloud() {
     session.onSendGameStateThen((state) => {
       console.log("Received state", state);
       setScores(state.scores);
-      setAvailableWords(state.availableWords);
       setWordsBestProgress(state.wordsBestProgress);
       setGameEndEpoch(state.gameEndEpoch);
+
+      for (let wordStr of state.availableWords) {
+        addWord(wordStr);
+      }
     });
     session.onAcknowledgeLetterThen((accepted, currentState) => {
       console.log("Letter acknowledged", accepted, currentState);
@@ -91,6 +95,7 @@ export default function WordCloud() {
     session.onAcknowledgeSubmitThen((success, testedState) => {
       console.log("Submit acknowledged", success, testedState);
       //réponse de si le mot a été réussi (valeur success)
+      //FIXME success est toujours à undefined
     });
     session.onWordsFoundThen((words) => {
       console.log("Words found", words);
@@ -103,7 +108,6 @@ export default function WordCloud() {
     });
 
     return () => {
-      console.log("CLOSE");
       fightSession.current?.close();
     };
   }, [error]);
@@ -137,9 +141,35 @@ export default function WordCloud() {
     }
   }
 
-  function addWord(word: Word) {
-    refWords.current.push(word);
-  }
+  /**
+   * Adds a word with a random position and weight.
+   */
+  const addWord = useCallback(
+    (wordStr: string) => {
+      if (app == undefined) {
+        throw new Error("Can't add new word because app is undefined. (Maybe the Pixi app hasn't been created yet)");
+      }
+      const canvasSizeX = containerSize.width;
+      const canvasSizeY = containerSize.height;
+
+      const weightDisparity = 5;
+      let newWord = new Word(
+        wordStr,
+        new Point(Math.random() * canvasSizeX, Math.random() * canvasSizeY),
+        10 + weightDisparity * Math.random(),
+      );
+    
+      newWord.getPixiText().style = {
+        //TODO replace by a new class method setStyle ?
+        fontFamily: "Arial",
+        fontSize: 24,
+        fill: 0xffffff,
+      };
+      newWord.setPosition(new Vector(newWord.getPosition().x, newWord.getPosition().y));
+      
+      app.stage.addChild(newWord.getPixiText());
+      refWords.current.push(newWord);
+  }, [app]);
 
   function clearWords() {
     refWords.current.forEach((word) => {
@@ -184,7 +214,9 @@ export default function WordCloud() {
 
   //WordCloud initialization
   const init = useCallback(async () => {
+    
     const app = new Application();
+    setApp(app);
 
     if (refContainer.current) {
       await app.init({
@@ -196,46 +228,17 @@ export default function WordCloud() {
     }
     app.canvas.id = "pixi-canvas";
 
+    clearWords(); //deletes words from previous renders
+
     if (refCanvas.current) {
       refCanvas.current.appendChild(app.canvas);
     }
 
-    clearWords(); //deletes words from previous renders
-    const canvasSizeX = containerSize.width;
-    const canvasSizeY = containerSize.height;
-
-    const weightDisparity = 5;
-    /* for (let i = 0; i < 80; i++) {
-      addWord(
-        new Word(
-          "word" + i,
-          new Point(Math.random() * canvasSizeX, Math.random() * canvasSizeY),
-          10 + weightDisparity * Math.random(),
-        ),
-      );
-    } */
-
-
-      for (let word of availableWords) {
-        addWord(
-          new Word(
-            word,
-            new Point(Math.random() * canvasSizeX, Math.random() * canvasSizeY),
-            10 + weightDisparity * Math.random(),
-          ),
-        );
-      }
-
-    refWords.current.forEach((word) => {
-      word.getPixiText().style = {
-        //TODO replace by a new class method setStyle ?
-        fontFamily: "Arial",
-        fontSize: 24,
-        fill: 0xffffff,
-      };
+    for (let word of refWords.current) {
       word.setPosition(new Vector(word.getPosition().x, word.getPosition().y));
-      app.stage.addChild(word.getPixiText());
-    });
+      app.stage.addChild(word.getPixiText())
+    }
+    
 
     //render loop
     app.ticker.add((time) => {
@@ -324,6 +327,9 @@ export default function WordCloud() {
         }
       }
       if (event.code === "Backspace") {
+        // FIXME this sends only 1 event even if the player deleted multiple letters at once,
+        // fix this by checking how many letters have been deleted
+        // (maybe in an other way entirely ikd)
         fightSession.current?.submitEraseLetter()
       }
     },
