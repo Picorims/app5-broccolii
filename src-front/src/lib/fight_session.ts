@@ -128,7 +128,6 @@ export class FightSession {
       console.info("Fight session closed.");
     });
     this.ws.addEventListener("message", (e) => {
-      console.log("pre call handleEvent ", e.data);
       
       try {
         const json = JSON.parse(e.data);
@@ -165,12 +164,10 @@ export class FightSession {
       fightID: this.fightID,
       ...eventPayload,
     };
-    console.log("dans sendEvent", JSON.stringify(event));
     this.ws.send(JSON.stringify(event));
   }
 
   private handleEvent(event: JsonLike) {
-    console.log("dans handleEvent ", event);
     if (!event || typeof event !== "object") {
       throw new Error("Invalid data.");
     }
@@ -248,7 +245,6 @@ export class FightSession {
   }
 
   submitLetter(letter: string) {
-    console.log("appel submitLETTER");
     if (letter.length !== 1) {
       throw new Error("Invalid letter (only one character is allowed).");
     }
@@ -258,7 +254,6 @@ export class FightSession {
     this.sendEvent("submitEraseLetter", {});
   }
   submitWord() {
-    console.log("appel submit");
     this.sendEvent("submit", {});
     
   }

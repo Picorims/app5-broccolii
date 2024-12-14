@@ -101,6 +101,10 @@ class FightSession:
             await self._handle_request_game_state(websocket)
         elif event["type"] == "submitLetter":
             await self._handle_submit_letter(websocket, event["userID"], event["letter"])
+        elif event["type"] == "submit":
+            await self._handle_submit_word(websocket, event["userID"])
+        elif event["type"] == "submitEraseLetter":
+            await self._handle_erase_letter(websocket, event["userID"])
         else:
             await self._send_error_event(websocket, "Unknown event type.")
         return False

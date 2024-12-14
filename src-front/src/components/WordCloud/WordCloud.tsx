@@ -94,6 +94,9 @@ export default function WordCloud() {
     });
     session.onWordsFoundThen((words) => {
       console.log("Words found", words);
+      for (let word of words) {
+        deleteWord(word);
+      }
     });
     session.onScoresUpdatedThen((scores) => {
       console.log("Scores updated", scores);
@@ -105,13 +108,33 @@ export default function WordCloud() {
     };
   }, [error]);
 
+  /**
+   * If a new letter has been typed, this sends a submitLetter event.
+   * If a letter has been erased, this does nothing.
+   * @param event 
+   */
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setInputValue(event.target.value);
+    let nv = event.nativeEvent as InputEvent
+    if (nv.data != null) {
+      fightSession.current?.submitLetter(nv.data)
+    }
   }
 
-  function deleteWord(index: number) {
+  function deleteWordByIndex(index: number) {
     refWords.current[index].getPixiText().removeFromParent();
     refWords.current.splice(index, 1);
+  }
+
+  function deleteWord(wordToDelete: string) {
+    for (let i = refWords.current.length - 1; i >= 0; i--) {
+      const word = refWords.current[i];
+
+      if (word.getText() === wordToDelete) {
+        deleteWordByIndex(i);
+        break;
+      }
+    }
   }
 
   function addWord(word: Word) {
@@ -294,15 +317,14 @@ export default function WordCloud() {
           const word = refWords.current[i];
 
           if (word.getText() === inputValue) {
-            //deleteWord(i);
+            //deleteWordByIndex(i);
             setInputValue("");
-
-            for (let letter of word.getText()) {
-              fightSession.current?.submitLetter(letter)
-            }
             fightSession.current?.submitWord()
           }
         }
+      }
+      if (event.code === "Backspace") {
+        fightSession.current?.submitEraseLetter()
       }
     },
     [inputValue],
