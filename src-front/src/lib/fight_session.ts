@@ -128,6 +128,8 @@ export class FightSession {
       console.info("Fight session closed.");
     });
     this.ws.addEventListener("message", (e) => {
+      console.log("pre call handleEvent ", e.data);
+      
       try {
         const json = JSON.parse(e.data);
         this.handleEvent(json);
@@ -168,7 +170,7 @@ export class FightSession {
   }
 
   private handleEvent(event: JsonLike) {
-    console.log("received", event);
+    console.log("dans handleEvent ", event);
     if (!event || typeof event !== "object") {
       throw new Error("Invalid data.");
     }

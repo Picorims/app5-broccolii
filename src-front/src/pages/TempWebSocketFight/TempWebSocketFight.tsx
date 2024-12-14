@@ -56,7 +56,7 @@ export default function TempWebSocketFight() {
     });
 
     return () => {
-      console.log("CLOSE");
+       console.log("CLOSE");
       fightSession.current?.close();
     };
   }, [error]);
@@ -74,6 +74,12 @@ export default function TempWebSocketFight() {
       <p>Available words: {availableWords.join(", ")}</p>
       <p>Words best progress: {JSON.stringify(wordsBestProgress)}</p>
       <p>Game end epoch: {gameEndEpoch}</p>
+      <button onClick={() => fightSession.current?.submitLetter('a')}>
+        Send Letter 'A'
+      </button>
+      <button onClick={() => fightSession.current?.submitWord()}>
+        Submit word
+      </button>
     </div>
   );
 }
