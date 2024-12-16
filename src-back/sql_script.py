@@ -1134,7 +1134,7 @@ words = {
 }
 # %%
 
-#%% Word Insertion
+# %% Word Insertion
 for category_name, word_list in words.items():
     for word in word_list:
         cursor.execute("INSERT OR IGNORE INTO Word (word) VALUES (?);", (word,))
@@ -1168,23 +1168,36 @@ cursor.execute(
             ('Super soil', 'Will multiply your broccoli production by 2 !', 'rare', 1, 0, 2)
     """
 )
-#%% CardEffect Insertion
+# %% CardEffect Insertion
 cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (1, 'Add To Production', 1)")
 cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (1, 'Add To Production', 2)")
 cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (2, 'Add To Click', 1)")
 cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (2, 'Add To Click', 5)")
-cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (3, 'Multiply Production By', 2)")
-cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (3, 'Multiply Production By', 3)")
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (3, 'Multiply Production By', 2)"
+)
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (3, 'Multiply Production By', 3)"
+)
 cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (4, 'Multiply Clicks By', 2)")
 cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (4, 'Multiply Clicks By', 3)")
-cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (5, 'Add To Crit Chance', 0.1)")
-cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (5, 'Add To Crit Chance', 0.25)")
-cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (6, 'Multiply Crit Chance By', 2)")
-cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (6, 'Multiply Crit Chance By', 3)")
-#%%
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (5, 'Add To Crit Chance', 0.1)"
+)
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (5, 'Add To Crit Chance', 0.25)"
+)
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (6, 'Multiply Crit Chance By', 2)"
+)
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (6, 'Multiply Crit Chance By', 3)"
+)
+# %%
 
-#%% Card Insertion & Verification
-cursor.execute("""INSERT INTO Card (name, effect, rarity, isNegative, idCardEffect) VALUES
+# %% Card Insertion & Verification
+cursor.execute(
+    """INSERT INTO Card (name, effect, rarity, isNegative, idCardEffect) VALUES
                    ('Farmer', 'Will add 1 broccoli to your account every second !', 'Common', 0, 1),
                    ('Farmer', 'Will add 1 broccoli to your account every second !', 'Common', 1, 1),
                    ('Super soil', 'Will multiply your broccoli production by 2 !', 'Rare', 0, 7),
@@ -1196,17 +1209,20 @@ cursor.execute("""INSERT INTO Card (name, effect, rarity, isNegative, idCardEffe
                    ('Beet', 'Gives you 10% more chance to Critical Click !', 'Rare', 0, 9),
                    ('Beet', 'Gives you 10% more chance to Critical Click !', 'Rare', 1, 9),
                    ('Butternut', 'Doubles your Critical Click chances !', 'Legendary', 0, 11),
-                   ('Butternut', 'Doubles your Critical Click chances !', 'Legendary', 1, 11)""")
+                   ('Butternut', 'Doubles your Critical Click chances !', 'Legendary', 1, 11)"""
+)
 
-cursor.execute("SELECT c.id, c.name, effect, rarity, isNegative, ce.name, ce.value FROM Card c, CardEffect ce WHERE c.idCardEffect = ce.id;")
+cursor.execute(
+    "SELECT c.id, c.name, effect, rarity, isNegative, ce.name, ce.value FROM Card c, CardEffect ce WHERE c.idCardEffect = ce.id;"
+)
 cards = cursor.fetchall()
 print("Cards in the database:")
 for card in cards:
     negative = "Negative " if card[4] else ""
-    print(f"{card[0]}: {negative}{card[1]} - {card[3]}");
-    print(f" {card[2]}");
-    print(f" {card[5]}: {card[6]}");
-#%%
+    print(f"{card[0]}: {negative}{card[1]} - {card[3]}")
+    print(f" {card[2]}")
+    print(f" {card[5]}: {card[6]}")
+# %%
 
 # %% Word & Category insert's verification
 sql_command = """
