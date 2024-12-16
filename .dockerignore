@@ -1,0 +1,10 @@
+# Ignore front node modules
+./src-front/node_modules
+
+# Ignore back environment
+./src-back/.env
+./src-back/env
+./src-back/venv
+
+# Ignore back python cache
+./src-back/__pycache__
