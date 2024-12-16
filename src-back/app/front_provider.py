@@ -9,6 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from pathlib import Path
 from fastapi import APIRouter, responses
+import os
 
 FRONTEND_DIST = Path("./dist")
 router = APIRouter()
@@ -21,8 +22,10 @@ if not FRONTEND_DIST.exists():
     "/{path:path}",
 )
 async def frontend_handler(path: str):
-    fp = FRONTEND_DIST / path
-    if not fp.exists() or path == "":
+    normalized_path = os.path.normpath(path)
+    fp = FRONTEND_DIST / normalized_path
+    allowed_path = str(fp).startswith(str(FRONTEND_DIST))
+    if not fp.exists() or path == "" or not fp.is_file() or not allowed_path:
         fp = FRONTEND_DIST / "index.html"
     print(fp, "<<<<<<<<<<<<<<<<<<<<<<")
 
