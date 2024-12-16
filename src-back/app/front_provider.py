@@ -24,8 +24,10 @@ if not FRONTEND_DIST.exists():
 async def frontend_handler(path: str):
     normalized_path = os.path.normpath(path)
     fp = FRONTEND_DIST / normalized_path
+    relative_path = "./" in path or "../" in path
     allowed_path = str(fp).startswith(str(FRONTEND_DIST))
-    if not fp.exists() or path == "" or not fp.is_file() or not allowed_path:
+    valid_path = fp.exists() and fp.is_file() and path != ""
+    if not valid_path or not allowed_path or relative_path:
         fp = FRONTEND_DIST / "index.html"
     print(fp, "<<<<<<<<<<<<<<<<<<<<<<")
 
