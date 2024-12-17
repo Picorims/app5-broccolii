@@ -52,7 +52,7 @@ class Word {
 export default function WordCloud() {
   const refCanvas = useRef<HTMLDivElement>(null);
   const refContainer = useRef<HTMLDivElement>(null);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const refContainerSize = useRef({ width: 0, height: 0 });
   const [app, setApp] = useState<Application<PIXI.Renderer>>();
   const refWords = useRef<Word[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -66,6 +66,7 @@ export default function WordCloud() {
 
   //session initialization
   useEffect(() => {
+    
     setError("");
     console.log("Initializing session...");
     fightSession.current = new FightSession("alice", "test", () => {
@@ -113,6 +114,70 @@ export default function WordCloud() {
     };
   }, [error]);
 
+  //WordCloud initialization
+  const init = useCallback(async () => {
+    const app = new Application();
+
+    if (refContainer.current) {
+      await app.init({
+        background: "#1099bb",
+        resizeTo: refContainer.current,
+        width: refContainerSize.current.width,
+        height: refContainerSize.current.height,
+      });
+    }
+    app.canvas.id = "pixi-canvas";
+
+    clearWords(); //deletes words from previous renders
+
+    if (refCanvas.current) {
+      refCanvas.current.appendChild(app.canvas);
+    }
+
+    setApp(app);
+    
+    //render loop
+    app.ticker.add((time) => {
+      
+      refWords.current.forEach((word) => {
+        //update the speed of words
+        word = updateSpeed(word);
+
+        //update the position of words
+        word.setPosition(
+          word.getPosition().add(word.speed.mult(time.deltaTime * 0.01)),
+        );
+
+        let pushDist = 30
+        //handling out of bounds
+        if (word.getPosition().x < 0) {
+          word.setPosition(new Point(0, word.getPosition().y));
+          word.speed = new Vector(0, word.speed.y);
+        }
+        if (word.getPosition().y < pushDist) {
+          word.setPosition(new Point(word.getPosition().x, pushDist + 1));
+          word.speed = new Vector(word.speed.x, 0);
+        }
+        if (word.getPosition().x > refContainerSize.current.width - pushDist) {
+          word.setPosition(
+            new Point(refContainerSize.current.width - pushDist - 1, word.getPosition().y),
+          );
+          word.speed = new Vector(0, word.speed.y);
+        }
+        if (word.getPosition().y > refContainerSize.current.height - pushDist) {
+          word.setPosition(
+            new Point(word.getPosition().x, refContainerSize.current.height - pushDist - 1),
+          );
+          word.speed = new Vector(word.speed.x, 0);
+        }
+      });
+    });
+
+    updateSize();
+    return app;
+  //}, [containerSize]);
+  }, []);
+
   /**
    * If a new letter has been typed, this sends a submitLetter event.
    * If a letter has been erased, this does nothing.
@@ -147,12 +212,11 @@ export default function WordCloud() {
    */
   const addWord = useCallback(
     (wordStr: string) => {
-      console.log("addword");
       if (app == undefined) {
         throw new Error("Can't add new word because app is undefined. (Maybe the Pixi app hasn't been created yet)");
       }
-      const canvasSizeX = containerSize.width;
-      const canvasSizeY = containerSize.height;
+      const canvasSizeX = refContainerSize.current.width;
+      const canvasSizeY = refContainerSize.current.height;
 
       const weightDisparity = 5;
       let newWord = new Word(
@@ -172,7 +236,7 @@ export default function WordCloud() {
       //app.stage.addChild(newWord.getPixiText());
       refWords.current.push(newWord);
       pushWord(newWord)
-  }, [app, containerSize]);
+  }, [app, refContainerSize]);
 
   function clearWords() {
     refWords.current.forEach((word) => {
@@ -214,99 +278,16 @@ export default function WordCloud() {
 
       return word;
     },
-    [containerSize],
+    [refContainerSize],
   );
-
-  //WordCloud initialization
-  const init = useCallback(async () => {
-    console.log("----------------------init");
-    
-    const app = new Application();
-
-    if (refContainer.current) {
-      await app.init({
-        background: "#1099bb",
-        resizeTo: refContainer.current,
-        width: containerSize.width,
-        height: containerSize.height,
-      });
-    }
-    app.canvas.id = "pixi-canvas";
-
-    clearWords(); //deletes words from previous renders
-
-    if (refCanvas.current) {
-      refCanvas.current.appendChild(app.canvas);
-    }
-
-
-    setApp(app);
-
-    
-    //render loop
-    app.ticker.add((time) => {
-      refWords.current.forEach((word) => {
-        //update the speed of words
-        word = updateSpeed(word);
-
-        //update the position of words
-        word.setPosition(
-          word.getPosition().add(word.speed.mult(time.deltaTime * 0.01)),
-        );
-
-        //handling out of bounds
-        /* if (word.getPosition().x < 0) {
-          word.setPosition(new Point(0, word.getPosition().y));
-          word.speed = new Vector(0, word.speed.y);
-        }
-        if (word.getPosition().y < 30) {
-          word.setPosition(new Point(word.getPosition().x, 30));
-          word.speed = new Vector(word.speed.x, 0);
-        }
-        if (word.getPosition().x > containerSize.width) {
-          word.setPosition(
-            new Point(containerSize.width, word.getPosition().y),
-          );
-          word.speed = new Vector(0, word.speed.y);
-        }
-        if (word.getPosition().y > containerSize.height - 30) {
-          word.setPosition(
-            new Point(word.getPosition().x, containerSize.height - 30),
-          );
-          word.speed = new Vector(word.speed.x, 0);
-        } */
-      });
-    });
-
-    return app;
-  //}, [containerSize]);
-  }, []);
 
   const pushWord = useCallback(
     (word: Word) => {
       if (!app || !app.stage) {
         throw new Error('App or stage not initialized. Skipping word push.');
       }
-      console.log("pushword", app.stage.children);
       app.stage.addChild(word.getPixiText());
-    },
-    [app]
-  );
-  
-
-  const refreshAfterResize = useCallback(
-    () => {
-      if (!app) {
-        console.warn('App not initialized. Skipping refresh.');
-        return;
-      }
-      for (let word of refWords.current) {
-        pushWord(word)
-      }
-    },
-    [app, pushWord]
-  );
-  
+    }, [app]);
 
 
   //cleanup function that erases the canvas when the page unmounts
@@ -327,23 +308,22 @@ export default function WordCloud() {
     };
   }, [init]);
 
+  const updateSize = useCallback(
+    () => {
+    //updates the size according to the window
+    if (refContainer.current) {
+      refContainerSize.current.width = refContainer.current.clientWidth;
+      refContainerSize.current.height = refContainer.current.clientHeight;
+    }
+  }, []);
+
   //function that updates the size of the container
   useEffect(() => {
-    const updateSize = () => {
-      //updates the size according to the window
-      if (refContainer.current) {
-        setContainerSize(prevSize => ({
-          width: refContainer.current ? refContainer.current.clientWidth : prevSize.width,
-          height: refContainer.current ? refContainer.current.clientHeight : prevSize.height,
-        }));
-      }
-      refreshAfterResize();
-    };
     window.addEventListener("resize", updateSize);
     updateSize();
 
     return () => window.removeEventListener("resize", updateSize);
-  }, [refreshAfterResize, setContainerSize]);
+  }, [refContainerSize]);
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
@@ -352,7 +332,6 @@ export default function WordCloud() {
           const word = refWords.current[i];
 
           if (word.getText() === inputValue) {
-            //deleteWordByIndex(i);
             setInputValue("");
             fightSession.current?.submitWord()
           }
@@ -363,6 +342,7 @@ export default function WordCloud() {
         // fix this by checking how many letters have been deleted
         // (maybe in an other way entirely ikd)
         fightSession.current?.submitEraseLetter()
+        
       }
     },
     [inputValue],
