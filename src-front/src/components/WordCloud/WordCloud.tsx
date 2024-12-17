@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Application } from "pixi.js";
 import * as PIXI from "pixi.js";
-import "./WordCloud.css";
+import styles from './WordCloud.module.css'
 
 import {
   Vector,
@@ -47,6 +47,8 @@ class Word {
   }
 }
 
+
+
 export default function WordCloud() {
   const refCanvas = useRef<HTMLDivElement>(null);
   const refContainer = useRef<HTMLDivElement>(null);
@@ -64,7 +66,6 @@ export default function WordCloud() {
 
   //session initialization
   useEffect(() => {
-    
     setError("");
     console.log("Initializing session...");
     fightSession.current = new FightSession("alice", "test", () => {
@@ -146,6 +147,7 @@ export default function WordCloud() {
    */
   const addWord = useCallback(
     (wordStr: string) => {
+      console.log("addword");
       if (app == undefined) {
         throw new Error("Can't add new word because app is undefined. (Maybe the Pixi app hasn't been created yet)");
       }
@@ -167,9 +169,10 @@ export default function WordCloud() {
       };
       newWord.setPosition(new Vector(newWord.getPosition().x, newWord.getPosition().y));
       
-      app.stage.addChild(newWord.getPixiText());
+      //app.stage.addChild(newWord.getPixiText());
       refWords.current.push(newWord);
-  }, [app]);
+      pushWord(newWord)
+  }, [app, containerSize]);
 
   function clearWords() {
     refWords.current.forEach((word) => {
@@ -180,9 +183,11 @@ export default function WordCloud() {
 
   const updateSpeed = useCallback(
     (word: Word) => {
+      if (refContainer.current == undefined) return word;
+      
       const center = new Point(
-        containerSize.width / 2,
-        containerSize.height / 2,
+        refContainer.current.clientWidth / 2,
+        refContainer.current.clientHeight / 2,
       );
 
       const centerForce = calculateVec(
@@ -214,9 +219,9 @@ export default function WordCloud() {
 
   //WordCloud initialization
   const init = useCallback(async () => {
+    console.log("----------------------init");
     
     const app = new Application();
-    setApp(app);
 
     if (refContainer.current) {
       await app.init({
@@ -234,12 +239,10 @@ export default function WordCloud() {
       refCanvas.current.appendChild(app.canvas);
     }
 
-    for (let word of refWords.current) {
-      word.setPosition(new Vector(word.getPosition().x, word.getPosition().y));
-      app.stage.addChild(word.getPixiText())
-    }
-    
 
+    setApp(app);
+
+    
     //render loop
     app.ticker.add((time) => {
       refWords.current.forEach((word) => {
@@ -252,7 +255,7 @@ export default function WordCloud() {
         );
 
         //handling out of bounds
-        if (word.getPosition().x < 0) {
+        /* if (word.getPosition().x < 0) {
           word.setPosition(new Point(0, word.getPosition().y));
           word.speed = new Vector(0, word.speed.y);
         }
@@ -271,12 +274,40 @@ export default function WordCloud() {
             new Point(word.getPosition().x, containerSize.height - 30),
           );
           word.speed = new Vector(word.speed.x, 0);
-        }
+        } */
       });
     });
 
     return app;
-  }, [containerSize, updateSpeed]);
+  //}, [containerSize]);
+  }, []);
+
+  const pushWord = useCallback(
+    (word: Word) => {
+      if (!app || !app.stage) {
+        throw new Error('App or stage not initialized. Skipping word push.');
+      }
+      console.log("pushword", app.stage.children);
+      app.stage.addChild(word.getPixiText());
+    },
+    [app]
+  );
+  
+
+  const refreshAfterResize = useCallback(
+    () => {
+      if (!app) {
+        console.warn('App not initialized. Skipping refresh.');
+        return;
+      }
+      for (let word of refWords.current) {
+        pushWord(word)
+      }
+    },
+    [app, pushWord]
+  );
+  
+
 
   //cleanup function that erases the canvas when the page unmounts
   useEffect(() => {
@@ -301,17 +332,18 @@ export default function WordCloud() {
     const updateSize = () => {
       //updates the size according to the window
       if (refContainer.current) {
-        setContainerSize({
-          width: refContainer.current.clientWidth,
-          height: refContainer.current.clientHeight,
-        });
+        setContainerSize(prevSize => ({
+          width: refContainer.current ? refContainer.current.clientWidth : prevSize.width,
+          height: refContainer.current ? refContainer.current.clientHeight : prevSize.height,
+        }));
       }
+      refreshAfterResize();
     };
-    window.addEventListener("resize", updateSize); //the listener calls the previous function
+    window.addEventListener("resize", updateSize);
     updateSize();
 
     return () => window.removeEventListener("resize", updateSize);
-  }, []);
+  }, [refreshAfterResize, setContainerSize]);
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
@@ -346,30 +378,22 @@ export default function WordCloud() {
   }, [handleKeyPress]);
 
   return (
-    <>
-      <div
-        ref={refContainer}
-        style={{
-          width: "100vw",
-          height: "100vh",
-          position: "relative", // Keeps input positioned correctly
-        }}
-      >
-        <div ref={refCanvas}></div>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          style={{
-            position: "absolute",
-            left: "10px",
-            top: "10px",
-            zIndex: 1000,
-            padding: "5px",
-            fontSize: "16px",
-          }}
-        />
+    <div ref={refContainer}
+      className={styles.container}
+    >
+      <div ref={refCanvas}></div>
+      <input
+        type="text"
+        value={inputValue}
+        onChange={handleInputChange}
+        className={styles.entry}
+      />
+      <div className={styles.score_board}>
+        <p>Scores : {scores[0]}</p>
+        <p>words progress : {wordsBestProgress[0]}</p>
+        <p>Game end: {gameEndEpoch}</p>
       </div>
-    </>
+      
+    </div>
   );
 }
