@@ -61,17 +61,17 @@ export default function TempWebSocketFight() {
   }, [error]);
 
   const sendLetters = () => {
-    fightSession.current?.submitLetter('b')
-    fightSession.current?.submitLetter('e')
-    fightSession.current?.submitLetter('e')
+    fightSession.current?.submitLetter("b");
+    fightSession.current?.submitLetter("e");
+    fightSession.current?.submitLetter("e");
   };
 
   const submit = () => {
-    fightSession.current?.submitWord()
+    fightSession.current?.submitWord();
   };
 
   const erase = () => {
-    fightSession.current?.submitEraseLetter()
+    fightSession.current?.submitEraseLetter();
   };
 
   return (
@@ -87,15 +87,9 @@ export default function TempWebSocketFight() {
       <p>Available words: {availableWords.join(", ")}</p>
       <p>Words best progress: {JSON.stringify(wordsBestProgress)}</p>
       <p>Game end epoch: {gameEndEpoch}</p>
-      <button onClick={sendLetters}>
-        Send Letters
-      </button>
-      <button onClick={submit}>
-        Submit word
-      </button>
-      <button onClick={erase}>
-        Erase
-      </button>
+      <button onClick={sendLetters}>Send Letters</button>
+      <button onClick={submit}>Submit word</button>
+      <button onClick={erase}>Erase</button>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Application } from "pixi.js";
 import * as PIXI from "pixi.js";
-import styles from './WordCloud.module.css'
+import styles from "./WordCloud.module.css";
 
 import {
   Vector,
@@ -47,8 +47,6 @@ class Word {
   }
 }
 
-
-
 export default function WordCloud() {
   const refCanvas = useRef<HTMLDivElement>(null);
   const refContainer = useRef<HTMLDivElement>(null);
@@ -66,7 +64,6 @@ export default function WordCloud() {
 
   //session initialization
   useEffect(() => {
-    
     setError("");
     console.log("Initializing session...");
     fightSession.current = new FightSession("alice", "test", () => {
@@ -84,7 +81,7 @@ export default function WordCloud() {
       setWordsBestProgress(state.wordsBestProgress);
       setGameEndEpoch(state.gameEndEpoch);
 
-      for (let wordStr of state.availableWords) {
+      for (const wordStr of state.availableWords) {
         addWord(wordStr);
       }
     });
@@ -101,7 +98,7 @@ export default function WordCloud() {
     });
     session.onWordsFoundThen((words) => {
       console.log("Words found", words);
-      for (let word of words) {
+      for (const word of words) {
         deleteWord(word);
       }
     });
@@ -135,10 +132,9 @@ export default function WordCloud() {
     }
 
     setApp(app);
-    
+
     //render loop
     app.ticker.add((time) => {
-      
       refWords.current.forEach((word) => {
         //update the speed of words
         word = updateSpeed(word);
@@ -148,7 +144,7 @@ export default function WordCloud() {
           word.getPosition().add(word.speed.mult(time.deltaTime * 0.01)),
         );
 
-        let pushDist = 30
+        const pushDist = 30;
         //handling out of bounds
         if (word.getPosition().x < 0) {
           word.setPosition(new Point(0, word.getPosition().y));
@@ -160,13 +156,19 @@ export default function WordCloud() {
         }
         if (word.getPosition().x > refContainerSize.current.width - pushDist) {
           word.setPosition(
-            new Point(refContainerSize.current.width - pushDist - 1, word.getPosition().y),
+            new Point(
+              refContainerSize.current.width - pushDist - 1,
+              word.getPosition().y,
+            ),
           );
           word.speed = new Vector(0, word.speed.y);
         }
         if (word.getPosition().y > refContainerSize.current.height - pushDist) {
           word.setPosition(
-            new Point(word.getPosition().x, refContainerSize.current.height - pushDist - 1),
+            new Point(
+              word.getPosition().x,
+              refContainerSize.current.height - pushDist - 1,
+            ),
           );
           word.speed = new Vector(word.speed.x, 0);
         }
@@ -175,19 +177,19 @@ export default function WordCloud() {
 
     updateSize();
     return app;
-  //}, [containerSize]);
+    //}, [containerSize]);
   }, []);
 
   /**
    * If a new letter has been typed, this sends a submitLetter event.
    * If a letter has been erased, this does nothing.
-   * @param event 
+   * @param event
    */
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setInputValue(event.target.value);
-    let nv = event.nativeEvent as InputEvent
+    const nv = event.nativeEvent as InputEvent;
     if (nv.data != null) {
-      fightSession.current?.submitLetter(nv.data)
+      fightSession.current?.submitLetter(nv.data);
     }
   }
 
@@ -213,30 +215,36 @@ export default function WordCloud() {
   const addWord = useCallback(
     (wordStr: string) => {
       if (app == undefined) {
-        throw new Error("Can't add new word because app is undefined. (Maybe the Pixi app hasn't been created yet)");
+        throw new Error(
+          "Can't add new word because app is undefined. (Maybe the Pixi app hasn't been created yet)",
+        );
       }
       const canvasSizeX = refContainerSize.current.width;
       const canvasSizeY = refContainerSize.current.height;
 
       const weightDisparity = 5;
-      let newWord = new Word(
+      const newWord = new Word(
         wordStr,
         new Point(Math.random() * canvasSizeX, Math.random() * canvasSizeY),
         10 + weightDisparity * Math.random(),
       );
-    
+
       newWord.getPixiText().style = {
         //TODO replace by a new class method setStyle ?
         fontFamily: "Arial",
         fontSize: 24,
         fill: 0xffffff,
       };
-      newWord.setPosition(new Vector(newWord.getPosition().x, newWord.getPosition().y));
-      
+      newWord.setPosition(
+        new Vector(newWord.getPosition().x, newWord.getPosition().y),
+      );
+
       //app.stage.addChild(newWord.getPixiText());
       refWords.current.push(newWord);
-      pushWord(newWord)
-  }, [app, refContainerSize]);
+      pushWord(newWord);
+    },
+    [app, refContainerSize],
+  );
 
   function clearWords() {
     refWords.current.forEach((word) => {
@@ -248,7 +256,7 @@ export default function WordCloud() {
   const updateSpeed = useCallback(
     (word: Word) => {
       if (refContainer.current == undefined) return word;
-      
+
       const center = new Point(
         refContainer.current.clientWidth / 2,
         refContainer.current.clientHeight / 2,
@@ -284,11 +292,12 @@ export default function WordCloud() {
   const pushWord = useCallback(
     (word: Word) => {
       if (!app || !app.stage) {
-        throw new Error('App or stage not initialized. Skipping word push.');
+        throw new Error("App or stage not initialized. Skipping word push.");
       }
       app.stage.addChild(word.getPixiText());
-    }, [app]);
-
+    },
+    [app],
+  );
 
   //cleanup function that erases the canvas when the page unmounts
   useEffect(() => {
@@ -308,8 +317,7 @@ export default function WordCloud() {
     };
   }, [init]);
 
-  const updateSize = useCallback(
-    () => {
+  const updateSize = useCallback(() => {
     //updates the size according to the window
     if (refContainer.current) {
       refContainerSize.current.width = refContainer.current.clientWidth;
@@ -333,7 +341,7 @@ export default function WordCloud() {
 
           if (word.getText() === inputValue) {
             setInputValue("");
-            fightSession.current?.submitWord()
+            fightSession.current?.submitWord();
           }
         }
       }
@@ -341,8 +349,7 @@ export default function WordCloud() {
         // FIXME this sends only 1 event even if the player deleted multiple letters at once,
         // fix this by checking how many letters have been deleted
         // (maybe in an other way entirely ikd)
-        fightSession.current?.submitEraseLetter()
-        
+        fightSession.current?.submitEraseLetter();
       }
     },
     [inputValue],
@@ -358,9 +365,7 @@ export default function WordCloud() {
   }, [handleKeyPress]);
 
   return (
-    <div ref={refContainer}
-      className={styles.container}
-    >
+    <div ref={refContainer} className={styles.container}>
       <div ref={refCanvas}></div>
       <input
         type="text"
@@ -373,7 +378,6 @@ export default function WordCloud() {
         <p>words progress : {wordsBestProgress[0]}</p>
         <p>Game end: {gameEndEpoch}</p>
       </div>
-      
     </div>
   );
 }

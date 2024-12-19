@@ -128,7 +128,6 @@ export class FightSession {
       console.info("Fight session closed.");
     });
     this.ws.addEventListener("message", (e) => {
-      
       try {
         const json = JSON.parse(e.data);
         this.handleEvent(json);
@@ -156,7 +155,6 @@ export class FightSession {
     eventType: T,
     eventPayload: Event<T>,
   ) {
-    
     this.assertReady();
     const event: BaseEventParams & Event<T> = {
       type: eventType,
@@ -255,7 +253,6 @@ export class FightSession {
   }
   submitWord() {
     this.sendEvent("submit", {});
-    
   }
 
   close() {
