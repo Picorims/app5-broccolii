@@ -15,7 +15,7 @@ class Category:
         self.id = id
         self.name = name.capitalize()
 
-    def PrintCategory(self):
+    def print_category(self):
         print(f"{self.id}: {self.name}")
 
 
@@ -25,28 +25,28 @@ class Word:
         self.name = name
         self.category = []
 
-    def GetWord(self):
+    def get_word(self):
         return self.name.capitalize()
 
-    def AddCategory(self, categoryId):
+    def add_category(self, categoryId):
         categoryName = cursor.execute(
             f"SELECT name FROM Category WHERE id = {categoryId}"
         ).fetchone()[0]
         self.category.append(Category(categoryId, categoryName))
 
-    def WordInCategory(self, category):
+    def word_in_category(self, category):
         return category in self.category
 
-    def PrintCategory(self):
+    def print_category(self):
         for i in self.category:
             i.PrintCategory()
 
-    def PrintWord(self):
-        print(f" {self.GetWord()}")
-        self.PrintCategory()
+    def print_word(self):
+        print(f" {self.get_word()}")
+        self.print_category()
 
-    def RemoveCategory(self, category):
-        if self.WordInCategory(category):
+    def remove_category(self, category):
+        if self.word_in_category(category):
             self.category.remove(category)
 
 
@@ -60,7 +60,7 @@ class Card:
         self.adding = adding
         self.multiplyBy = multiplyBy
 
-    def PrintCard(self):
+    def print_card(self):
         negative = "Negative " if self.isNegative else ""
         print(f"{self.id}: {negative}{self.name} - {self.rarity}")
         print(f" {self.effect}")
@@ -74,30 +74,30 @@ class Account:
         self.username = username
         self.cards = cards
 
-    def AddCard(self, card):
+    def add_card(self, card):
         self.cards.append([card, 0])
         cursor.execute(f"INSERT INTO AccountCard VALUES ({self.id}, {card.id}, 0)")
 
-    def EquipCard(self, card):
+    def equip_card(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         cursor.execute(
             f"UPDATE TABLE AccountCard SET isEquipped = 1 WHERE idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
         )
 
-    def UnequipCard(self, card):
+    def unequip_card(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         cursor.execute(
             f"UPDATE TABLE AccountCard SET isEquipped = 0 WHERE idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
         )
 
-    def UserExists(login):
+    def user_exists(login):
         cursor.execute("SELECT * FROM Account WHERE username = ?", (login,))
         return cursor.fetchone() is not None
 
-    def CreateUser(self, login, password):
-        if self.UserExists(login):
+    def create_user(self, login, password):
+        if self.user_exists(login):
             return {"status": "error", "message": "Username already exists"}
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
@@ -107,7 +107,7 @@ class Account:
         connection.commit()
         return {"status": "success", "message": "User created successfully"}
 
-    def CheckPassword(login, password):
+    def check_password(login, password):
         cursor.execute("SELECT password FROM Account WHERE username = ?", (login,))
         result = cursor.fetchone()
         if result is None:
@@ -137,7 +137,7 @@ for word in query:
         words[word[1]].AddCategory(word[2])
     else:
         w = Word(word[0], word[1])
-        w.AddCategory(word[2])
+        w.add_category(word[2])
         words.append(w)
 
 for word in words:
@@ -149,7 +149,7 @@ query = cursor.fetchall()
 categories = [Category(*category) for category in query]
 
 for category in categories:
-    category.PrintCategory()
+    category.print_category()
 # %%
 
 # %% Creating words
@@ -170,7 +170,7 @@ for word in query:
         words_dict[word_key].AddCategory(word[2])
     else:
         w = Word(word[0], word[1])
-        w.AddCategory(word[2])
+        w.add_category(word[2])
         words_dict[word_key] = w
         words.append(w)
 
@@ -186,7 +186,7 @@ query = cursor.fetchall()
 cards = [Card(*card) for card in query]
 
 for card in cards:
-    card.PrintCard()
+    card.print_card()
 # %%
 
 connection.commit()
