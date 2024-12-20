@@ -1213,7 +1213,9 @@ cursor.execute(
 )
 
 cursor.execute(
-    "SELECT c.id, c.name, effect, rarity, isNegative, ce.name, ce.value FROM Card c, CardEffect ce WHERE c.idCardEffect = ce.id;"
+    """SELECT c.id, c.name, effect, rarity, isNegative, ce.name, ce.value
+            FROM Card c, CardEffect ce
+            WHERE c.idCardEffect = ce.id;"""
 )
 cards = cursor.fetchall()
 print("Cards in the database:")

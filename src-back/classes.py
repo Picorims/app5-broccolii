@@ -81,13 +81,15 @@ class Account:
     def EquipCard(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         cursor.execute(
-            f"UPDATE TABLE AccountCard SET isEquipped = 1 WHERE idAccount = {self.id} AND idCard = {card.id})"
+            f"UPDATE TABLE AccountCard SET isEquipped = 1 WHERE idAccount = {self.id}\n"
+            f"AND idCard = {card.id})"
         )
 
     def UnequipCard(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         cursor.execute(
-            f"UPDATE TABLE AccountCard SET isEquipped = 0 WHERE idAccount = {self.id} AND idCard = {card.id})"
+            f"UPDATE TABLE AccountCard SET isEquipped = 0 WHERE idAccount = {self.id}\n"
+            f"AND idCard = {card.id})"
         )
 
     def UserExists(login):
