@@ -170,8 +170,6 @@ export default function WordCloud() {
     });
     session.onAcknowledgeSubmitThen((success, testedState) => {
       console.log("Submit acknowledged", success, testedState);
-      //réponse de si le mot a été réussi (valeur success)
-      //FIXME success est toujours à undefined
     });
     session.onWordsFoundThen((words) => {
       console.log("Words found", words);
