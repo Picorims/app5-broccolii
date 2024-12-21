@@ -18,38 +18,38 @@ if not FRONTEND_DIST.exists():
     print("FRONTEND DIST NOT FOUND, IMPOSSIBLE TO SERVE THE FRONTEND")
 
 
-@router.get(
-    "/{path:path}",
-)
-async def frontend_handler(path: str):
-    normalized_path = os.path.normpath(path)
-    fp = FRONTEND_DIST / normalized_path
-    relative_path = "./" in path or "../" in path
-    allowed_path = str(fp).startswith(str(FRONTEND_DIST))
-    valid_path = fp.exists() and fp.is_file() and path != ""
-    if not valid_path or not allowed_path or relative_path:
-        fp = FRONTEND_DIST / "index.html"
-    print(fp, "<<<<<<<<<<<<<<<<<<<<<<")
+# @router.get(
+#     "/{path:path}",
+# )
+# async def frontend_handler(path: str):
+#     normalized_path = os.path.normpath(path)
+#     fp = FRONTEND_DIST / normalized_path
+#     relative_path = "./" in path or "../" in path
+#     allowed_path = str(fp).startswith(str(FRONTEND_DIST))
+#     valid_path = fp.exists() and fp.is_file() and path != ""
+#     if not valid_path or not allowed_path or relative_path:
+#         fp = FRONTEND_DIST / "index.html"
+#     print(fp, "<<<<<<<<<<<<<<<<<<<<<<")
 
-    # https://developer.mozilla.org/en-US/docs/Web/HTTP/MIME_types/Common_types
-    media_type = "text/html"
-    if fp.suffix == ".js":
-        media_type = "application/javascript"
-    if fp.suffix == ".css":
-        media_type = "text/css"
-    if fp.suffix == ".json":
-        media_type = "application/json"
-    if fp.suffix == ".png":
-        media_type = "image/png"
-    if fp.suffix == ".jpg" or fp.suffix == ".jpeg":
-        media_type = "image/jpeg"
-    if fp.suffix == ".ico":
-        media_type = "image/x-icon"
-    if fp.suffix == ".svg":
-        media_type = "image/svg+xml"
-    if fp.suffix == ".woff2":
-        media_type = "font/woff2"
+#     # https://developer.mozilla.org/en-US/docs/Web/HTTP/MIME_types/Common_types
+#     media_type = "text/html"
+#     if fp.suffix == ".js":
+#         media_type = "application/javascript"
+#     if fp.suffix == ".css":
+#         media_type = "text/css"
+#     if fp.suffix == ".json":
+#         media_type = "application/json"
+#     if fp.suffix == ".png":
+#         media_type = "image/png"
+#     if fp.suffix == ".jpg" or fp.suffix == ".jpeg":
+#         media_type = "image/jpeg"
+#     if fp.suffix == ".ico":
+#         media_type = "image/x-icon"
+#     if fp.suffix == ".svg":
+#         media_type = "image/svg+xml"
+#     if fp.suffix == ".woff2":
+#         media_type = "font/woff2"
 
-    print(fp.suffix)
-    print(media_type, "<<<<<<<<<<<<<<<<<<<<<<")
-    return responses.FileResponse(fp, media_type=media_type)
+#     print(fp.suffix)
+#     print(media_type, "<<<<<<<<<<<<<<<<<<<<<<")
+#     return responses.FileResponse(fp, media_type=media_type)

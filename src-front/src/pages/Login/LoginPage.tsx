@@ -27,7 +27,16 @@ export default function LoginPage() {
 
     const response = await API.login(login as string, password as string);
     if (response.ok) {
+      const json = await response.json();
+      localStorage.setItem("token", json.access_token);
       console.log("Login successful");
+
+      // testing login
+      const resp = await API.auth_test();
+      if (resp.ok) {
+        console.log("Login test successful");
+        console.log(await resp.text());
+      }
     } else {
       console.error("Login failed");
       alert("Login failed, please check your credentials or try again later");

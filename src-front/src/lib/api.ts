@@ -49,4 +49,17 @@ export class API {
             
         });
     }
+
+    public static auth_test() {
+        const url = `${getEnv().backendUrl}/api/v1/user/auth_test`;
+        console.log("[API] [GET] " + url);
+        
+        return fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
+    }
 }

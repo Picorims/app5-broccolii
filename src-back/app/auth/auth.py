@@ -7,9 +7,14 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
-from fastapi import APIRouter, status, HTTPException
+from datetime import timedelta
+from typing import Annotated
+from fastapi import APIRouter, Depends, Request, status, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 from ..classes import Account
+import app.auth.jwt_utils as jwt_utils
 
 router = APIRouter()
 
@@ -41,7 +46,12 @@ async def register(body: RegisterBody):
     Account.create_user(body.username, body.password)
     print("User created successfully")
     
-    return
+    access_token_expires = timedelta(minutes=jwt_utils.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = jwt_utils.create_access_token(
+        data={"sub": body.username}, expires_delta=access_token_expires
+    )
+    
+    return jwt_utils.Token(access_token=access_token, token_type="bearer")
 
 class LoginBody(BaseModel):
     username: str
@@ -50,7 +60,7 @@ class LoginBody(BaseModel):
 @router.post("/user/login",
                 status_code=status.HTTP_200_OK,
                 description="Login a user.")
-async def login(body: LoginBody):
+async def login(body: LoginBody) -> jwt_utils.Token:
     # check that all API values are present
     if not body.username or not body.password:
         print("Missing username or password")
@@ -69,4 +79,15 @@ async def login(body: LoginBody):
     
     print("User logged in successfully")
     
-    return
+    access_token_expires = timedelta(minutes=jwt_utils.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = jwt_utils.create_access_token(
+        data={"sub": body.username}, expires_delta=access_token_expires
+    )
+    
+    return jwt_utils.Token(access_token=access_token, token_type="bearer")
+
+@router.get("/user/auth_test", dependencies=[Depends(HTTPBearer())])
+async def auth_test(credentials: jwt_utils.Credentials) -> JSONResponse:
+    jwt_utils.verify_token(credentials)
+    
+    return JSONResponse(content={"status": "success", "message": "User is authenticated"}, media_type="application/json")
