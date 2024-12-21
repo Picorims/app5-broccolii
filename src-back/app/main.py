@@ -9,6 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 # from .web_socket import router as ws_router
 from .fight.fight_session import router as fight_router
 from .front_provider import router as front_router
