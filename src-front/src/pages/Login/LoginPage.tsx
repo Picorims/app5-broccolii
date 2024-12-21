@@ -51,7 +51,7 @@ export default function LoginPage() {
             const success = await API.refreshToken();
             if (success) {
               console.log("Refresh token successful");
-              console.log("test auth again.")
+              console.log("test auth again.");
               const resp = await API.authTest();
               console.log(resp.ok);
               if (resp.ok) {
@@ -70,7 +70,7 @@ export default function LoginPage() {
                 }
               }
             }
-          }   
+          }
         }, 1000 * 61);
       }
     } else {
