@@ -250,7 +250,7 @@ def build_json_event(event_type, data):
     Returns:
         str: stringified JSON
     """
-    #print(data)
+    # print(data)
     obj = {key: value for key, value in data.items()}
     obj["type"] = event_type
     return json.dumps(obj)
