@@ -126,13 +126,13 @@ class Account:
     def check_password(login, password):
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
-        
+
         cursor.execute("SELECT password FROM Account WHERE username = ?", (login,))
         result = cursor.fetchone()
-        
+
         cursor.close()
         connection.close()
-        
+
         if result is None:
             return {"status": "error", "message": "User does not exist"}
 
@@ -144,7 +144,7 @@ class Account:
 
 
 class Token:
-    
+
     @staticmethod
     def invalidate_jti(jti: str, expiration_date: datetime):
         """Store a token jti to blacklist it.
@@ -153,22 +153,24 @@ class Token:
             token (str): the token to invalidate.
             expiration_date (datetime): the token expiration timestamp.
         """
-        
+
         # https://stackoverflow.com/questions/60918317/do-i-need-to-hash-refresh-token-stored-in-database
-        
+
         # if the db is leaked, and the token was stored, they could reuse it.
         # if we only store the jti, they can't reuse it unless
         # the secret is also leaked, making it a tad bit harder.
-        
+
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
         # assume the max possible duration
         timestamp = generate_refresh_token_timestamp()
-        cursor.execute("INSERT INTO ExpiredToken (jti, expirationDate) VALUES (?,?)", (jti, timestamp))
+        cursor.execute(
+            "INSERT INTO ExpiredToken (jti, expirationDate) VALUES (?,?)", (jti, timestamp)
+        )
         connection.commit()
         cursor.close()
         connection.close()
-        
+
     @staticmethod
     def is_jti_blacklisted(jti: str) -> bool:
         """Check if the token was invalidated.
@@ -183,7 +185,7 @@ class Token:
         cursor.close()
         connection.close()
         return result is not None
-    
+
     @staticmethod
     def purge_expired_tokens():
         """Remove all expired tokens from the database."""
@@ -193,6 +195,7 @@ class Token:
         connection.commit()
         cursor.close()
         connection.close()
+
 
 Token.purge_expired_tokens()
 
