@@ -94,19 +94,30 @@ class Account:
 
     @staticmethod
     def user_exists(login):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM Account WHERE username = ?", (login,))
-        return cursor.fetchone() is not None
+        result = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        return result is not None
 
     @staticmethod
-    def create_user(self, login, password):
-        if self.user_exists(login):
+    def create_user(login, password):
+        if Account.user_exists(login):
             return {"status": "error", "message": "Username already exists"}
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
 
         cursor.execute(
             "INSERT INTO Account (username, password) VALUES (?, ?)", (login, hashed_password)
         )
         connection.commit()
+        cursor.close()
+        connection.close()
+
         return {"status": "success", "message": "User created successfully"}
 
     @staticmethod

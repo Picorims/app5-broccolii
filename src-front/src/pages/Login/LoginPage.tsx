@@ -7,17 +7,15 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 import Button from "../../components/Button/Button";
 import Card from "../../components/Card/Card";
 import LabeledInput from "../../components/LabeledInput/LabeledInput";
 import styles from "./LoginPage.module.css";
-import { WebSocketConnection } from "../../lib/web_socket";
+import { API } from "../../lib/api";
 
 export default function LoginPage() {
   const [registerPasswordError, setRegisterPasswordError] = useState("");
-
-  const testWs = useRef<WebSocketConnection | null>(null);
 
   const onSubmitLogin = (e: FormEvent<HTMLFormElement>) => {
     console.log("Logging in...");
@@ -27,17 +25,14 @@ export default function LoginPage() {
     // const login = data.get("login");
     // const password = data.get("password");
 
-    if (testWs.current) {
-      testWs.current.sendMessage("Hello from the client");
-    }
   };
 
-  const onSubmitRegister = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmitRegister = async (e: FormEvent<HTMLFormElement>) => {
     console.log("Registering...");
     e.preventDefault();
 
     const data = new FormData(e.currentTarget);
-    // const login = data.get("login");
+    const login = data.get("login");
     const password = data.get("password");
     const confirmPassword = data.get("confirm_password");
 
@@ -48,18 +43,15 @@ export default function LoginPage() {
       setRegisterPasswordError("Passwords do not match");
       return;
     }
+
+    const response = await API.register(login as string, password as string);
+    if (response.ok) {
+      console.log("Registration successful");
+    } else {
+      console.error("Registration failed");
+      alert("Registration failed, please try again later");
+    }
   };
-
-  useEffect(() => {
-    testWs.current = new WebSocketConnection();
-    testWs.current.sendMessage("Hello from the client");
-
-    return () => {
-      if (testWs.current) {
-        testWs.current.close();
-      }
-    };
-  });
 
   return (
     <main className={styles.main}>
