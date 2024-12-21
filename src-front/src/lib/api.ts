@@ -12,10 +12,29 @@ import { getEnv } from "../environment";
 
 /**
  * Contains static methods for interacting with the API.
+ * 
+ * For details on the API, see the API documentation.
  */
 export class API {
     public static register(login: string, password: string) {
         const url = `${getEnv().backendUrl}/api/v1/user/register`;
+        console.log("[API] [POST] " + url);
+        
+        return fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: login,
+                password: password,
+            }),
+            
+        });
+    }
+
+    public static login(login: string, password: string) {
+        const url = `${getEnv().backendUrl}/api/v1/user/login`;
         console.log("[API] [POST] " + url);
         
         return fetch(url, {

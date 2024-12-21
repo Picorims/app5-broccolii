@@ -122,8 +122,15 @@ class Account:
 
     @staticmethod
     def check_password(login, password):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        
         cursor.execute("SELECT password FROM Account WHERE username = ?", (login,))
         result = cursor.fetchone()
+        
+        cursor.close()
+        connection.close()
+        
         if result is None:
             return {"status": "error", "message": "User does not exist"}
 

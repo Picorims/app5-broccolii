@@ -42,3 +42,31 @@ async def register(body: RegisterBody):
     print("User created successfully")
     
     return
+
+class LoginBody(BaseModel):
+    username: str
+    password: str
+
+@router.post("/user/login",
+                status_code=status.HTTP_200_OK,
+                description="Login a user.")
+async def login(body: LoginBody):
+    # check that all API values are present
+    if not body.username or not body.password:
+        print("Missing username or password")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing username or password"
+        )
+            
+    # check that the password is correct
+    if not Account.check_password(body.username, body.password)["status"] == "success":
+        print("Connection refused")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Connection refused"
+        )
+    
+    print("User logged in successfully")
+    
+    return

@@ -17,14 +17,21 @@ import { API } from "../../lib/api";
 export default function LoginPage() {
   const [registerPasswordError, setRegisterPasswordError] = useState("");
 
-  const onSubmitLogin = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
     console.log("Logging in...");
     e.preventDefault();
 
-    // const data = new FormData(e.currentTarget);
-    // const login = data.get("login");
-    // const password = data.get("password");
+    const data = new FormData(e.currentTarget);
+    const login = data.get("login");
+    const password = data.get("password");
 
+    const response = await API.login(login as string, password as string);
+    if (response.ok) {
+      console.log("Login successful");
+    } else {
+      console.error("Login failed");
+      alert("Login failed, please check your credentials or try again later");
+    }
   };
 
   const onSubmitRegister = async (e: FormEvent<HTMLFormElement>) => {
