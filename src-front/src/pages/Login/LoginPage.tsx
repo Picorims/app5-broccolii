@@ -28,14 +28,50 @@ export default function LoginPage() {
     const response = await API.login(login as string, password as string);
     if (response.ok) {
       const json = await response.json();
-      localStorage.setItem("token", json.access_token);
+      localStorage.setItem("access_token", json.access_token);
+      localStorage.setItem("refresh_token", json.refresh_token);
       console.log("Login successful");
 
-      // testing login
-      const resp = await API.auth_test();
+      // testing login (when there is a need to delete it, prefer
+      // moving it to a test file instead of deleting it)
+      const resp = await API.authTest();
       if (resp.ok) {
         console.log("Login test successful");
         console.log(await resp.text());
+
+        console.log("Testing timeout with 1min access token");
+        setTimeout(async () => {
+          // testing timeout with 1min access token
+          const resp = await API.authTest();
+          console.log(resp.ok);
+
+          //testing refresh token
+          if (!resp.ok) {
+            console.log("Testing refresh token");
+            const success = await API.refreshToken();
+            if (success) {
+              console.log("Refresh token successful");
+              console.log("test auth again.")
+              const resp = await API.authTest();
+              console.log(resp.ok);
+              if (resp.ok) {
+                console.log("testing logout");
+                await API.logout();
+                const resp = await API.authTest();
+                console.log(resp.ok);
+                if (!resp.ok) {
+                  console.log("Logout successful");
+                  console.log("ensure refresh token is invalid");
+                  const success = await API.refreshToken();
+                  console.log(success);
+                  if (!success) {
+                    console.log("Refresh token invalidation successful");
+                  }
+                }
+              }
+            }
+          }   
+        }, 1000 * 61);
       }
     } else {
       console.error("Login failed");

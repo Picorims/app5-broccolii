@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 import bcrypt
+from datetime import datetime
+from .auth.jwt_utils import generate_refresh_token_timestamp
 
 
 db_name = "broccolii.db"
@@ -140,6 +142,59 @@ class Account:
         else:
             return {"status": "error", "message": "Incorrect password"}
 
+
+class Token:
+    
+    @staticmethod
+    def invalidate_jti(jti: str, expiration_date: datetime):
+        """Store a token jti to blacklist it.
+
+        Args:
+            token (str): the token to invalidate.
+            expiration_date (datetime): the token expiration timestamp.
+        """
+        
+        # https://stackoverflow.com/questions/60918317/do-i-need-to-hash-refresh-token-stored-in-database
+        
+        # if the db is leaked, and the token was stored, they could reuse it.
+        # if we only store the jti, they can't reuse it unless
+        # the secret is also leaked, making it a tad bit harder.
+        
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        # assume the max possible duration
+        timestamp = generate_refresh_token_timestamp()
+        cursor.execute("INSERT INTO ExpiredToken (jti, expirationDate) VALUES (?,?)", (jti, timestamp))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        
+    @staticmethod
+    def is_jti_blacklisted(jti: str) -> bool:
+        """Check if the token was invalidated.
+
+        Args:
+            jti (str): the token to check.
+        """
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM ExpiredToken WHERE jti = ?", (jti,))
+        result = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        return result is not None
+    
+    @staticmethod
+    def purge_expired_tokens():
+        """Remove all expired tokens from the database."""
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM ExpiredToken WHERE expirationDate < datetime('now')")
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+Token.purge_expired_tokens()
 
 # %%
 

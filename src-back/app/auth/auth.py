@@ -13,7 +13,7 @@ from fastapi import APIRouter, Depends, Request, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
-from ..classes import Account
+from ..classes import Account, Token as TokenDB
 import app.auth.jwt_utils as jwt_utils
 
 router = APIRouter()
@@ -46,12 +46,8 @@ async def register(body: RegisterBody):
     Account.create_user(body.username, body.password)
     print("User created successfully")
     
-    access_token_expires = timedelta(minutes=jwt_utils.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = jwt_utils.create_access_token(
-        data={"sub": body.username}, expires_delta=access_token_expires
-    )
-    
-    return jwt_utils.Token(access_token=access_token, token_type="bearer")
+    return jwt_utils.create_token_pair()
+
 
 class LoginBody(BaseModel):
     username: str
@@ -78,16 +74,31 @@ async def login(body: LoginBody) -> jwt_utils.Token:
         )
     
     print("User logged in successfully")
-    
-    access_token_expires = timedelta(minutes=jwt_utils.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = jwt_utils.create_access_token(
-        data={"sub": body.username}, expires_delta=access_token_expires
-    )
-    
-    return jwt_utils.Token(access_token=access_token, token_type="bearer")
+        
+    return jwt_utils.create_token_pair()
 
 @router.get("/user/auth_test", dependencies=[Depends(HTTPBearer())])
 async def auth_test(credentials: jwt_utils.Credentials) -> JSONResponse:
     jwt_utils.verify_token(credentials)
     
     return JSONResponse(content={"status": "success", "message": "User is authenticated"}, media_type="application/json")
+
+@router.get("/user/refresh_token", description="Refresh the access token. The bearer must be the refresh token.")
+async def refresh_token(credentials: jwt_utils.Credentials) -> jwt_utils.Token:
+    token_data = jwt_utils.verify_token(credentials)
+    
+    if TokenDB.is_jti_blacklisted(token_data.jti):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token"
+        )
+    
+    return jwt_utils.create_token_pair()
+
+@router.get("/user/logout", description="Logout the user. The bearer must be the access token.")
+async def logout(credentials: jwt_utils.Credentials):
+    token_data = jwt_utils.verify_token(credentials)
+    
+    TokenDB.invalidate_jti(token_data.jti)
+    
+    return JSONResponse(content={"status": "success", "message": "User logged out"}, media_type="application/json")

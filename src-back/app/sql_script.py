@@ -92,6 +92,14 @@ sql_command = """
     );
 """
 cursor.execute(sql_command)
+
+sql_command = """
+    CREATE TABLE ExpiredToken(
+        jti VARCHAR(256) PRIMARY KEY,
+        expirationDate DATETIME NOT NULL
+    );
+"""
+cursor.execute(sql_command)
 # %%
 
 # %% Account Insertion & Verification

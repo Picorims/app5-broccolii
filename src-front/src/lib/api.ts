@@ -50,7 +50,7 @@ export class API {
         });
     }
 
-    public static auth_test() {
+    public static authTest() {
         const url = `${getEnv().backendUrl}/api/v1/user/auth_test`;
         console.log("[API] [GET] " + url);
         
@@ -58,8 +58,46 @@ export class API {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
             },
         });
+    }
+
+    public static async refreshToken(): Promise<boolean> {
+        const url = `${getEnv().backendUrl}/api/v1/user/refresh_token`;
+        console.log("[API] [GET] " + url);
+        
+        const resp = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("refresh_token")}`,
+            },
+        });
+
+        if (resp.ok) {
+            const json = await resp.json();
+            localStorage.setItem("access_token", json.access_token);
+            localStorage.setItem("refresh_token", json.refresh_token);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static logout() {
+        const url = `${getEnv().backendUrl}/api/v1/user/logout`;
+        console.log("[API] [GET] " + url);
+
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+            },
+        });
+
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
     }
 }
