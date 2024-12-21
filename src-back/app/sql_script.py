@@ -53,7 +53,9 @@ sql_command = """
        effect TEXT NOT NULL,
        rarity VARCHAR(50),
        isNegative LOGICAL,
-       idCardEffect INT
+       idCardEffect INT,
+       adding LOGICAL,
+       multiplyBy DECIMAL(10,3)
     );
 """
 cursor.execute(sql_command)
