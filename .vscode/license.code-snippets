@@ -17,7 +17,7 @@
 	// }
 	"license": {
 		"description": "Add license to file",
-		"scope": "javascript,typescript,javascriptreact,typescriptreact,html,css,scss",
+		"scope": "javascript,typescript,javascriptreact,typescriptreact,html,css,scss,python",
 		"prefix": ["license","cprt"],
 		"body": [
 			"$BLOCK_COMMENT_START",

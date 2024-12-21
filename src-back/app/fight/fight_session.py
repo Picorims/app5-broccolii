@@ -84,9 +84,9 @@ class FightSession:
         if not event["fightID"] == self._fight_id:
             await self._send_error_event(websocket, "Non matching fight session.")
             await websocket.close()
-            return False
+            return True
         if await self.close_if_player_not_allowed(event["userID"], websocket):
-            return False
+            return True
 
         if not self.player_has_session(event["userID"]):
             self.add_player_session(websocket, event["userID"])
@@ -95,15 +95,19 @@ class FightSession:
             await self._send_error_event(websocket, "Player already has an open session.")
             self.remove_player_session(event["userID"])
             await websocket.close()
-            return False
+            return True
 
         if event["type"] == "requestGameState":
             await self._handle_request_game_state(websocket)
         elif event["type"] == "submitLetter":
             await self._handle_submit_letter(websocket, event["userID"], event["letter"])
+        elif event["type"] == "submit":
+            await self._handle_submit_word(websocket, event["userID"])
+        elif event["type"] == "submitEraseLetter":
+            await self._handle_erase_letter(websocket, event["userID"])
         else:
             await self._send_error_event(websocket, "Unknown event type.")
-        return True
+        return False
 
     async def _handle_request_game_state(self, websocket: WebSocket):
         state = {}
@@ -156,9 +160,7 @@ class FightSession:
             )
             success = True
         await websocket.send_text(
-            build_json_event(
-                "acknowledgeSubmit", {"accepted": success, "testedState": currentState}
-            )
+            build_json_event("acknowledgeSubmit", {"success": success, "testedState": currentState})
         )
 
     async def _send_error_event(self, websocket: WebSocket, msg: str):
@@ -246,7 +248,7 @@ def build_json_event(event_type, data):
     Returns:
         str: stringified JSON
     """
-    print(data)
+    # print(data)
     obj = {key: value for key, value in data.items()}
     obj["type"] = event_type
     return json.dumps(obj)
