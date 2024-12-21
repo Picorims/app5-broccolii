@@ -47,7 +47,13 @@ class Word {
   }
 }
 
-export default function WordCloud() {
+export default function WordCloud({
+  userId,
+  fightId
+}: {
+  userId: string;
+  fightId: string;
+}) {
   const refCanvas = useRef<HTMLDivElement>(null);
   const refContainer = useRef<HTMLDivElement>(null);
   const refContainerSize = useRef({ width: 0, height: 0 });
@@ -67,8 +73,6 @@ export default function WordCloud() {
 
   //WordCloud initialization
   const init = useCallback(async () => {
-    console.log("init front");
-
     const app = new Application();
 
     if (refContainer.current) {
@@ -133,17 +137,15 @@ export default function WordCloud() {
     });
 
     updateSize();
-    console.log("init front fin", app, app.stage);
     return app;
     //}, [containerSize]);
   }, []);
 
   //session initialization
   useEffect(() => {
-    console.log("init back");
     setError("");
     console.log("Initializing session...");
-    fightSession.current = new FightSession("alice", "test", () => {
+    fightSession.current = new FightSession(userId, fightId, () => {
       console.log("WebSocket open. Getting state...");
       fightSession.current?.requestGameState();
     });
@@ -299,8 +301,6 @@ export default function WordCloud() {
   }
 
   const pushWord = useCallback((word: Word) => {
-    console.log("pushWord");
-
     if (!refApp.current || !refApp.current.stage) {
       console.error("App or stage not initialized. Skipping word push.");
       return;

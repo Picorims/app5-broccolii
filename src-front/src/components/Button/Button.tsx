@@ -14,15 +14,17 @@ export interface Props {
   type: "button" | "submit";
   children: React.ReactNode;
   variant?: "primary" | "secondary" | "accent";
+  onClick?: () => void;
 }
 
 export default function Button({
   type,
   children,
   variant = "secondary",
+  onClick,
 }: Props) {
   return (
-    <button type={type} className={classList(styles.button, variant)}>
+    <button type={type} className={classList(styles.button, variant)} onClick={onClick}>
       {children}
     </button>
   );
