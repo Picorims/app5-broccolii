@@ -92,10 +92,12 @@ class Account:
             f"AND idCard = {card.id})"
         )
 
+    @staticmethod
     def user_exists(login):
         cursor.execute("SELECT * FROM Account WHERE username = ?", (login,))
         return cursor.fetchone() is not None
 
+    @staticmethod
     def create_user(self, login, password):
         if self.user_exists(login):
             return {"status": "error", "message": "Username already exists"}
@@ -107,6 +109,7 @@ class Account:
         connection.commit()
         return {"status": "success", "message": "User created successfully"}
 
+    @staticmethod
     def check_password(login, password):
         cursor.execute("SELECT password FROM Account WHERE username = ?", (login,))
         result = cursor.fetchone()
