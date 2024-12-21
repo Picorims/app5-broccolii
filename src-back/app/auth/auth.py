@@ -7,11 +7,9 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
-from datetime import timedelta
-from typing import Annotated
-from fastapi import APIRouter, Depends, Request, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.responses import JSONResponse
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import HTTPBearer
 from pydantic import BaseModel
 from ..classes import Account, Token as TokenDB
 import app.auth.jwt_utils as jwt_utils
