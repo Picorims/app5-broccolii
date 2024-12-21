@@ -160,9 +160,7 @@ class FightSession:
             )
             success = True
         await websocket.send_text(
-            build_json_event(
-                "acknowledgeSubmit", {"success": success, "testedState": currentState}
-            )
+            build_json_event("acknowledgeSubmit", {"success": success, "testedState": currentState})
         )
 
     async def _send_error_event(self, websocket: WebSocket, msg: str):
