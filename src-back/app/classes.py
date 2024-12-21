@@ -39,7 +39,7 @@ class Word:
 
     def print_category(self):
         for i in self.category:
-            i.PrintCategory()
+            i.print_category()
 
     def print_word(self):
         print(f" {self.get_word()}")
@@ -134,7 +134,7 @@ query = cursor.fetchall()
 words = []
 for word in query:
     if word in words:
-        words[word[1]].AddCategory(word[2])
+        words[word[1]].add_category(word[2])
     else:
         w = Word(word[0], word[1])
         w.add_category(word[2])
@@ -142,7 +142,7 @@ for word in query:
 
 for word in words:
     if len(word.category) > 1:
-        word.PrintWord()
+        word.print_word()
 
 cursor.execute("SELECT id, name FROM Category;")
 query = cursor.fetchall()
@@ -167,7 +167,7 @@ words = []
 for word in query:
     word_key = (word[0], word[1])
     if word_key in words_dict:
-        words_dict[word_key].AddCategory(word[2])
+        words_dict[word_key].add_category(word[2])
     else:
         w = Word(word[0], word[1])
         w.add_category(word[2])
@@ -176,7 +176,7 @@ for word in query:
 
 for word in words:
     if len(word.category) > 1:
-        word.PrintWord()
+        word.print_word()
 
 # %%
 
