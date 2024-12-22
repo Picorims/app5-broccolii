@@ -16,6 +16,9 @@ import { API } from "../../lib/api";
 
 export default function LoginPage() {
   const [registerPasswordError, setRegisterPasswordError] = useState("");
+  const [registerUsernameError, setRegisterUsernameError] = useState("");
+
+  const usernameRegex = /^[a-zA-Z0-9_]{3,32}$/g;
 
   const onSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
     console.log("Logging in...");
@@ -89,6 +92,12 @@ export default function LoginPage() {
     const confirmPassword = data.get("confirm_password");
 
     setRegisterPasswordError("");
+    setRegisterUsernameError("");
+
+    if (!login || !password || !confirmPassword) {
+      console.error("Missing fields");
+      return;
+    }
 
     if (password !== confirmPassword) {
       console.error("Passwords do not match");
@@ -96,7 +105,13 @@ export default function LoginPage() {
       return;
     }
 
-    const response = await API.register(login as string, password as string);
+    if (!login.toString()?.match(usernameRegex)) {
+      console.error("Invalid username");
+      setRegisterUsernameError("Invalid username");
+      return;
+    }
+
+    const response = await API.register(login.toString(), password.toString());
     if (response.ok) {
       console.log("Registration successful");
     } else {
@@ -128,7 +143,14 @@ export default function LoginPage() {
         <h2>Register</h2>
         {/* TODO: adjust form */}
         <form action="" method="post" onSubmit={onSubmitRegister}>
-          <LabeledInput type="text" label="Username" name="login" required />
+          <LabeledInput
+            type="text"
+            label="Username (between 3 and 32 alphanumeric characters separated by underscores)"
+            name="login"
+            error={registerUsernameError}
+            pattern={usernameRegex}
+            required
+          />
           <LabeledInput
             type="password"
             label="Password"

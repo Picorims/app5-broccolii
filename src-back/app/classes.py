@@ -3,6 +3,7 @@ import sqlite3
 import bcrypt
 from datetime import datetime
 from .auth.jwt_utils import generate_refresh_token_timestamp
+import re
 
 
 db_name = "broccolii.db"
@@ -141,6 +142,20 @@ class Account:
             return {"status": "success", "message": "Password is correct"}
         else:
             return {"status": "error", "message": "Incorrect password"}
+
+    @staticmethod
+    def valid_username(username: str) -> bool:
+        """Check if the username is valid.
+
+        (between 3 and 32 alphanumeric characters and underscores)
+
+        Args:
+            username (str): the username to check.
+
+        Returns:
+            bool: True if the username is valid, False otherwise.
+        """
+        return re.match(r"^[a-zA-Z0-9_]{3,32}$", username) is not None
 
 
 class Token:
