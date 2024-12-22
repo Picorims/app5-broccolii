@@ -9,10 +9,13 @@
 
 .container {
   width: 100%;
+  margin-bottom: var(--spacing-s);
 }
 
 .label span {
+  display: inline-block;
   font-size: 1.2rem;
+  line-height: 1;
 }
 
 .input {

@@ -16,6 +16,7 @@ export interface Props {
   name?: string;
   error?: string;
   required?: boolean;
+  pattern?: RegExp;
 }
 
 export default function LabeledInput({
@@ -24,6 +25,7 @@ export default function LabeledInput({
   name,
   error = "",
   required = false,
+  pattern
 }: Props) {
   const onInput = (e: FormEvent<HTMLInputElement>) => {
     (e.target as HTMLInputElement).setCustomValidity("");
@@ -39,7 +41,7 @@ export default function LabeledInput({
   }, [error]);
 
   return (
-    <div>
+    <div className={styles.container}>
       <label className={styles.label}>
         <span>{label}</span>
         <input
@@ -49,6 +51,7 @@ export default function LabeledInput({
           onInput={onInput}
           ref={inputRef}
           required={required}
+          pattern={pattern?.source}
         />
       </label>
       {error !== "" && <span className={styles.error}>{error}</span>}
