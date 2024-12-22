@@ -53,7 +53,9 @@ sql_command = """
        effect TEXT NOT NULL,
        rarity VARCHAR(50),
        isNegative LOGICAL,
-       idCardEffect INT
+       idCardEffect INT,
+       adding LOGICAL,
+       multiplyBy DECIMAL(10,3)
     );
 """
 cursor.execute(sql_command)
@@ -87,6 +89,14 @@ sql_command = """
        PRIMARY KEY(idAccount, idCard),
        FOREIGN KEY(idAccount) REFERENCES Account(id),
        FOREIGN KEY(idCard) REFERENCES Upgrade(id)
+    );
+"""
+cursor.execute(sql_command)
+
+sql_command = """
+    CREATE TABLE ExpiredToken(
+        jti VARCHAR(256) PRIMARY KEY,
+        expirationDate DATETIME NOT NULL
     );
 """
 cursor.execute(sql_command)
