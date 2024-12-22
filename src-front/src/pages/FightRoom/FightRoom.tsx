@@ -1,23 +1,20 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import WorldCloud from "../../components/WordCloud/WordCloud";
 
 function FightRoom() {
   const queryParameters = new URLSearchParams(window.location.search)
-  const refFightId = useRef<string>("");
-  const refUserId = useRef<string>("");
+  const [fightId, setFightId] = useState<string>();
+  const [userId, setUserId] = useState<string>();
 
   useEffect(() => {
-    refFightId.current = queryParameters.get("fightId") as string
-    refUserId.current = queryParameters.get("userId") as string
+    setFightId(queryParameters.get("fightId") as string)
+    setUserId(queryParameters.get("userId") as string)
+  }, [fightId, userId]);
 
-    console.log("args : ", refFightId.current, refUserId.current);
-    
-    
-  });
-
-  return <WorldCloud 
-  userId={refUserId.current}
-  fightId={refFightId.current}/>;
+  if (userId == null || fightId == null) {
+    return <div>Loading...</div>
+  }
+  return <WorldCloud userId={userId} fightId={fightId}/>;
 }
 
 export default FightRoom;
