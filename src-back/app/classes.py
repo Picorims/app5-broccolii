@@ -143,11 +143,10 @@ class Account:
         else:
             return {"status": "error", "message": "Incorrect password"}
 
-
     @staticmethod
     def valid_username(username: str) -> bool:
         """Check if the username is valid.
-        
+
         (between 3 and 32 alphanumeric characters and underscores)
 
         Args:
@@ -157,6 +156,7 @@ class Account:
             bool: True if the username is valid, False otherwise.
         """
         return re.match(r"^[a-zA-Z0-9_]{3,32}$", username) is not None
+
 
 class Token:
 

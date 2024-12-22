@@ -38,9 +38,7 @@ async def register(body: RegisterBody):
     # check that the username is respecting rules
     if not Account.valid_username(body.username):
         print("Invalid username")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid username"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid username")
 
     # check that the user does not already exist
     if Account.user_exists(body.username):
