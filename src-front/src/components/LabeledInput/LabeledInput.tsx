@@ -25,7 +25,7 @@ export default function LabeledInput({
   name,
   error = "",
   required = false,
-  pattern
+  pattern,
 }: Props) {
   const onInput = (e: FormEvent<HTMLInputElement>) => {
     (e.target as HTMLInputElement).setCustomValidity("");

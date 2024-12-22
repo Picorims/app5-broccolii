@@ -143,7 +143,14 @@ export default function LoginPage() {
         <h2>Register</h2>
         {/* TODO: adjust form */}
         <form action="" method="post" onSubmit={onSubmitRegister}>
-          <LabeledInput type="text" label="Username (between 3 and 32 alphanumeric characters separated by underscores)" name="login" error={registerUsernameError} pattern={usernameRegex} required />
+          <LabeledInput
+            type="text"
+            label="Username (between 3 and 32 alphanumeric characters separated by underscores)"
+            name="login"
+            error={registerUsernameError}
+            pattern={usernameRegex}
+            required
+          />
           <LabeledInput
             type="password"
             label="Password"
