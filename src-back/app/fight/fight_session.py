@@ -9,7 +9,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import json
 import time
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+import uuid
+from pydantic import BaseModel
+from fastapi.responses import JSONResponse
+from fastapi import APIRouter, WebSocket, status, WebSocketDisconnect, HTTPException
 
 
 router = APIRouter()
@@ -28,7 +31,21 @@ class FightSession:
         self._words_found = []
         self._word_best_progress = {}
         self._game_end_epoch = int(time.time() + 60)
-
+    
+    def toString(self):
+        res = "FightSession : ["
+        res += "\t_fight_id : " + self._fight_id + "\n"
+        res += "\t_players : " + self._players.__str__() + "\n"
+        res += "\t_players_sessions : " + self._players_sessions.__str__() + "\n"
+        res += "\t_players_typing_history : " + self._players_typing_history.__str__() + "\n"
+        res += "\t_scores : " + self._scores.__str__() + "\n"
+        res += "\t_words_to_find : " + self._words_to_find.__str__() + "\n"
+        res += "\t_words_found : " + self._words_found.__str__() + "\n"
+        res += "\t_word_best_progress : " + self._word_best_progress.__str__() + "\n"
+        res += "\t_game_end_epoch : " + self._game_end_epoch.__str__() + "\n"
+        res += "]"
+        return res
+    
     def add_player_session(self, session: WebSocket, name: str):
         if name in self._players_sessions:
             raise Exception("This player already has a session.")
@@ -42,6 +59,25 @@ class FightSession:
             raise Exception("This player does not have a session.")
         self._players_sessions.pop(name, None)
 
+    def add_player(self, userId: str, websocket: WebSocket):
+        #print("avant", self.toString())
+        self._players.append(userId)
+        self.add_player_session(websocket, userId)
+        self._players_typing_history[userId] = []
+        self._scores[userId] = 0
+        #print("après", self.toString())
+        return
+
+    def find_user_from_ws(self, ws_to_find : WebSocket):
+        print(ws_to_find)
+        for ws in self._players_sessions:
+            print("\t", self._players_sessions[ws])
+            if self._players_sessions[ws] == ws_to_find:
+                print("\t\tFound")
+                return ws
+
+
+    
     async def close_if_player_not_allowed(self, name, websocket):
         """If the player is allowed, do nothing and return False.
         Otherwise, send an error and close the connection, and return True.
@@ -53,13 +89,15 @@ class FightSession:
         Returns:
             bool: session closed
         """
-        if name not in self._players:
+        """if name not in self._players:
             await self._send_error_event(websocket, "Player not in fight session.")
             await websocket.close()
-            return True
+            return True"""
         return False
 
     async def handle_event(self, event, websocket: WebSocket):
+        print("CALL HANDLE EVENT", event)
+
         """handle event. Returns False if the session was closed.
 
         Args:
@@ -87,6 +125,12 @@ class FightSession:
             return True
         if await self.close_if_player_not_allowed(event["userID"], websocket):
             return True
+        
+        #If the player isn't in the game, we add them
+        print(event["userID"], self._players)
+        if event["userID"] not in self._players:
+            print("PLAYER NOT IN GAME")
+            self.add_player(event["userID"], websocket)
 
         if not self.player_has_session(event["userID"]):
             self.add_player_session(websocket, event["userID"])
@@ -150,7 +194,7 @@ class FightSession:
             self._words_to_find.remove(currentState)
             self._scores[userID] += 1
             self._players_typing_history[userID] = []
-            self._update_words_best_progress()
+            await self._update_words_best_progress()
             await self._broadcast(build_json_event("wordsFound", {"words": [currentState]}))
             await self._broadcast(
                 build_json_event(
@@ -171,9 +215,11 @@ class FightSession:
 
     async def _broadcast(self, msg: str):
         for _, session in self._players_sessions.items():
+            print("PRE ERROR", msg)
             await session.send_text(msg)
 
     async def _update_words_best_progress(self):
+        print("CALL _update_words_best_progress", self.toString())
         self._word_best_progress = {}
         for player_progress in self._players_typing_history:
             if len(player_progress) > 0:
@@ -213,11 +259,56 @@ async def websocket_endpoint(fightId, websocket: WebSocket):
                     if websocket_closed:
                         break
     except WebSocketDisconnect:
+        user = sessions[fightId].find_user_from_ws(websocket)
         print("Client disconnected")
         try:
             sessions[fightId].remove_player_session(user)
         except Exception as e:
             print(f"Could not remove {user} from session {fightId}: {e}")
+
+    
+"""@router.post("/fight/create")
+async def create_session(player_list: list[str]):
+    print("CREATION DE LA NOUVELLE SESSION")
+    newFightId = str(uuid.uuid4())[:8]
+    while newFightId in sessions:
+        newFightId = str(uuid.uuid4())[:8]
+        
+    sessions[newFightId] = FightSession(newFightId, [])
+
+    
+    return {"fightId": newFightId, "message": "Session created successfully"}"""
+
+class CreateFightSessionBody(BaseModel):
+    player_list: list[str]
+    
+
+@router.post(
+    "/fight/create",
+    status_code=status.HTTP_201_CREATED,
+    description="Register a new user, if the username does not already exist.",
+)
+async def register(body: CreateFightSessionBody):
+    # check that all API values are present
+    if not body.player_list:
+        print("Missing player_list")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing player_list"
+        )
+    
+    print("CREATION DE LA NOUVELLE SESSION")
+    newFightId = str(uuid.uuid4())[:8]
+    while newFightId in sessions:
+        newFightId = str(uuid.uuid4())[:8]
+        
+    sessions[newFightId] = FightSession(newFightId, [])
+    
+    return JSONResponse(
+        content={"status": "success", "message": "Game created", "fightId": newFightId},
+        media_type="application/json",
+    )
+
+
 
 
 async def get_json(websocket: WebSocket, data: str):

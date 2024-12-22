@@ -3,6 +3,8 @@ import styles from "./Lobby.module.css";
 import Card from '../../components/Card/Card';
 import { useState } from 'react';
 
+import { getEnv } from "../../environment";
+
 export default function Lobby() {
   const navigate = useNavigate();
   //const refLink = useRef<string>();
@@ -13,7 +15,8 @@ export default function Lobby() {
     const newId = Math.random().toString(36).substring(2,7); /* random id generator */
     setFightID(newId)
   }
-  const createRoomDebug = () => {
+  
+  const createRoomDebug = async () => {
     const debugFightIdInput = document.getElementById('debugFightId') as HTMLInputElement; // Type assertion
     const debugFightId = debugFightIdInput?.value;
     setFightID(debugFightId)
@@ -22,6 +25,22 @@ export default function Lobby() {
     const debugUserId = debugUserIdInput?.value;
     setUserID(debugUserId)
 
+    //create the room
+    /* const url = `${getEnv().backendUrl}/api/v1/fight/create`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: ""
+    });
+    console.log("response :", response); */
+
+    //I want the next part of the code to be executed only when the first part is finished (async)
+    
+    
+
+    //afterwards, join the room
     navigate('/fight?fightId=' + debugFightId + "&userId=" + debugUserId);
   }
 
