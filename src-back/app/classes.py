@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 import bcrypt
+from datetime import datetime
+from .auth.jwt_utils import generate_refresh_token_timestamp
+import re
 
 
 db_name = "broccolii.db"
@@ -39,7 +42,7 @@ class Word:
 
     def print_category(self):
         for i in self.category:
-            i.PrintCategory()
+            i.print_category()
 
     def print_word(self):
         print(f" {self.get_word()}")
@@ -92,24 +95,45 @@ class Account:
             f"AND idCard = {card.id})"
         )
 
+    @staticmethod
     def user_exists(login):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM Account WHERE username = ?", (login,))
-        return cursor.fetchone() is not None
+        result = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        return result is not None
 
-    def create_user(self, login, password):
-        if self.user_exists(login):
+    @staticmethod
+    def create_user(login, password):
+        if Account.user_exists(login):
             return {"status": "error", "message": "Username already exists"}
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
 
         cursor.execute(
             "INSERT INTO Account (username, password) VALUES (?, ?)", (login, hashed_password)
         )
         connection.commit()
+        cursor.close()
+        connection.close()
+
         return {"status": "success", "message": "User created successfully"}
 
+    @staticmethod
     def check_password(login, password):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
         cursor.execute("SELECT password FROM Account WHERE username = ?", (login,))
         result = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
         if result is None:
             return {"status": "error", "message": "User does not exist"}
 
@@ -119,6 +143,76 @@ class Account:
         else:
             return {"status": "error", "message": "Incorrect password"}
 
+    @staticmethod
+    def valid_username(username: str) -> bool:
+        """Check if the username is valid.
+
+        (between 3 and 32 alphanumeric characters and underscores)
+
+        Args:
+            username (str): the username to check.
+
+        Returns:
+            bool: True if the username is valid, False otherwise.
+        """
+        return re.match(r"^[a-zA-Z0-9_]{3,32}$", username) is not None
+
+
+class Token:
+
+    @staticmethod
+    def invalidate_jti(jti: str, expiration_date: datetime):
+        """Store a token jti to blacklist it.
+
+        Args:
+            token (str): the token to invalidate.
+            expiration_date (datetime): the token expiration timestamp.
+        """
+
+        # https://stackoverflow.com/questions/60918317/do-i-need-to-hash-refresh-token-stored-in-database
+
+        # if the db is leaked, and the token was stored, they could reuse it.
+        # if we only store the jti, they can't reuse it unless
+        # the secret is also leaked, making it a tad bit harder.
+
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        # assume the max possible duration
+        timestamp = generate_refresh_token_timestamp()
+        cursor.execute(
+            "INSERT INTO ExpiredToken (jti, expirationDate) VALUES (?,?)", (jti, timestamp)
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+    @staticmethod
+    def is_jti_blacklisted(jti: str) -> bool:
+        """Check if the token was invalidated.
+
+        Args:
+            jti (str): the token to check.
+        """
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM ExpiredToken WHERE jti = ?", (jti,))
+        result = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        return result is not None
+
+    @staticmethod
+    def purge_expired_tokens():
+        """Remove all expired tokens from the database."""
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM ExpiredToken WHERE expirationDate < datetime('now')")
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+
+Token.purge_expired_tokens()
 
 # %%
 
@@ -134,7 +228,7 @@ query = cursor.fetchall()
 words = []
 for word in query:
     if word in words:
-        words[word[1]].AddCategory(word[2])
+        words[word[1]].add_category(word[2])
     else:
         w = Word(word[0], word[1])
         w.add_category(word[2])
@@ -142,7 +236,7 @@ for word in query:
 
 for word in words:
     if len(word.category) > 1:
-        word.PrintWord()
+        word.print_word()
 
 cursor.execute("SELECT id, name FROM Category;")
 query = cursor.fetchall()
@@ -167,7 +261,7 @@ words = []
 for word in query:
     word_key = (word[0], word[1])
     if word_key in words_dict:
-        words_dict[word_key].AddCategory(word[2])
+        words_dict[word_key].add_category(word[2])
     else:
         w = Word(word[0], word[1])
         w.add_category(word[2])
@@ -176,7 +270,7 @@ for word in query:
 
 for word in words:
     if len(word.category) > 1:
-        word.PrintWord()
+        word.print_word()
 
 # %%
 
