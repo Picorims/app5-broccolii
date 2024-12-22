@@ -145,6 +145,8 @@ export default function WordCloud({
   useEffect(() => {
     setError("");
     console.log("Initializing session...");
+    console.log("pré création session :", userId, fightId);
+    
     fightSession.current = new FightSession(userId, fightId, () => {
       console.log("WebSocket open. Getting state...");
       fightSession.current?.requestGameState();
@@ -153,6 +155,8 @@ export default function WordCloud({
     const session = fightSession.current;
     session.onErrorThen((err) => {
       setError(err);
+      console.log('error: ', err);
+      
     });
     session.onSendGameStateThen((state) => {
       console.log("Received state", state);
@@ -186,7 +190,7 @@ export default function WordCloud({
     return () => {
       fightSession.current?.close();
     };
-  }, [error]); //This is the dependency array that causes the issue
+  }, [fightId, userId]);
 
   /**
    * If a new letter has been typed, this sends a submitLetter event.
