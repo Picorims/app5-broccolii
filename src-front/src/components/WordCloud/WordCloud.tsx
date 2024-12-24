@@ -49,7 +49,7 @@ class Word {
 
 export default function WordCloud({
   userId,
-  fightId
+  fightId,
 }: {
   userId: string;
   fightId: string;
@@ -61,7 +61,7 @@ export default function WordCloud({
   const refApp = useRef<Application<PIXI.Renderer>>();
   const refWords = useRef<Word[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [error, setError] = useState("");
+  //const [error, setError] = useState("");
   const [scores, setScores] = useState<Record<string, number>>({});
   const [wordsBestProgress, setWordsBestProgress] = useState<
     Record<string, number>
@@ -143,10 +143,10 @@ export default function WordCloud({
 
   //session initialization
   useEffect(() => {
-    setError("");
+    //setError("");
     console.log("Initializing session...");
     console.log("pré création session :", userId, fightId);
-    
+
     fightSession.current = new FightSession(userId, fightId, () => {
       console.log("WebSocket open. Getting state...");
       fightSession.current?.requestGameState();
@@ -154,9 +154,8 @@ export default function WordCloud({
 
     const session = fightSession.current;
     session.onErrorThen((err) => {
-      setError(err);
-      console.log('error: ', err);
-      
+      //setError(err);
+      console.log("error: ", err);
     });
     session.onSendGameStateThen((state) => {
       console.log("Received state", state);

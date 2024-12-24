@@ -1,49 +1,51 @@
-html, body, #app, #app>div {
-    height: 100%;
-    width: 100%
+html,
+body,
+#app,
+#app > div {
+  height: 100%;
+  width: 100%;
 }
 
-
 .mainContainer {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    border-radius: 2em;
-    background-color: red;
-    height: 100%;
-    width: 100%
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  border-radius: 2em;
+  background-color: red;
+  height: 100%;
+  width: 100%;
 }
 
 .enterRoom {
-    padding: 1em;
-    margin: 1em;
-    background-color: salmon;
-    border-radius: 2em;
-    height: 50%;
-    width: 100%
+  padding: 1em;
+  margin: 1em;
+  background-color: salmon;
+  border-radius: 2em;
+  height: 50%;
+  width: 100%;
 }
 
 .createRoom {
-    padding: 1em;
-    margin: 1em;
-    background-color: salmon;
-    border-radius: 2em;
-    height: 95%;
-    width: 100%
+  padding: 1em;
+  margin: 1em;
+  background-color: salmon;
+  border-radius: 2em;
+  height: 95%;
+  width: 100%;
 }
 
 .searchBar {
-    background-color: white;
-    height: 3em;
-    width: 90%;
-    border-radius: 3em;
+  background-color: white;
+  height: 3em;
+  width: 90%;
+  border-radius: 3em;
 }
 
 .horizontalDiv {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .tempDebug {
-    background-color: lime;
+  background-color: lime;
 }

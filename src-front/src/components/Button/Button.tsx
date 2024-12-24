@@ -24,7 +24,11 @@ export default function Button({
   onClick,
 }: Props) {
   return (
-    <button type={type} className={classList(styles.button, variant)} onClick={onClick}>
+    <button
+      type={type}
+      className={classList(styles.button, variant)}
+      onClick={onClick}
+    >
       {children}
     </button>
   );
