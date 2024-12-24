@@ -60,12 +60,10 @@ class FightSession:
         self._players_sessions.pop(name, None)
 
     def add_player(self, userId: str, websocket: WebSocket):
-        #print("avant", self.toString())
         self._players.append(userId)
         self.add_player_session(websocket, userId)
         self._players_typing_history[userId] = []
         self._scores[userId] = 0
-        #print("après", self.toString())
         return
 
     def find_user_from_ws(self, ws_to_find : WebSocket):
@@ -96,8 +94,6 @@ class FightSession:
         return False
 
     async def handle_event(self, event, websocket: WebSocket):
-        print("CALL HANDLE EVENT", event)
-
         """handle event. Returns False if the session was closed.
 
         Args:
@@ -127,9 +123,7 @@ class FightSession:
             return True
         
         #If the player isn't in the game, we add them
-        print(event["userID"], self._players)
         if event["userID"] not in self._players:
-            print("PLAYER NOT IN GAME")
             self.add_player(event["userID"], websocket)
 
         if not self.player_has_session(event["userID"]):
@@ -215,11 +209,9 @@ class FightSession:
 
     async def _broadcast(self, msg: str):
         for _, session in self._players_sessions.items():
-            print("PRE ERROR", msg)
             await session.send_text(msg)
 
     async def _update_words_best_progress(self):
-        print("CALL _update_words_best_progress", self.toString())
         self._word_best_progress = {}
         for player_progress in self._players_typing_history:
             if len(player_progress) > 0:
@@ -279,21 +271,22 @@ async def create_session(player_list: list[str]):
     
     return {"fightId": newFightId, "message": "Session created successfully"}"""
 
-class CreateFightSessionBody(BaseModel):
-    player_list: list[str]
-    
 
+class CreateFightSessionBody(BaseModel):
+    players_list: list[str]
+    
 @router.post(
     "/fight/create",
     status_code=status.HTTP_201_CREATED,
-    description="Register a new user, if the username does not already exist.",
+    description="Creates a session.",
 )
-async def register(body: CreateFightSessionBody):
+async def create_session(body: CreateFightSessionBody):
     # check that all API values are present
-    if not body.player_list:
-        print("Missing player_list")
+    print("CALL ROUTE", body)
+    if body.players_list == None:
+        print("Missing players_list")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing player_list"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing players_list"
         )
     
     print("CREATION DE LA NOUVELLE SESSION")

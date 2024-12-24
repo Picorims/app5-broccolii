@@ -76,6 +76,7 @@ async def login(body: LoginBody) -> jwt_utils.Token:
     return jwt_utils.create_token_pair()
 
 
+#EXEMPLE DE ROUTE qui demande une authentification du user, elle ne fait rien
 @router.get("/user/auth_test", dependencies=[Depends(HTTPBearer())])
 async def auth_test(credentials: jwt_utils.Credentials) -> JSONResponse:
     jwt_utils.verify_token(credentials)

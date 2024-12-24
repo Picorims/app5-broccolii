@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from "./Lobby.module.css";
 import Card from '../../components/Card/Card';
 import { useState } from 'react';
+import { API } from "../../lib/api";
 
 import { getEnv } from "../../environment";
 
@@ -25,23 +26,14 @@ export default function Lobby() {
     const debugUserId = debugUserIdInput?.value;
     setUserID(debugUserId)
 
-    //create the room
-    /* const url = `${getEnv().backendUrl}/api/v1/fight/create`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: ""
-    });
-    console.log("response :", response); */
 
-    //I want the next part of the code to be executed only when the first part is finished (async)
-    
-    
+    const response = await API.createFight([])
 
-    //afterwards, join the room
-    navigate('/fight?fightId=' + debugFightId + "&userId=" + debugUserId);
+    const res = await response.json()
+    console.log("response :", res);
+
+    navigate('/fight?fightId=' + res["fightId"] + "&userId=" + debugUserId);
+
   }
 
   const joinRoom = () => {
