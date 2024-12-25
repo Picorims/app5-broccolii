@@ -36,13 +36,13 @@ class FightSession:
         self._game_duration_ms = 60_000
         self._game_start_epoch_ms = int(time.time() * 1000) + self._game_start_wait_ms
         self._game_end_epoch_ms = self._game_start_epoch_ms + self._game_duration_ms
-        
+
         def end_game():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             loop.run_until_complete(self._finish_game())
             loop.close()
-        
+
         timer_delay_seconds = (self._game_start_wait_ms + self._game_duration_ms) / 1000
         Timer(timer_delay_seconds, end_game).start()
         print("Created fight session", self._fight_id)
@@ -71,7 +71,7 @@ class FightSession:
 
     def remove_player_session(self, name: str):
         """Remove a player from the session.
-        
+
         If the game ended and there are no more players,
         the session is removed.
 
@@ -90,8 +90,7 @@ class FightSession:
             self.remove_self()
 
     def remove_self(self):
-        """Closes the fight.
-        """
+        """Closes the fight."""
         sessions.pop(self._fight_id, None)
         print("Removed fight session", self._fight_id)
 
@@ -197,7 +196,7 @@ class FightSession:
     async def _handle_submit_letter(self, websocket: WebSocket, userID: str, letter: str):
         if not await self._is_within_game_time(websocket):
             return
-        
+
         self._players_typing_history[userID].append(letter)
         currentState = "".join(self._players_typing_history[userID])
         await websocket.send_text(
@@ -269,10 +268,10 @@ class FightSession:
         await self._broadcast(
             build_json_event("sendWordsBestProgress", {"words": self._word_best_progress})
         )
-        
+
     async def _is_within_game_time(self, websocket: WebSocket = None) -> bool:
         """Returns if the game is currently running.
-        
+
         If a websocket is provided, sends a websocket error event
         if the game is not running.
         """
@@ -281,12 +280,12 @@ class FightSession:
             if websocket is not None:
                 await self._send_error_event(websocket, "Game is over.")
             return False
-        
+
         if now_ms < self._game_start_epoch_ms:
             if websocket is not None:
                 await self._send_error_event(websocket, "Game has not started yet.")
             return False
-        
+
         return True
 
     async def _finish_game(self):
@@ -296,7 +295,7 @@ class FightSession:
             await self._players_sessions[player].send_text(
                 build_json_event("wonPrize", {"prize": prize})
             )
-            
+
     def _get_prize_of_player(self, player):
         # TODO: implement
         return self._scores[player]
