@@ -52,13 +52,33 @@ class FightSession:
             raise Exception("This player already has a session.")
         self._players_sessions[name] = session
 
-    def player_has_session(self, name):
+    def player_has_session(self, name: str):
         return name in self._players_sessions
 
-    def remove_player_session(self, name):
+    def remove_player_session(self, name: str):
+        """Remove a player from the session.
+        
+        If the game ended and there are no more players,
+        the session is removed.
+
+        Args:
+            name (str): the player to remove.
+
+        Raises:
+            Exception: if the player do not have a session.
+        """
         if name not in self._players_sessions:
             raise Exception("This player does not have a session.")
         self._players_sessions.pop(name, None)
+
+        now_ms = int(time.time() * 1000)
+        if len(self._players_sessions) == 0 and now_ms > self._game_end_epoch_ms:
+            self.remove_self()
+
+    def remove_self(self):
+        """Closes the fight.
+        """
+        sessions.pop(self._fight_id, None)
 
     def add_player(self, userId: str, websocket: WebSocket):
         self._players.append(userId)
