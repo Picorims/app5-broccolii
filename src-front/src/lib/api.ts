@@ -98,6 +98,7 @@ export class API {
     localStorage.removeItem("refresh_token");
   }
 
+
   public static getCurrentUserInfo() {
     const url = `${getEnv().backendUrl}/api/v1/user/me`;
     console.log("[API] [GET] " + url);
@@ -108,6 +109,19 @@ export class API {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
+
+  public static async createFight(players_list: string[]) {
+    const url = `${getEnv().backendUrl}/api/v1/fight/create`;
+
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        players_list: players_list,
+      }),
+
     });
   }
 }
