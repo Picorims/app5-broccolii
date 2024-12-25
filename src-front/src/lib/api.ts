@@ -98,7 +98,6 @@ export class API {
     localStorage.removeItem("refresh_token");
   }
 
-
   public static getCurrentUserInfo() {
     const url = `${getEnv().backendUrl}/api/v1/user/me`;
     console.log("[API] [GET] " + url);
@@ -123,7 +122,6 @@ export class API {
       body: JSON.stringify({
         players_list: players_list,
       }),
-
     });
   }
 }
