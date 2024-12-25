@@ -33,7 +33,6 @@ export default function Lobby() {
     }
     setUserID(userIdInput?.value);
 
-
     console.log(userId);
 
     navigate("/fight?fightId=" + fightId + "&userId=" + userIdInput?.value);
