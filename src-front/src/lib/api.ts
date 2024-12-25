@@ -110,4 +110,18 @@ export class API {
       },
     });
   }
+  
+  public static async createFight(players_list: string[]) {
+    const url = `${getEnv().backendUrl}/api/v1/fight/create`;
+
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        players_list: players_list,
+      }),
+    });
+  }
 }
