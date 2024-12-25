@@ -39,7 +39,7 @@ export default function Lobby() {
     // setFightID(response["fightId"]);
 
     console.log(userId);
-    
+
     navigate("/fight?fightId=" + fightId + "&userId=" + userIdInput?.value);
   };
 
