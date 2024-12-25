@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 import sqlite3
 import bcrypt
 from datetime import datetime
@@ -31,7 +32,7 @@ class Word:
         self.name = name
         self.category = []
 
-    def get_word(self):
+    def get_word(self) -> str:
         return self.name.capitalize()
 
     def add_category(self, categoryId):
@@ -280,7 +281,7 @@ cursor.execute(sql_command)
 query = cursor.fetchall()
 # The dictionnary is used to check if we have already registered a word
 words_dict = {}
-words = []
+words: list[Word] = []
 for word in query:
     word_key = (word[0], word[1])
     if word_key in words_dict:
@@ -310,3 +311,24 @@ if VERBOSE:
 
 connection.commit()
 connection.close()
+
+def get_random_word_list(categories = [], amount = 300):
+    # return all if not enough words
+    if (amount > len(words)):
+        return [word.get_word() for word in words]
+    
+    words_copy: list[Word] = []
+    
+    # filter by category if needed
+    if len(categories) == 0:
+        words_copy = words.copy()
+    else:
+        for word in words:
+            if any(word.word_in_category(category) for category in categories):
+                words_copy.append(word)
+                
+    # shuffle
+    random.shuffle(words_copy)
+    
+    return [word.get_word().lower() for word in words_copy[:amount]]
+    

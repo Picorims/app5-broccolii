@@ -13,6 +13,7 @@ import uuid
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, WebSocket, status, WebSocketDisconnect, HTTPException
+from ..classes import get_random_word_list
 
 
 router = APIRouter()
@@ -27,7 +28,7 @@ class FightSession:
         self._players_sessions = {}
         self._players_typing_history = {player: [] for player in player_list}
         self._scores = {player: 0 for player in player_list}
-        self._words_to_find = ["word", "broccoli", "tomato", "bee", "beekeeper"]
+        self._words_to_find = get_random_word_list(amount=100)
         self._words_found = []
         self._word_best_progress = {}
         self._game_end_epoch = int(time.time() + 60)
