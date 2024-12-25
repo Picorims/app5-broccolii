@@ -30,7 +30,8 @@ class FightSession:
         self._words_to_find = ["word", "broccoli", "tomato", "bee", "beekeeper"]
         self._words_found = []
         self._word_best_progress = {}
-        self._game_end_epoch = int(time.time() + 60)
+        self._game_start_epoch_ms = int(time.time() * 1000) + 30_000 # now + 30 seconds
+        self._game_end_epoch_ms = self._game_start_epoch_ms + 60_000 # 1 minute
 
     def toString(self):
         res = "FightSession : ["
@@ -42,7 +43,7 @@ class FightSession:
         res += "\t_words_to_find : " + self._words_to_find.__str__() + "\n"
         res += "\t_words_found : " + self._words_found.__str__() + "\n"
         res += "\t_word_best_progress : " + self._word_best_progress.__str__() + "\n"
-        res += "\t_game_end_epoch : " + self._game_end_epoch.__str__() + "\n"
+        res += "\t_game_end_epoch : " + self._game_end_epoch_ms.__str__() + "\n"
         res += "]"
         return res
 
@@ -152,11 +153,15 @@ class FightSession:
         state["wordsBestProgress"] = {
             word: progress for word, progress in self._word_best_progress.items()
         }
-        state["gameEndEpoch"] = self._game_end_epoch
+        state["gameEndEpochMs"] = self._game_end_epoch_ms
+        state["gameStartEpochMs"] = self._game_start_epoch_ms
 
         await websocket.send_text(build_json_event("sendGameState", state))
 
     async def _handle_submit_letter(self, websocket: WebSocket, userID: str, letter: str):
+        if not await self._is_within_game_time(websocket):
+            return
+        
         self._players_typing_history[userID].append(letter)
         currentState = "".join(self._players_typing_history[userID])
         await websocket.send_text(
@@ -165,6 +170,9 @@ class FightSession:
         await self._update_words_best_progress()
 
     async def _handle_erase_letter(self, websocket: WebSocket, userID: str):
+        if not await self._is_within_game_time(websocket):
+            return
+
         if len(self._players_typing_history[userID]) <= 0:
             await self._send_error_event(websocket, "No letter to erase.")
             return
@@ -179,6 +187,9 @@ class FightSession:
         await self._update_words_best_progress()
 
     async def _handle_submit_word(self, websocket: WebSocket, userID: str):
+        if not await self._is_within_game_time(websocket):
+            return
+
         currentState = "".join(self._players_typing_history[userID])
         success = False
         if currentState in self._words_to_find:
@@ -222,6 +233,21 @@ class FightSession:
         await self._broadcast(
             build_json_event("sendWordsBestProgress", {"words": self._word_best_progress})
         )
+        
+    async def _is_within_game_time(self, websocket: WebSocket) -> bool:
+        """Returns if the game is currently running. Sends a websocket error if not.
+        """
+        now_ms = int(time.time() * 1000)
+        if now_ms > self._game_end_epoch_ms:
+            await self._send_error_event(websocket, "Game is over.")
+            return False
+        
+        if now_ms < self._game_start_epoch_ms:
+            await self._send_error_event(websocket, "Game has not started yet.")
+            return False
+        
+        return True
+
 
 
 sessions["test"] = FightSession("test", ["alice", "bob"])
