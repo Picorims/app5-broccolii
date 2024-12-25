@@ -7,7 +7,9 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
+import asyncio
 import json
+from threading import Timer
 import time
 import uuid
 from pydantic import BaseModel
@@ -24,14 +26,26 @@ class FightSession:
     def __init__(self, fight_id, player_list):
         self._fight_id = fight_id
         self._players = [player for player in player_list]
-        self._players_sessions = {}
+        self._players_sessions: dict[str, WebSocket] = {}
         self._players_typing_history = {player: [] for player in player_list}
         self._scores = {player: 0 for player in player_list}
         self._words_to_find = ["word", "broccoli", "tomato", "bee", "beekeeper"]
         self._words_found = []
         self._word_best_progress = {}
-        self._game_start_epoch_ms = int(time.time() * 1000) + 30_000 # now + 30 seconds
-        self._game_end_epoch_ms = self._game_start_epoch_ms + 60_000 # 1 minute
+        self._game_start_wait_ms = 30_000
+        self._game_duration_ms = 60_000
+        self._game_start_epoch_ms = int(time.time() * 1000) + self._game_start_wait_ms
+        self._game_end_epoch_ms = self._game_start_epoch_ms + self._game_duration_ms
+        
+        def end_game():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(self._finish_game())
+            loop.close()
+        
+        timer_delay_seconds = (self._game_start_wait_ms + self._game_duration_ms) / 1000
+        Timer(timer_delay_seconds, end_game).start()
+        print("Created fight session", self._fight_id)
 
     def toString(self):
         res = "FightSession : ["
@@ -79,6 +93,7 @@ class FightSession:
         """Closes the fight.
         """
         sessions.pop(self._fight_id, None)
+        print("Removed fight session", self._fight_id)
 
     def add_player(self, userId: str, websocket: WebSocket):
         self._players.append(userId)
@@ -274,6 +289,17 @@ class FightSession:
         
         return True
 
+    async def _finish_game(self):
+        print("Game finished", self._fight_id)
+        for player in self._players_sessions:
+            prize = self._get_prize_of_player(player)
+            await self._players_sessions[player].send_text(
+                build_json_event("wonPrize", {"prize": prize})
+            )
+            
+    def _get_prize_of_player(self, player):
+        # TODO: implement
+        return self._scores[player]
 
 
 sessions["test"] = FightSession("test", ["alice", "bob"])
