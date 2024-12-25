@@ -109,7 +109,9 @@ export class API {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
-
+    });
+  }
+  
   public static async createFight(players_list: string[]) {
     const url = `${getEnv().backendUrl}/api/v1/fight/create`;
 
