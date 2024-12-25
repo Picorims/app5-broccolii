@@ -312,13 +312,14 @@ if VERBOSE:
 connection.commit()
 connection.close()
 
-def get_random_word_list(categories = [], amount = 300):
+
+def get_random_word_list(categories=[], amount=300):
     # return all if not enough words
-    if (amount > len(words)):
+    if amount > len(words):
         return [word.get_word() for word in words]
-    
+
     words_copy: list[Word] = []
-    
+
     # filter by category if needed
     if len(categories) == 0:
         words_copy = words.copy()
@@ -326,9 +327,8 @@ def get_random_word_list(categories = [], amount = 300):
         for word in words:
             if any(word.word_in_category(category) for category in categories):
                 words_copy.append(word)
-                
+
     # shuffle
     random.shuffle(words_copy)
-    
+
     return [word.get_word().lower() for word in words_copy[:amount]]
-    
