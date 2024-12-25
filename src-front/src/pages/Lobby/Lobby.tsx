@@ -33,10 +33,6 @@ export default function Lobby() {
     }
     setUserID(userIdInput?.value);
 
-    // const request = await API.createFight([]);
-    // const response = await request.json();
-
-    // setFightID(response["fightId"]);
 
     console.log(userId);
 
