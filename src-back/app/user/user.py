@@ -14,6 +14,7 @@ from app.classes import Account
 
 router = APIRouter()
 
+
 @router.get(
     "/user/me",
     status_code=status.HTTP_200_OK,
@@ -21,13 +22,13 @@ router = APIRouter()
 )
 async def me(credentials: jwt_utils.Credentials):
     token_data = jwt_utils.verify_token(credentials)
-    
+
     user_info = Account.get_user_info(token_data.sub)
-    
+
     if user_info is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"message": "User not found"},
         )
-    
+
     return user_info

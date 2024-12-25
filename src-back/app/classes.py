@@ -76,6 +76,7 @@ class UserInfo(BaseModel):
     username: str
     broccolis: int
 
+
 class Account:
     def __init__(self, id, broccolis, username, cards):
         self.id = id
@@ -162,7 +163,7 @@ class Account:
             bool: True if the username is valid, False otherwise.
         """
         return re.match(r"^[a-zA-Z0-9_]{3,32}$", username) is not None
-    
+
     @staticmethod
     def get_user_info(username: str):
         connection = sqlite3.connect(db_name)
@@ -171,7 +172,7 @@ class Account:
         result = cursor.fetchone()
         cursor.close()
         connection.close()
-        
+
         if result is None:
             return None
         return UserInfo(username=result[0], broccolis=result[1])
