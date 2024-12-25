@@ -12,6 +12,7 @@ db_name = "broccolii.db"
 connection = sqlite3.connect(db_name)
 cursor = connection.cursor()
 print("Connected to the database")
+VERBOSE = False
 
 
 # %% Class Definitions
@@ -254,16 +255,18 @@ for word in query:
         w.add_category(word[2])
         words.append(w)
 
-for word in words:
-    if len(word.category) > 1:
-        word.print_word()
+if VERBOSE:
+    for word in words:
+        if len(word.category) > 1:
+            word.print_word()
 
 cursor.execute("SELECT id, name FROM Category;")
 query = cursor.fetchall()
 categories = [Category(*category) for category in query]
 
-for category in categories:
-    category.print_category()
+if VERBOSE:
+    for category in categories:
+        category.print_category()
 # %%
 
 # %% Creating words
@@ -288,9 +291,10 @@ for word in query:
         words_dict[word_key] = w
         words.append(w)
 
-for word in words:
-    if len(word.category) > 1:
-        word.print_word()
+if VERBOSE:
+    for word in words:
+        if len(word.category) > 1:
+            word.print_word()
 
 # %%
 
@@ -299,8 +303,9 @@ cursor.execute("SELECT id, name, effect, rarity, isNegative, adding, multiplyBy 
 query = cursor.fetchall()
 cards = [Card(*card) for card in query]
 
-for card in cards:
-    card.print_card()
+if VERBOSE:
+    for card in cards:
+        card.print_card()
 # %%
 
 connection.commit()
