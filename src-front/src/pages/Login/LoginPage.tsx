@@ -13,10 +13,12 @@ import Card from "../../components/Card/Card";
 import LabeledInput from "../../components/LabeledInput/LabeledInput";
 import styles from "./LoginPage.module.css";
 import { API } from "../../lib/api";
+import { useNavigate } from "react-router";
 
 export default function LoginPage() {
   const [registerPasswordError, setRegisterPasswordError] = useState("");
   const [registerUsernameError, setRegisterUsernameError] = useState("");
+  const navigate = useNavigate();
 
   const usernameRegex = /^[a-zA-Z0-9_]{3,32}$/g;
 
@@ -34,6 +36,7 @@ export default function LoginPage() {
       localStorage.setItem("access_token", json.access_token);
       localStorage.setItem("refresh_token", json.refresh_token);
       console.log("Login successful");
+      navigate("/clicker");
 
       // testing login (when there is a need to delete it, prefer
       // moving it to a test file instead of deleting it)
@@ -114,6 +117,7 @@ export default function LoginPage() {
     const response = await API.register(login.toString(), password.toString());
     if (response.ok) {
       console.log("Registration successful");
+      navigate("/clicker");
     } else {
       console.error("Registration failed");
       alert("Registration failed, please try again later");
