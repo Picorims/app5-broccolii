@@ -99,8 +99,6 @@ export class API {
   }
 
   public static async createFight(players_list: string[]) {
-    console.log("CALL TS ROUTE");
-
     const url = `${getEnv().backendUrl}/api/v1/fight/create`;
 
     return fetch(url, {
