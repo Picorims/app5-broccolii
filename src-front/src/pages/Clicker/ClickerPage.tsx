@@ -7,7 +7,7 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BroccoliiButton from "../../components/BroccoliiButton/BroccoliiButton";
 import styles from "./ClickerPage.module.css";
 
@@ -15,6 +15,7 @@ import image1 from "../../assets/broccolii/broccolii(1).png";
 import image2 from "../../assets/broccolii/broccolii(2).png";
 import image3 from "../../assets/broccolii/broccolii(3).png";
 import image4 from "../../assets/broccolii/broccolii(4).png";
+import { API } from "../../lib/api";
 
 const ClickerPage = () => {
   // Array of objects representing images and their corresponding texts.
@@ -36,6 +37,19 @@ const ClickerPage = () => {
 
     setCurrentItem(items[randomIndex]);
   };
+
+  useEffect(() => {
+    async function getCurrentUserInfo() {
+
+      const resp = await API.getCurrentUserInfo();
+      if (resp.ok) {
+        const data = await resp.json();
+        console.log(data);
+      }
+    }
+
+    getCurrentUserInfo();
+  });
 
   return (
     <div className={styles.container}>
