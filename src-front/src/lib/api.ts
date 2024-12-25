@@ -110,7 +110,7 @@ export class API {
       },
     });
   }
-  
+
   public static async createFight(players_list: string[]) {
     const url = `${getEnv().backendUrl}/api/v1/fight/create`;
 
