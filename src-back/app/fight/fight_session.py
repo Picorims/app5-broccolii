@@ -175,6 +175,7 @@ class FightSession:
         }
         state["gameEndEpochMs"] = self._game_end_epoch_ms
         state["gameStartEpochMs"] = self._game_start_epoch_ms
+        state["gameRunning"] = await self._is_within_game_time()
 
         await websocket.send_text(build_json_event("sendGameState", state))
 
@@ -254,16 +255,21 @@ class FightSession:
             build_json_event("sendWordsBestProgress", {"words": self._word_best_progress})
         )
         
-    async def _is_within_game_time(self, websocket: WebSocket) -> bool:
-        """Returns if the game is currently running. Sends a websocket error if not.
+    async def _is_within_game_time(self, websocket: WebSocket = None) -> bool:
+        """Returns if the game is currently running.
+        
+        If a websocket is provided, sends a websocket error event
+        if the game is not running.
         """
         now_ms = int(time.time() * 1000)
         if now_ms > self._game_end_epoch_ms:
-            await self._send_error_event(websocket, "Game is over.")
+            if websocket is not None:
+                await self._send_error_event(websocket, "Game is over.")
             return False
         
         if now_ms < self._game_start_epoch_ms:
-            await self._send_error_event(websocket, "Game has not started yet.")
+            if websocket is not None:
+                await self._send_error_event(websocket, "Game has not started yet.")
             return False
         
         return True
