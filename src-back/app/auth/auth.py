@@ -49,7 +49,7 @@ async def register(body: RegisterBody):
     Account.create_user(body.username, body.password)
     print("User created successfully")
 
-    return jwt_utils.create_token_pair()
+    return jwt_utils.create_token_pair(body.username)
 
 
 class LoginBody(BaseModel):
@@ -73,7 +73,7 @@ async def login(body: LoginBody) -> jwt_utils.Token:
 
     print("User logged in successfully")
 
-    return jwt_utils.create_token_pair()
+    return jwt_utils.create_token_pair(body.username)
 
 
 @router.get("/user/auth_test", dependencies=[Depends(HTTPBearer())])
@@ -98,7 +98,7 @@ async def refresh_token(credentials: jwt_utils.Credentials) -> jwt_utils.Token:
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token"
         )
 
-    return jwt_utils.create_token_pair()
+    return jwt_utils.create_token_pair(token_data.sub)
 
 
 @router.get("/user/logout", description="Logout the user. The bearer must be the access token.")
