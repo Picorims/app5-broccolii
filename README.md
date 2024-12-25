@@ -52,6 +52,12 @@ fastapi run ./app/main.py
 deactivate
 ```
 
+#### Initializing the environment
+
+- in `src_back`, create `JWT_SECRET` with `openssl rand -hex 32 > JWT_SECRET`. `openssl` is bundled with Git Bash, or you can install it manually.
+
+- With the environment active, run `py ./app/sql_script.py` to initialize the database. (If you built a docker image, it should already be done by the docker file.) This script should never be imported into the app, as it erases any existing database!
+
 #### Updating dependencies
 
 after installation or updates, do:
@@ -75,5 +81,5 @@ black .
 
 ## Docker
 
-- build: `. docker_build.sh`
+- build: `. docker_build.sh` (if it is intended for production, generate a new `JWT_SECRET`).
 - run (example): `docker run -p 8000:8000 app5-broccolii`
