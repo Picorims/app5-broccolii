@@ -1,3 +1,17 @@
+import pickle
+from classes import Account, Token as TokenDB
+
+with open("cards.pkl", "rb") as file:
+    cards = pickle.load(file)
+
+blabla = user()
+user.broccoli
+
+
+def single_click():
+    broccoli_amount = 1
+
+
 def count_broccoli(click_amount, active_card_list):
     """
     returns boccoli amount given click_amount.
