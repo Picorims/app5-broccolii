@@ -2,6 +2,8 @@
 import sqlite3
 import bcrypt
 from datetime import datetime
+
+from pydantic import BaseModel
 from .auth.jwt_utils import generate_refresh_token_timestamp
 import re
 
@@ -68,6 +70,11 @@ class Card:
         print(f"{self.id}: {negative}{self.name} - {self.rarity}")
         print(f" {self.effect}")
         print(f" Adds: {self.adding} - Multiplies by: {self.multiplyBy}")
+
+
+class UserInfo(BaseModel):
+    username: str
+    broccolis: int
 
 
 class Account:
@@ -156,6 +163,19 @@ class Account:
             bool: True if the username is valid, False otherwise.
         """
         return re.match(r"^[a-zA-Z0-9_]{3,32}$", username) is not None
+
+    @staticmethod
+    def get_user_info(username: str):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        cursor.execute("SELECT username, broccolis FROM Account WHERE username = ?", (username,))
+        result = cursor.fetchone()
+        cursor.close()
+        connection.close()
+
+        if result is None:
+            return None
+        return UserInfo(username=result[0], broccolis=result[1])
 
 
 class Token:

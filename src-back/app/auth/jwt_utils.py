@@ -54,9 +54,9 @@ class TokenData(BaseModel):
     exp: datetime
 
 
-def _create_token(jti: str, expires_delta: timedelta):
+def _create_token(jti: str, expires_delta: timedelta, username: str):
     to_encode = dict()
-    to_encode.update({"sub": "user"})
+    to_encode.update({"sub": username})
     to_encode.update({"jti": jti})
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
@@ -64,7 +64,7 @@ def _create_token(jti: str, expires_delta: timedelta):
     return encoded_jwt
 
 
-def _create_access_token(jti: str) -> str:
+def _create_access_token(jti: str, username: str) -> str:
     """Create a token for accessing the API.
 
     Args:
@@ -73,10 +73,10 @@ def _create_access_token(jti: str) -> str:
     Returns:
         str: the token
     """
-    return _create_token(jti, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    return _create_token(jti, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES), username)
 
 
-def _create_refresh_token(jti: str) -> str:
+def _create_refresh_token(jti: str, username: str) -> str:
     """Create a token for refreshing the access token.
 
     Args:
@@ -85,7 +85,7 @@ def _create_refresh_token(jti: str) -> str:
     Returns:
         str: the token
     """
-    return _create_token(jti, timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
+    return _create_token(jti, timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS), username)
 
 
 def generate_refresh_token_timestamp() -> datetime:
@@ -93,7 +93,7 @@ def generate_refresh_token_timestamp() -> datetime:
     return datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
 
 
-def create_token_pair() -> Token:
+def create_token_pair(username: str) -> Token:
     """Create a pair of tokens for accessing the API and refreshing
     the access token.
 
@@ -104,8 +104,8 @@ def create_token_pair() -> Token:
     # sharing the UUID allow to expire a refresh token
     # from an access token.
     uuid = str(uuid4())
-    access_token = _create_access_token(uuid)
-    refresh_token = _create_refresh_token(uuid)
+    access_token = _create_access_token(uuid, username)
+    refresh_token = _create_refresh_token(uuid, username)
     return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
 
 

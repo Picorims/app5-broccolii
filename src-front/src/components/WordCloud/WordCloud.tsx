@@ -47,7 +47,13 @@ class Word {
   }
 }
 
-export default function WordCloud() {
+export default function WordCloud({
+  userId,
+  fightId,
+}: {
+  userId: string;
+  fightId: string;
+}) {
   const refCanvas = useRef<HTMLDivElement>(null);
   const refContainer = useRef<HTMLDivElement>(null);
   const refContainerSize = useRef({ width: 0, height: 0 });
@@ -55,7 +61,7 @@ export default function WordCloud() {
   const refApp = useRef<Application<PIXI.Renderer>>();
   const refWords = useRef<Word[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [error, setError] = useState("");
+  //const [error, setError] = useState("");
   const [scores, setScores] = useState<Record<string, number>>({});
   const [wordsBestProgress, setWordsBestProgress] = useState<
     Record<string, number>
@@ -67,8 +73,6 @@ export default function WordCloud() {
 
   //WordCloud initialization
   const init = useCallback(async () => {
-    console.log("init front");
-
     const app = new Application();
 
     if (refContainer.current) {
@@ -133,24 +137,25 @@ export default function WordCloud() {
     });
 
     updateSize();
-    console.log("init front fin", app, app.stage);
     return app;
     //}, [containerSize]);
   }, []);
 
   //session initialization
   useEffect(() => {
-    console.log("init back");
-    setError("");
+    //setError("");
     console.log("Initializing session...");
-    fightSession.current = new FightSession("alice", "test", () => {
+    console.log("pré création session :", userId, fightId);
+
+    fightSession.current = new FightSession(userId, fightId, () => {
       console.log("WebSocket open. Getting state...");
       fightSession.current?.requestGameState();
     });
 
     const session = fightSession.current;
     session.onErrorThen((err) => {
-      setError(err);
+      //setError(err);
+      console.log("error: ", err);
     });
     session.onSendGameStateThen((state) => {
       console.log("Received state", state);
@@ -184,7 +189,7 @@ export default function WordCloud() {
     return () => {
       fightSession.current?.close();
     };
-  }, [error]); //This is the dependency array that causes the issue
+  }, [fightId, userId]);
 
   /**
    * If a new letter has been typed, this sends a submitLetter event.
@@ -299,8 +304,6 @@ export default function WordCloud() {
   }
 
   const pushWord = useCallback((word: Word) => {
-    console.log("pushWord");
-
     if (!refApp.current || !refApp.current.stage) {
       console.error("App or stage not initialized. Skipping word push.");
       return;
