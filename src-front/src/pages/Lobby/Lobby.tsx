@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./Lobby.module.css";
 import Card from "../../components/Card/Card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { API } from "../../lib/api";
 
 // import { getEnv } from "../../environment";
@@ -9,40 +9,39 @@ import { API } from "../../lib/api";
 export default function Lobby() {
   const navigate = useNavigate();
   //const refLink = useRef<string>();
-  const [fightID, setFightID] = useState<string>("");
-  const [userID, setUserID] = useState<string>("");
+  const [fightId, setFightID] = useState<string>("");
+  const [userId, setUserID] = useState<string>("");
 
-  // const createRoom = () => {
-  //   const newId = Math.random().toString(36).substring(2,7); /* random id generator */
-  //   setFightID(newId)
-  // }
+  useEffect(() => {
+    const initializeFight = async () => {
+      const request = await API.createFight([]);
+      const response = await request.json();
+      setFightID(response["fightId"]);
+    };
 
-  const createRoomDebug = async () => {
-    const debugFightIdInput = document.getElementById(
-      "debugFightId",
-    ) as HTMLInputElement; // Type assertion
-    const debugFightId = debugFightIdInput?.value;
-    setFightID(debugFightId);
+    initializeFight();
+  }, []); // Empty dependency array means this effect runs once on mount
 
-    const debugUserIdInput = document.getElementById(
+  const createRoom = async () => {
+    const userIdInput = document.getElementById(
       "debugUserId",
-    ) as HTMLInputElement; // Type assertion
-    const debugUserId = debugUserIdInput?.value;
-    setUserID(debugUserId);
-    console.log(userID);
+    ) as HTMLInputElement;
 
-    const response = await API.createFight([]);
+    if (userIdInput == null) {
+      console.log("Error while searching for input fields.");
+      return;
+    }
+    setUserID(userIdInput?.value);
 
-    const res = await response.json();
-    console.log("response :", res);
+    // const request = await API.createFight([]);
+    // const response = await request.json();
 
-    navigate("/fight?fightId=" + res["fightId"] + "&userId=" + debugUserId);
+    // setFightID(response["fightId"]);
+
+    console.log(userId);
+    
+    navigate("/fight?fightId=" + fightId + "&userId=" + userIdInput?.value);
   };
-
-  // const joinRoom = () => {
-  //   console.log("test");
-
-  // }
 
   return (
     <>
@@ -72,18 +71,18 @@ export default function Lobby() {
           </div>
           <div className={styles.horizontalDiv}>
             <h3>Max players :</h3>
-            <input type="number" />
+            <input type="number" className={styles.input} />
           </div>
           <div className={styles.horizontalDiv}>
             <h3>Room link :</h3>
-            <h3>{fightID}</h3>
+            <h3>{fightId}</h3>
           </div>
-          <div className={styles.tempDebug}>
-            <input type="text" id="debugFightId" />
-            fightId
+          <div className={styles.horizontalDiv}>
             <input type="text" id="debugUserId" />
             userId
-            <button onClick={() => createRoomDebug()}></button>
+            <button onClick={() => createRoom()} className={styles.button}>
+              JOIN ROOM
+            </button>
           </div>
         </Card>
       </div>
