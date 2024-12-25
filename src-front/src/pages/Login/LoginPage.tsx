@@ -74,6 +74,9 @@ export default function LoginPage() {
 
     const response = await API.register(login.toString(), password.toString());
     if (response.ok) {
+      const json = await response.json();
+      localStorage.setItem("access_token", json.access_token);
+      localStorage.setItem("refresh_token", json.refresh_token);
       console.log("Registration successful");
       navigate("/clicker");
     } else {
