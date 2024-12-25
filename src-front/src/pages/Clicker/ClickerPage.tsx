@@ -40,7 +40,6 @@ const ClickerPage = () => {
 
   useEffect(() => {
     async function getCurrentUserInfo() {
-
       const resp = await API.getCurrentUserInfo();
       if (resp.ok) {
         const data = await resp.json();
