@@ -11,11 +11,13 @@ if os.path.exists(db_name):
 else:
     print(f"The {db_name} file doesn't exist.")
 
-connection = sqlite3.connect(db_name)
 
+db_name = "broccolii.db"
+connection = sqlite3.connect(db_name)
 cursor = connection.cursor()
 print("Connected to the database")
 
+# %% Database Creation
 sql_command = """
     CREATE TABLE Word(
        id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,14 +47,25 @@ sql_command = """
 cursor.execute(sql_command)
 
 sql_command = """
-    CREATE TABLE Upgrade(
+    CREATE TABLE Card(
        id INTEGER PRIMARY KEY AUTOINCREMENT,
        name VARCHAR(50) NOT NULL,
        effect TEXT NOT NULL,
-       price INT DEFAULT 50,
-       multiplyingBy DECIMAL(10,3) DEFAULT 1,
-       adding INT DEFAULT 0,
-       UNIQUE(name)
+       rarity VARCHAR(50),
+       isNegative LOGICAL,
+       idCardEffect INT,
+       adding LOGICAL,
+       multiplyBy DECIMAL(10,3)
+    );
+"""
+cursor.execute(sql_command)
+
+sql_command = """
+    CREATE TABLE CardEffect(
+       id INTEGER PRIMARY KEY AUTOINCREMENT,
+       idEffect INT,
+       name VARCHAR(50) NOT NULL,
+       value DECIMAL(10,3)
     );
 """
 cursor.execute(sql_command)
@@ -69,18 +82,27 @@ sql_command = """
 cursor.execute(sql_command)
 
 sql_command = """
-    CREATE TABLE AccountUpgrade(
+    CREATE TABLE AccountCard(
        idAccount INT,
-       idUpgrade INT,
-       Number_Owned INT NOT NULL,
-       PRIMARY KEY(idAccount, idUpgrade),
+       idCard INT,
+       isEquipped LOGICAL NOT NULL,
+       PRIMARY KEY(idAccount, idCard),
        FOREIGN KEY(idAccount) REFERENCES Account(id),
-       FOREIGN KEY(idUpgrade) REFERENCES Upgrade(id)
+       FOREIGN KEY(idCard) REFERENCES Upgrade(id)
     );
 """
 cursor.execute(sql_command)
 
-# insertion
+sql_command = """
+    CREATE TABLE ExpiredToken(
+        jti VARCHAR(256) PRIMARY KEY,
+        expirationDate DATETIME NOT NULL
+    );
+"""
+cursor.execute(sql_command)
+# %%
+
+# %% Account Insertion & Verification
 passwordA = bcrypt.hashpw("pwdAlettuce".encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 passwordB = bcrypt.hashpw("pwdBrocolivier".encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 passwordC = bcrypt.hashpw("pwdPicorims".encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -97,11 +119,13 @@ accounts = cursor.fetchall()
 print("Accounts in the database:")
 for account in accounts:
     print(f"ID: {account[0]}, Username: {account[1]}")
+# %%
 
-# Creating Category
-categories = ["Agriculture", "Green", "Bwords"]
+# %% Category Insertion
+categories = ["Agriculture", "Green", "B_words"]
 for category in categories:
     cursor.execute("INSERT OR IGNORE INTO Category (name) VALUES (?);", (category,))
+# %%
 
 # %% Word list for each categories
 agriculture = [
@@ -389,11 +413,9 @@ agriculture = [
     "bean",
     "amaranth",
     "quinoa",
-    "buckwheat",
     "sorghum",
     "safflower",
     "sesame",
-    "basil",
     "peppermint",
     "oregano",
     "tarragon",
@@ -1053,7 +1075,7 @@ b_words = [
     "bluebottle",
     "birdwood",
     "bellbird",
-    "bloodroot",
+    "bullrush",
     "buzzwort",
     "bugleweed",
     "bagworm",
@@ -1086,16 +1108,43 @@ b_words = [
     "broadcast",
     "bee",
     "bikini",
+    "barley",
+    "barn",
+    "basil",
+    "beans",
+    "beet",
+    "beekeeping",
+    "belladonna",
+    "berry",
+    "bitter",
+    "biodiversity",
+    "birch",
+    "black",
+    "black-eyed",
+    "blue",
+    "bean",
+    "beetroot",
+    "butternut",
+    "boneset",
+    "bottle",
+    "breadfruit",
+    "broom",
+    "broccoli",
+    "bellflower",
+    "beehive",
+    "buttercup",
 ]
 # %%
 
+# %% Words dictionnary
 words = {
     "Agriculture": agriculture,
     "Green": green,
-    "Bwords": b_words,
+    "B_words": b_words,
 }
+# %%
 
-# Inserting words in Word
+# %% Word Insertion
 for category_name, word_list in words.items():
     for word in word_list:
         cursor.execute("INSERT OR IGNORE INTO Word (word) VALUES (?);", (word,))
@@ -1117,6 +1166,75 @@ for category_name in words:
             "INSERT OR IGNORE INTO WordCategory (idWord, idCategory) VALUES (?, ?);",
             (word_id[0], category_id),
         )
+# %%
+
+# %% Card Insertion & Verification
+cursor.execute(
+    """
+    INSERT INTO Card (name, effect, rarity, isNegative, adding, multiplyBy)
+        VALUES ('Farmer', 'Will add 1 broccoli to your account every second !', 'common', 0, 1, 1),
+            ('Farmer', 'Will add 1 broccoli to your account every second !', 'common', 1, 1, 1),
+            ('Super soil', 'Will multiply your broccoli production by 2 !', 'rare', 0, 0, 2),
+            ('Super soil', 'Will multiply your broccoli production by 2 !', 'rare', 1, 0, 2)
+    """
+)
+# %% CardEffect Insertion
+cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (1, 'Add To Production', 1)")
+cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (1, 'Add To Production', 2)")
+cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (2, 'Add To Click', 1)")
+cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (2, 'Add To Click', 5)")
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (3, 'Multiply Production By', 2)"
+)
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (3, 'Multiply Production By', 3)"
+)
+cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (4, 'Multiply Clicks By', 2)")
+cursor.execute("INSERT INTO CardEffect (idEffect, name, value) VALUES (4, 'Multiply Clicks By', 3)")
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (5, 'Add To Crit Chance', 0.1)"
+)
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (5, 'Add To Crit Chance', 0.25)"
+)
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (6, 'Multiply Crit Chance By', 2)"
+)
+cursor.execute(
+    "INSERT INTO CardEffect (idEffect, name, value) VALUES (6, 'Multiply Crit Chance By', 3)"
+)
+# %%
+
+# %% Card Insertion & Verification
+cursor.execute(
+    """INSERT INTO Card (name, effect, rarity, isNegative, idCardEffect) VALUES
+                   ('Farmer', 'Will add 1 broccoli to your account every second !', 'Common', 0, 1),
+                   ('Farmer', 'Will add 1 broccoli to your account every second !', 'Common', 1, 1),
+                   ('Super soil', 'Will multiply your broccoli production by 2 !', 'Rare', 0, 7),
+                   ('Super soil', 'Will multiply your broccoli production by 2 !', 'Rare', 1, 7),
+                   ('Eggplant', 'Will multiply your click effects by 2 !', 'Rare', 0, 5),
+                   ('Eggplant', 'Will multiply your click effects by 2 !', 'Rare', 1, 5),
+                   ('Carrot', 'Your clicks will now give 5 more broccolis !', 'Legendary', 0, 4),
+                   ('Carrot', 'Your clicks will now give 5 more broccolis !', 'Legendary', 1, 4),
+                   ('Beet', 'Gives you 10% more chance to Critical Click !', 'Rare', 0, 9),
+                   ('Beet', 'Gives you 10% more chance to Critical Click !', 'Rare', 1, 9),
+                   ('Butternut', 'Doubles your Critical Click chances !', 'Legendary', 0, 11),
+                   ('Butternut', 'Doubles your Critical Click chances !', 'Legendary', 1, 11)"""
+)
+
+cursor.execute(
+    """SELECT c.id, c.name, effect, rarity, isNegative, ce.name, ce.value
+            FROM Card c, CardEffect ce
+            WHERE c.idCardEffect = ce.id;"""
+)
+cards = cursor.fetchall()
+print("Cards in the database:")
+for card in cards:
+    negative = "Negative " if card[4] else ""
+    print(f"{card[0]}: {negative}{card[1]} - {card[3]}")
+    print(f" {card[2]}")
+    print(f" {card[5]}: {card[6]}")
+# %%
 
 # %% Word & Category insert's verification
 sql_command = """
@@ -1139,6 +1257,6 @@ for result in results:
     print(f"{result[1]}: {result[0]}, ")
 # %%
 
-
+connection.commit()
 connection.close()
 print("Database setup complete.")

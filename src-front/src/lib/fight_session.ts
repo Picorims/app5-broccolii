@@ -166,7 +166,6 @@ export class FightSession {
   }
 
   private handleEvent(event: JsonLike) {
-    console.log("received", event);
     if (!event || typeof event !== "object") {
       throw new Error("Invalid data.");
     }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Application } from "pixi.js";
 import * as PIXI from "pixi.js";
-import "./WordCloud.css";
+import styles from "./WordCloud.module.css";
 
 import {
   Vector,
@@ -9,6 +9,7 @@ import {
   calculateVec,
   calculateVecSquared,
 } from "../../lib/vectorsUtility";
+import { FightSession } from "../../lib/fight_session";
 
 class Word {
   private pixiText: PIXI.Text;
@@ -49,106 +50,45 @@ class Word {
 export default function WordCloud() {
   const refCanvas = useRef<HTMLDivElement>(null);
   const refContainer = useRef<HTMLDivElement>(null);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const refContainerSize = useRef({ width: 0, height: 0 });
+  //const [app, setApp] = useState<Application<PIXI.Renderer>>();
+  const refApp = useRef<Application<PIXI.Renderer>>();
   const refWords = useRef<Word[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const [error, setError] = useState("");
+  const [scores, setScores] = useState<Record<string, number>>({});
+  const [wordsBestProgress, setWordsBestProgress] = useState<
+    Record<string, number>
+  >({});
+  const [gameEndEpoch, setGameEndEpoch] = useState(0);
+  const fightSession = useRef<FightSession | null>(null);
+  const refAddWord = useRef<(wordStr: string) => void>();
+  const refDeleteWord = useRef<(wordToDelete: string) => void>();
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setInputValue(event.target.value);
-  }
-
-  function deleteWord(index: number) {
-    refWords.current[index].getPixiText().removeFromParent();
-    refWords.current.splice(index, 1);
-  }
-
-  function addWord(word: Word) {
-    refWords.current.push(word);
-  }
-
-  function clearWords() {
-    refWords.current.forEach((word) => {
-      word.getPixiText().removeFromParent();
-    });
-    refWords.current = [];
-  }
-
-  const updateSpeed = useCallback(
-    (word: Word) => {
-      const center = new Point(
-        containerSize.width / 2,
-        containerSize.height / 2,
-      );
-
-      const centerForce = calculateVec(
-        word.getPosition().x,
-        word.getPosition().y,
-        center.x,
-        center.y,
-        0.5 * word.mass,
-      );
-      word.speed = centerForce;
-
-      refWords.current.forEach((currWord) => {
-        if (currWord != word) {
-          const interForce = calculateVecSquared(
-            word.getPosition().x,
-            word.getPosition().y,
-            currWord.getPosition().x,
-            currWord.getPosition().y,
-            500,
-          );
-          word.speed = word.speed.add(interForce);
-        }
-      });
-
-      return word;
-    },
-    [containerSize],
-  );
-
+  //WordCloud initialization
   const init = useCallback(async () => {
+    console.log("init front");
+
     const app = new Application();
 
     if (refContainer.current) {
       await app.init({
         background: "#1099bb",
         resizeTo: refContainer.current,
-        width: containerSize.width,
-        height: containerSize.height,
+        width: refContainerSize.current.width,
+        height: refContainerSize.current.height,
       });
     }
     app.canvas.id = "pixi-canvas";
+
+    clearWords(); //deletes words from previous renders
 
     if (refCanvas.current) {
       refCanvas.current.appendChild(app.canvas);
     }
 
-    clearWords(); //deletes words from previous renders
-    const canvasSizeX = containerSize.width;
-    const canvasSizeY = containerSize.height;
-
-    const weightDisparity = 5;
-    for (let i = 0; i < 80; i++) {
-      addWord(
-        new Word(
-          "word" + i,
-          new Point(Math.random() * canvasSizeX, Math.random() * canvasSizeY),
-          10 + weightDisparity * Math.random(),
-        ),
-      );
-    }
-
-    refWords.current.forEach((word) => {
-      word.getPixiText().style = {
-        //TODO replace by a new class method setStyle ?
-        fontFamily: "Arial",
-        fontSize: 24,
-        fill: 0xffffff,
-      };
-      word.setPosition(new Vector(word.getPosition().x, word.getPosition().y));
-      app.stage.addChild(word.getPixiText());
-    });
+    //setApp(app);
+    refApp.current = app;
 
     //render loop
     app.ticker.add((time) => {
@@ -161,32 +101,212 @@ export default function WordCloud() {
           word.getPosition().add(word.speed.mult(time.deltaTime * 0.01)),
         );
 
+        const pushDist = 30;
         //handling out of bounds
         if (word.getPosition().x < 0) {
           word.setPosition(new Point(0, word.getPosition().y));
           word.speed = new Vector(0, word.speed.y);
         }
-        if (word.getPosition().y < 30) {
-          word.setPosition(new Point(word.getPosition().x, 30));
+        if (word.getPosition().y < pushDist) {
+          word.setPosition(new Point(word.getPosition().x, pushDist + 1));
           word.speed = new Vector(word.speed.x, 0);
         }
-        if (word.getPosition().x > containerSize.width) {
+        if (word.getPosition().x > refContainerSize.current.width - pushDist) {
           word.setPosition(
-            new Point(containerSize.width, word.getPosition().y),
+            new Point(
+              refContainerSize.current.width - pushDist - 1,
+              word.getPosition().y,
+            ),
           );
           word.speed = new Vector(0, word.speed.y);
         }
-        if (word.getPosition().y > containerSize.height - 30) {
+        if (word.getPosition().y > refContainerSize.current.height - pushDist) {
           word.setPosition(
-            new Point(word.getPosition().x, containerSize.height - 30),
+            new Point(
+              word.getPosition().x,
+              refContainerSize.current.height - pushDist - 1,
+            ),
           );
           word.speed = new Vector(word.speed.x, 0);
         }
       });
     });
 
+    updateSize();
+    console.log("init front fin", app, app.stage);
     return app;
-  }, [containerSize, updateSpeed]);
+    //}, [containerSize]);
+  }, []);
+
+  //session initialization
+  useEffect(() => {
+    console.log("init back");
+    setError("");
+    console.log("Initializing session...");
+    fightSession.current = new FightSession("alice", "test", () => {
+      console.log("WebSocket open. Getting state...");
+      fightSession.current?.requestGameState();
+    });
+
+    const session = fightSession.current;
+    session.onErrorThen((err) => {
+      setError(err);
+    });
+    session.onSendGameStateThen((state) => {
+      console.log("Received state", state);
+      setScores(state.scores);
+      setWordsBestProgress(state.wordsBestProgress);
+      setGameEndEpoch(state.gameEndEpoch);
+
+      for (const wordStr of state.availableWords) {
+        refAddWord.current?.(wordStr);
+      }
+    });
+    session.onAcknowledgeLetterThen((accepted, currentState) => {
+      console.log("Letter acknowledged", accepted, currentState);
+    });
+    session.onAcknowledgeLetterErasedThen((accepted, currentState) => {
+      console.log("Letter erased acknowledged", accepted, currentState);
+    });
+    session.onAcknowledgeSubmitThen((success, testedState) => {
+      console.log("Submit acknowledged", success, testedState);
+    });
+    session.onWordsFoundThen((words) => {
+      console.log("Words found", words);
+      for (const word of words) {
+        refDeleteWord.current?.(word);
+      }
+    });
+    session.onScoresUpdatedThen((scores) => {
+      console.log("Scores updated", scores);
+    });
+
+    return () => {
+      fightSession.current?.close();
+    };
+  }, [error]); //This is the dependency array that causes the issue
+
+  /**
+   * If a new letter has been typed, this sends a submitLetter event.
+   * If a letter has been erased, this does nothing.
+   * @param event
+   */
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setInputValue(event.target.value);
+    const nv = event.nativeEvent as InputEvent;
+    if (nv.data != null) {
+      fightSession.current?.submitLetter(nv.data);
+    }
+  }
+
+  function deleteWordByIndex(index: number) {
+    refWords.current[index].getPixiText().removeFromParent();
+    refWords.current.splice(index, 1);
+  }
+
+  //function deleteWord(wordToDelete: string) {
+  useEffect(() => {
+    refDeleteWord.current = (wordToDelete: string) => {
+      for (let i = refWords.current.length - 1; i >= 0; i--) {
+        const word = refWords.current[i];
+
+        if (word.getText() === wordToDelete) {
+          deleteWordByIndex(i);
+          break;
+        }
+      }
+    };
+  });
+
+  /**
+   * Adds a word with a random position and weight.
+   */
+  //function addWord(wordStr: string) {
+  useEffect(() => {
+    refAddWord.current = (wordStr: string) => {
+      if (refApp.current == undefined) {
+        console.error(
+          "Can't add new word because app is undefined. (Maybe the Pixi app hasn't been created yet)",
+        );
+        return;
+      }
+      const canvasSizeX = refContainerSize.current.width;
+      const canvasSizeY = refContainerSize.current.height;
+
+      const weightDisparity = 5;
+      const newWord = new Word(
+        wordStr,
+        new Point(Math.random() * canvasSizeX, Math.random() * canvasSizeY),
+        10 + weightDisparity * Math.random(),
+      );
+
+      newWord.getPixiText().style = {
+        //TODO replace by a new class method setStyle ?
+        fontFamily: "Arial",
+        fontSize: 24,
+        fill: 0xffffff,
+      };
+      newWord.setPosition(
+        new Vector(newWord.getPosition().x, newWord.getPosition().y),
+      );
+
+      //app.stage.addChild(newWord.getPixiText());
+      refWords.current.push(newWord);
+      pushWord(newWord);
+    };
+  });
+
+  function clearWords() {
+    refWords.current.forEach((word) => {
+      word.getPixiText().removeFromParent();
+    });
+    refWords.current = [];
+  }
+
+  /* const updateSpeed = useCallback(
+    (word: Word) => { */
+  function updateSpeed(word: Word) {
+    if (refContainer.current == undefined) return word;
+
+    const center = new Point(
+      refContainer.current.clientWidth / 2,
+      refContainer.current.clientHeight / 2,
+    );
+
+    const centerForce = calculateVec(
+      word.getPosition().x,
+      word.getPosition().y,
+      center.x,
+      center.y,
+      0.5 * word.mass,
+    );
+    word.speed = centerForce;
+
+    refWords.current.forEach((currWord) => {
+      if (currWord != word) {
+        const interForce = calculateVecSquared(
+          word.getPosition().x,
+          word.getPosition().y,
+          currWord.getPosition().x,
+          currWord.getPosition().y,
+          500,
+        );
+        word.speed = word.speed.add(interForce);
+      }
+    });
+
+    return word;
+  }
+
+  const pushWord = useCallback((word: Word) => {
+    console.log("pushWord");
+
+    if (!refApp.current || !refApp.current.stage) {
+      console.error("App or stage not initialized. Skipping word push.");
+      return;
+    }
+    refApp.current.stage.addChild(word.getPixiText());
+  }, []);
 
   //cleanup function that erases the canvas when the page unmounts
   useEffect(() => {
@@ -206,22 +326,22 @@ export default function WordCloud() {
     };
   }, [init]);
 
+  /* const updateSize = useCallback(() => { */
+  function updateSize() {
+    //updates the size according to the window
+    if (refContainer.current) {
+      refContainerSize.current.width = refContainer.current.clientWidth;
+      refContainerSize.current.height = refContainer.current.clientHeight;
+    }
+  }
+
   //function that updates the size of the container
   useEffect(() => {
-    const updateSize = () => {
-      //updates the size according to the window
-      if (refContainer.current) {
-        setContainerSize({
-          width: refContainer.current.clientWidth,
-          height: refContainer.current.clientHeight,
-        });
-      }
-    };
-    window.addEventListener("resize", updateSize); //the listener calls the previous function
+    window.addEventListener("resize", updateSize);
     updateSize();
 
     return () => window.removeEventListener("resize", updateSize);
-  }, []);
+  }, [refContainerSize]);
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
@@ -230,10 +350,16 @@ export default function WordCloud() {
           const word = refWords.current[i];
 
           if (word.getText() === inputValue) {
-            deleteWord(i);
             setInputValue("");
+            fightSession.current?.submitWord();
           }
         }
+      }
+      if (event.code === "Backspace") {
+        // FIXME this sends only 1 event even if the player deleted multiple letters at once,
+        // fix this by checking how many letters have been deleted
+        // (maybe in an other way entirely ikd)
+        fightSession.current?.submitEraseLetter();
       }
     },
     [inputValue],
@@ -249,30 +375,19 @@ export default function WordCloud() {
   }, [handleKeyPress]);
 
   return (
-    <>
-      <div
-        ref={refContainer}
-        style={{
-          width: "100vw",
-          height: "100vh",
-          position: "relative", // Keeps input positioned correctly
-        }}
-      >
-        <div ref={refCanvas}></div>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          style={{
-            position: "absolute",
-            left: "10px",
-            top: "10px",
-            zIndex: 1000,
-            padding: "5px",
-            fontSize: "16px",
-          }}
-        />
+    <div ref={refContainer} className={styles.container}>
+      <div ref={refCanvas}></div>
+      <input
+        type="text"
+        value={inputValue}
+        onChange={handleInputChange}
+        className={styles.entry}
+      />
+      <div className={styles.score_board}>
+        <p>Scores : {scores[0]}</p>
+        <p>words progress : {wordsBestProgress[0]}</p>
+        <p>Game end: {gameEndEpoch}</p>
       </div>
-    </>
+    </div>
   );
 }
