@@ -12,7 +12,6 @@
   bottom: 10px;
   left: 50%;
   margin: 0 15px;
-  transform: translateX-(-50%);
   cursor: pointer;
   z-index: 1000;
 }
@@ -55,7 +54,7 @@
   transition: opacity 0.1s ease-in-out;
 }
 
-/* Croix pour fermer une carte */
+/* Cross to close a Booster Card */
 .closeButton {
   position: absolute;
   background-color: black;
@@ -77,7 +76,6 @@
   background-color: red;
 }
 
-/* Menu déroulant */
 .dropdownMenu {
   display: flex;
   gap: 5px;
