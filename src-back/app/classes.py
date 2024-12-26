@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 import sqlite3
 import bcrypt
 from datetime import datetime
@@ -12,6 +13,7 @@ db_name = "broccolii.db"
 connection = sqlite3.connect(db_name)
 cursor = connection.cursor()
 print("Connected to the database")
+VERBOSE = False
 
 
 # %% Class Definitions
@@ -30,7 +32,7 @@ class Word:
         self.name = name
         self.category = []
 
-    def get_word(self):
+    def get_word(self) -> str:
         return self.name.capitalize()
 
     def add_category(self, categoryId):
@@ -254,16 +256,18 @@ for word in query:
         w.add_category(word[2])
         words.append(w)
 
-for word in words:
-    if len(word.category) > 1:
-        word.print_word()
+if VERBOSE:
+    for word in words:
+        if len(word.category) > 1:
+            word.print_word()
 
 cursor.execute("SELECT id, name FROM Category;")
 query = cursor.fetchall()
 categories = [Category(*category) for category in query]
 
-for category in categories:
-    category.print_category()
+if VERBOSE:
+    for category in categories:
+        category.print_category()
 # %%
 
 # %% Creating words
@@ -277,7 +281,7 @@ cursor.execute(sql_command)
 query = cursor.fetchall()
 # The dictionnary is used to check if we have already registered a word
 words_dict = {}
-words = []
+words: list[Word] = []
 for word in query:
     word_key = (word[0], word[1])
     if word_key in words_dict:
@@ -288,9 +292,10 @@ for word in query:
         words_dict[word_key] = w
         words.append(w)
 
-for word in words:
-    if len(word.category) > 1:
-        word.print_word()
+if VERBOSE:
+    for word in words:
+        if len(word.category) > 1:
+            word.print_word()
 
 # %%
 
@@ -299,9 +304,31 @@ cursor.execute("SELECT id, name, effect, rarity, isNegative, adding, multiplyBy 
 query = cursor.fetchall()
 cards = [Card(*card) for card in query]
 
-for card in cards:
-    card.print_card()
+if VERBOSE:
+    for card in cards:
+        card.print_card()
 # %%
 
 connection.commit()
 connection.close()
+
+
+def get_random_word_list(categories=[], amount=300):
+    # return all if not enough words
+    if amount > len(words):
+        return [word.get_word() for word in words]
+
+    words_copy: list[Word] = []
+
+    # filter by category if needed
+    if len(categories) == 0:
+        words_copy = words.copy()
+    else:
+        for word in words:
+            if any(word.word_in_category(category) for category in categories):
+                words_copy.append(word)
+
+    # shuffle
+    random.shuffle(words_copy)
+
+    return [word.get_word().lower() for word in words_copy[:amount]]
