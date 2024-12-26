@@ -21,6 +21,7 @@ type ServerEvent =
   | "wordsFound"
   | "scoresUpdated"
   | "acknowledgeLetter"
+  | "wonPrize"
   | "acknowledgeLetterErased"
   | "acknowledgeSubmit";
 type EventType = ClientEvent | ServerEvent;
@@ -101,6 +102,7 @@ export class FightSession {
   ) => void = () => {};
   private onAcknowledgeSubmit: (success: boolean, testedState: string) => void =
     () => {};
+  private onPrizeReceived: (prize: unknown /*TODO define*/) => void = () => {};
 
   /**
    * Open the connection.
@@ -213,6 +215,13 @@ export class FightSession {
         this.onAcknowledgeSubmit(payload.success, payload.testedState);
         break;
       }
+      case "wonPrize": {
+        this.onPrizeReceived(e);
+        break;
+      }
+      default: {
+        console.warn("Unknown event type", eventType);
+      }
     }
   }
 
@@ -240,6 +249,9 @@ export class FightSession {
   }
   onAcknowledgeSubmitThen(f: (success: boolean, testedState: string) => void) {
     this.onAcknowledgeSubmit = f;
+  }
+  onPrizeReceivedThen(f: (prize: unknown /*TODO define*/) => void) {
+    this.onPrizeReceived = f;
   }
 
   submitLetter(letter: string) {

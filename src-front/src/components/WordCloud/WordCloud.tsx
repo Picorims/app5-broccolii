@@ -185,6 +185,9 @@ export default function WordCloud({
     session.onScoresUpdatedThen((scores) => {
       console.log("Scores updated", scores);
     });
+    session.onPrizeReceivedThen((prize) => {
+      console.log("Prize received", prize);
+    });
 
     return () => {
       fightSession.current?.close();

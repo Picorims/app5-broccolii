@@ -54,6 +54,9 @@ export default function TempWebSocketFight() {
     session.onScoresUpdatedThen((scores) => {
       console.log("Scores updated", scores);
     });
+    session.onPrizeReceivedThen((prize) => {
+      console.log("Won prize", prize);
+    });
 
     return () => {
       fightSession.current?.close();

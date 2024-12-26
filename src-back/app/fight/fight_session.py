@@ -7,7 +7,9 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
+import asyncio
 import json
+from threading import Timer
 import time
 import uuid
 from pydantic import BaseModel
@@ -24,13 +26,26 @@ class FightSession:
     def __init__(self, fight_id, player_list):
         self._fight_id = fight_id
         self._players = [player for player in player_list]
-        self._players_sessions = {}
+        self._players_sessions: dict[str, WebSocket] = {}
         self._players_typing_history = {player: [] for player in player_list}
         self._scores = {player: 0 for player in player_list}
         self._words_to_find = ["word", "broccoli", "tomato", "bee", "beekeeper"]
         self._words_found = []
         self._word_best_progress = {}
-        self._game_end_epoch = int(time.time() + 60)
+        self._game_start_wait_ms = 30_000
+        self._game_duration_ms = 60_000
+        self._game_start_epoch_ms = int(time.time() * 1000) + self._game_start_wait_ms
+        self._game_end_epoch_ms = self._game_start_epoch_ms + self._game_duration_ms
+
+        def end_game():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(self._finish_game())
+            loop.close()
+
+        timer_delay_seconds = (self._game_start_wait_ms + self._game_duration_ms) / 1000
+        Timer(timer_delay_seconds, end_game).start()
+        print("Created fight session", self._fight_id)
 
     def toString(self):
         res = "FightSession : ["
@@ -42,7 +57,7 @@ class FightSession:
         res += "\t_words_to_find : " + self._words_to_find.__str__() + "\n"
         res += "\t_words_found : " + self._words_found.__str__() + "\n"
         res += "\t_word_best_progress : " + self._word_best_progress.__str__() + "\n"
-        res += "\t_game_end_epoch : " + self._game_end_epoch.__str__() + "\n"
+        res += "\t_game_end_epoch : " + self._game_end_epoch_ms.__str__() + "\n"
         res += "]"
         return res
 
@@ -51,13 +66,33 @@ class FightSession:
             raise Exception("This player already has a session.")
         self._players_sessions[name] = session
 
-    def player_has_session(self, name):
+    def player_has_session(self, name: str):
         return name in self._players_sessions
 
-    def remove_player_session(self, name):
+    def remove_player_session(self, name: str):
+        """Remove a player from the session.
+
+        If the game ended and there are no more players,
+        the session is removed.
+
+        Args:
+            name (str): the player to remove.
+
+        Raises:
+            Exception: if the player do not have a session.
+        """
         if name not in self._players_sessions:
             raise Exception("This player does not have a session.")
         self._players_sessions.pop(name, None)
+
+        now_ms = int(time.time() * 1000)
+        if len(self._players_sessions) == 0 and now_ms > self._game_end_epoch_ms:
+            self.remove_self()
+
+    def remove_self(self):
+        """Closes the fight."""
+        sessions.pop(self._fight_id, None)
+        print("Removed fight session", self._fight_id)
 
     def add_player(self, userId: str, websocket: WebSocket):
         self._players.append(userId)
@@ -152,11 +187,16 @@ class FightSession:
         state["wordsBestProgress"] = {
             word: progress for word, progress in self._word_best_progress.items()
         }
-        state["gameEndEpoch"] = self._game_end_epoch
+        state["gameEndEpochMs"] = self._game_end_epoch_ms
+        state["gameStartEpochMs"] = self._game_start_epoch_ms
+        state["gameRunning"] = await self._is_within_game_time()
 
         await websocket.send_text(build_json_event("sendGameState", state))
 
     async def _handle_submit_letter(self, websocket: WebSocket, userID: str, letter: str):
+        if not await self._is_within_game_time(websocket):
+            return
+
         self._players_typing_history[userID].append(letter)
         currentState = "".join(self._players_typing_history[userID])
         await websocket.send_text(
@@ -165,6 +205,9 @@ class FightSession:
         await self._update_words_best_progress()
 
     async def _handle_erase_letter(self, websocket: WebSocket, userID: str):
+        if not await self._is_within_game_time(websocket):
+            return
+
         if len(self._players_typing_history[userID]) <= 0:
             await self._send_error_event(websocket, "No letter to erase.")
             return
@@ -179,6 +222,9 @@ class FightSession:
         await self._update_words_best_progress()
 
     async def _handle_submit_word(self, websocket: WebSocket, userID: str):
+        if not await self._is_within_game_time(websocket):
+            return
+
         currentState = "".join(self._players_typing_history[userID])
         success = False
         if currentState in self._words_to_find:
@@ -222,6 +268,37 @@ class FightSession:
         await self._broadcast(
             build_json_event("sendWordsBestProgress", {"words": self._word_best_progress})
         )
+
+    async def _is_within_game_time(self, websocket: WebSocket = None) -> bool:
+        """Returns if the game is currently running.
+
+        If a websocket is provided, sends a websocket error event
+        if the game is not running.
+        """
+        now_ms = int(time.time() * 1000)
+        if now_ms > self._game_end_epoch_ms:
+            if websocket is not None:
+                await self._send_error_event(websocket, "Game is over.")
+            return False
+
+        if now_ms < self._game_start_epoch_ms:
+            if websocket is not None:
+                await self._send_error_event(websocket, "Game has not started yet.")
+            return False
+
+        return True
+
+    async def _finish_game(self):
+        print("Game finished", self._fight_id)
+        for player in self._players_sessions:
+            prize = self._get_prize_of_player(player)
+            await self._players_sessions[player].send_text(
+                build_json_event("wonPrize", {"prize": prize})
+            )
+
+    def _get_prize_of_player(self, player):
+        # TODO: implement
+        return self._scores[player]
 
 
 sessions["test"] = FightSession("test", ["alice", "bob"])
