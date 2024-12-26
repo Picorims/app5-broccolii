@@ -87,8 +87,12 @@ class Account:
         self.cards = cards
 
     def add_card(self, card):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
         self.cards.append([card, 0])
         cursor.execute(f"INSERT INTO AccountCard VALUES ({self.id}, {card.id}, 0)")
+        cursor.close()
+        connection.close()
 
     @staticmethod
     def add_card_from_username(username, card_id):
@@ -112,11 +116,15 @@ class Account:
         return {"status": "success", "message": "Card added to account."}
 
     def equip_card(self, card):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         cursor.execute(
-            f"UPDATE TABLE AccountCard SET isEquipped = 1 WHERE idAccount = {self.id}\n"
+            f"UPDATE AccountCard SET isEquipped = 1 WHERE (idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
         )
+        cursor.close()
+        connection.close()
 
     def equip_card_from_username(username, cardId):
         # WARNING this function equips ALL the cards that have cardId
@@ -152,6 +160,7 @@ class Account:
 
     def unequip_card(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
+        #TODO: this request won't work. modify inpired by above working request
         cursor.execute(
             f"UPDATE TABLE AccountCard SET isEquipped = 0 WHERE idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
@@ -190,6 +199,20 @@ class Account:
         # TODO make the following line work
         # self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         return {"status": "success", "message": "Equipped card."}
+
+    @staticmethod
+    def get_cards(username):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        cursor.execute(
+            """SELECT idCard FROM AccountCard
+                INNER JOIN Account ON AccountCard.idAccount = Account.id
+                WHERE Account.username = username"""
+        )
+        result = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        return result
 
     @staticmethod
     def user_exists(login):
