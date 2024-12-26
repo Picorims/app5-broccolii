@@ -124,7 +124,7 @@ export class API {
       }),
     });
   }
-  
+
   public static patchClick() {
     const url = `${getEnv().backendUrl}/api/v1/click`;
     console.log("[API] [PATCH] " + url);
@@ -137,7 +137,7 @@ export class API {
       },
     });
   }
-
+  
   public static async addCard(username: string, cardId: string) {
     const url = `${getEnv().backendUrl}/api/v1/card/add`;
 
@@ -182,5 +182,4 @@ export class API {
       }),
     });
   }
-
 }

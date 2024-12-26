@@ -15,6 +15,7 @@ from .fight.fight_session import router as fight_router
 from .front_provider import router as front_router
 from .auth.auth import router as auth_router
 from .user.user import router as user_router
+from .card.card import router as card_router
 
 print('\n\n-------------------------------')
 from .broccoli_counter import single_click
@@ -38,4 +39,5 @@ app.add_middleware(
 app.include_router(fight_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(user_router, prefix="/api/v1")
+app.include_router(card_router, prefix="/api/v1")
 app.include_router(front_router)

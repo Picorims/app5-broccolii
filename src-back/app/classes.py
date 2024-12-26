@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 import sqlite3
 import bcrypt
 from datetime import datetime
@@ -12,6 +13,7 @@ db_name = "broccolii.db"
 connection = sqlite3.connect(db_name)
 cursor = connection.cursor()
 print("Connected to the database")
+VERBOSE = False
 
 
 # %% Class Definitions
@@ -30,7 +32,7 @@ class Word:
         self.name = name
         self.category = []
 
-    def get_word(self):
+    def get_word(self) -> str:
         return self.name.capitalize()
 
     def add_category(self, categoryId):
@@ -92,6 +94,27 @@ class Account:
         cursor.close()
         connection.close()
 
+    @staticmethod
+    def add_card_from_username(username, card_id):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
+        req = f"SELECT id FROM Account WHERE Account.username = '{username}'"
+        cursor.execute(req)
+        resultId = cursor.fetchone()
+        if resultId is None:
+            return {"status": "error", "message": "Account not found."}
+        user_id = resultId[0]
+
+        req2 = f"INSERT INTO AccountCard VALUES ({user_id}, {card_id}, 0)"
+        cursor.execute(req2)
+        print("res insertion : ", cursor.fetchone())
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return {"status": "success", "message": "Card added to account."}
+
     def equip_card(self, card):
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
@@ -103,6 +126,38 @@ class Account:
         cursor.close()
         connection.close()
 
+    def equip_card_from_username(username, cardId):
+        # WARNING this function equips ALL the cards that have cardId
+        # (if the user possesses multiple times the same card)
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
+        req = f"SELECT id FROM Account WHERE Account.username = '{username}'"
+        cursor.execute(req)
+        resultId = cursor.fetchone()
+        if resultId is None:
+            return {"status": "error", "message": "Account not found."}
+        user_id = resultId[0]
+
+        req2 = f"SELECT * FROM AccountCard WHERE idAccount = {user_id} AND idCard = {cardId}"
+        cursor.execute(req2)
+        resultCards = cursor.fetchone()
+
+        if resultCards is None:
+            return {"status": "error", "message": "Account does not own the card."}
+
+        req3 = "UPDATE AccountCard SET isEquipped = 1 "
+        req3 += f"WHERE idAccount = {user_id} AND idCard = {cardId}"
+        cursor.execute(req3)
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        # TODO make the following line work
+        # self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
+        return {"status": "success", "message": "Equipped card."}
+
     def unequip_card(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         #TODO: this request won't work. modify inpired by above working request
@@ -110,6 +165,40 @@ class Account:
             f"UPDATE TABLE AccountCard SET isEquipped = 0 WHERE idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
         )
+
+    def unequip_card_from_username(username, cardId):
+        # WARNING this function unequips ALL the cards that have cardId
+        # (if the user possesses multiple times the same card)
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
+        req = f"SELECT id FROM Account WHERE Account.username = '{username}'"
+        cursor.execute(req)
+        resultId = cursor.fetchone()
+        if resultId is None:
+            return {"status": "error", "message": "Account not found."}
+        user_id = resultId[0]
+        print("id user", user_id)
+
+        req2 = f"SELECT * FROM AccountCard WHERE idAccount = {user_id} AND idCard = {cardId}"
+        cursor.execute(req2)
+        resultCards = cursor.fetchone()
+        print("la carte :", resultCards)
+
+        if resultCards is None:
+            return {"status": "error", "message": "Account does not own the card."}
+
+        req3 = "UPDATE AccountCard SET isEquipped = 0 "
+        req3 += f"WHERE idAccount = {user_id} AND idCard = {cardId}"
+        cursor.execute(req3)
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        # TODO make the following line work
+        # self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
+        return {"status": "success", "message": "Equipped card."}
 
     @staticmethod
     def get_cards(username):
@@ -277,16 +366,18 @@ for word in query:
         w.add_category(word[2])
         words.append(w)
 
-for word in words:
-    if len(word.category) > 1:
-        word.print_word()
+if VERBOSE:
+    for word in words:
+        if len(word.category) > 1:
+            word.print_word()
 
 cursor.execute("SELECT id, name FROM Category;")
 query = cursor.fetchall()
 categories = [Category(*category) for category in query]
 
-for category in categories:
-    category.print_category()
+if VERBOSE:
+    for category in categories:
+        category.print_category()
 # %%
 
 # %% Creating words
@@ -300,7 +391,7 @@ cursor.execute(sql_command)
 query = cursor.fetchall()
 # The dictionnary is used to check if we have already registered a word
 words_dict = {}
-words = []
+words: list[Word] = []
 for word in query:
     word_key = (word[0], word[1])
     if word_key in words_dict:
@@ -311,9 +402,10 @@ for word in query:
         words_dict[word_key] = w
         words.append(w)
 
-for word in words:
-    if len(word.category) > 1:
-        word.print_word()
+if VERBOSE:
+    for word in words:
+        if len(word.category) > 1:
+            word.print_word()
 
 # %%
 
@@ -322,9 +414,31 @@ cursor.execute("SELECT id, name, effect, rarity, isNegative, adding, multiplyBy 
 query = cursor.fetchall()
 cards = [Card(*card) for card in query]
 
-for card in cards:
-    card.print_card()
+if VERBOSE:
+    for card in cards:
+        card.print_card()
 # %%
 
 connection.commit()
 connection.close()
+
+
+def get_random_word_list(categories=[], amount=300):
+    # return all if not enough words
+    if amount > len(words):
+        return [word.get_word() for word in words]
+
+    words_copy: list[Word] = []
+
+    # filter by category if needed
+    if len(categories) == 0:
+        words_copy = words.copy()
+    else:
+        for word in words:
+            if any(word.word_in_category(category) for category in categories):
+                words_copy.append(word)
+
+    # shuffle
+    random.shuffle(words_copy)
+
+    return [word.get_word().lower() for word in words_copy[:amount]]

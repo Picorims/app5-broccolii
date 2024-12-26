@@ -11,6 +11,9 @@ WORKDIR /src-back
 COPY src-back/ .
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 COPY --from=frontend /src-front/dist dist
+# Generate new JWT_SECRET
+RUN rm -f JWT_SECRET
+RUN openssl rand -base64 32 > JWT_SECRET
 RUN python ./app/sql_script.py
 EXPOSE 8000
 # CMD ["fastapi", "run", "./app/main.py"]
