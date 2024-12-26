@@ -12,8 +12,29 @@ import {
 import { FightSession } from "../../lib/fight_session";
 import { Link } from "react-router-dom";
 
+
 class Word {
+  private static colWordBox = "#444";
+  private static colWordBoxBorderHighlighted = "#090";
+  private static colWordBoxBorder = "#777";
+  private static colText = "#cdb";
+
+  private static pixiTextStyle1 = new PIXI.TextStyle({ 
+    fontSize: 50,
+    fontFamily: "EnterCommand",
+    fill: Word.colText
+  });
+
+  private static pixiTextStyle2 = new PIXI.TextStyle({ 
+    fontSize: 50,
+    fontFamily: "EnterCommand",
+    fill: "#5c5",
+  });
+
   private pixiText: PIXI.Text;
+  private pixiText2: PIXI.Text;
+  private pixiGraphics: PIXI.Graphics;
+  private isHighlighted: boolean;
   public speed: Vector;
 
   constructor(
@@ -21,7 +42,21 @@ class Word {
     private position: Point,
     public mass: number,
   ) {
-    this.pixiText = new PIXI.Text({ text: text });
+    this.pixiText = new PIXI.Text({ text: text, style: Word.pixiTextStyle1});
+    this.pixiText.anchor._x = 0.5
+    this.pixiText.anchor._y = 0.5
+    
+    this.pixiText2 = new PIXI.Text({ text: "", style: Word.pixiTextStyle2});
+    this.pixiText2.anchor._x = 0
+    this.pixiText2.anchor._y = 0.5
+    
+    this.pixiGraphics = new PIXI.Graphics();
+    this.pixiGraphics.roundRect(-this.pixiText.bounds.maxX*1.2, -20, this.pixiText.bounds.maxX*2.4, 40, 15);
+    this.pixiGraphics.stroke({ color: Word.colWordBoxBorder, width: 7 });
+    this.pixiGraphics.fill(Word.colWordBox);
+    this.pixiGraphics.position.set(position.x, position.y);
+
+    this.isHighlighted = false;
     this.speed = new Vector(0, 0);
   }
 
@@ -38,13 +73,45 @@ class Word {
     return this.pixiText;
   }
 
+  getPixiText2() {
+    return this.pixiText2;
+  }
+
+  getPixiGraphics() {
+    return this.pixiGraphics;
+  }
+
   getPosition() {
     return this.position;
+  }
+
+  getHighlighted() {
+    return this.isHighlighted;
+  }
+
+  setHighlighted(highlight: boolean) {
+    this.isHighlighted = highlight;
+    this.pixiGraphics.clear();
+    
+    if (highlight) {
+      this.pixiGraphics.roundRect(-this.pixiText.bounds.maxX*1.2, -20, this.pixiText.bounds.maxX*2.4, 40, 15);
+      this.pixiGraphics.stroke({ color: Word.colWordBoxBorderHighlighted, width: 10 });
+      this.pixiGraphics.fill(Word.colWordBox);
+      this.pixiGraphics.position.set(this.position.x, this.position.y);
+    } else {
+      this.pixiGraphics.roundRect(-this.pixiText.bounds.maxX*1.2, -20, this.pixiText.bounds.maxX*2.4, 40, 15);
+      this.pixiGraphics.stroke({ color: Word.colWordBoxBorder, width: 10 });
+      this.pixiGraphics.fill(Word.colWordBox);
+      this.pixiGraphics.position.set(this.position.x, this.position.y);
+    }
+    
   }
 
   setPosition(position: Point = new Point(0, 0)) {
     this.position = position;
     this.pixiText.position.set(this.position.x, this.position.y);
+    this.pixiText2.position.set(this.position.x + this.pixiText.bounds.minX, this.position.y);
+    this.pixiGraphics.position.set(this.position.x, this.position.y)
   }
 }
 
@@ -74,11 +141,12 @@ export default function WordCloud({
 
   //WordCloud initialization
   const init = useCallback(async () => {
+    // PIXI.Assets.add({alias:"font", src:""})
     const app = new Application();
 
     if (refContainer.current) {
       await app.init({
-        background: "#1099bb",
+        background: "#196e30",
         resizeTo: refContainer.current,
         width: refContainerSize.current.width,
         height: refContainerSize.current.height,
@@ -145,8 +213,6 @@ export default function WordCloud({
   useEffect(() => {
     //setError("");
     console.log("Initializing session...");
-    console.log("pré création session :", userId, fightId);
-
     fightSession.current = new FightSession(userId, fightId, () => {
       console.log("WebSocket open. Getting state...");
       fightSession.current?.requestGameState();
@@ -208,17 +274,17 @@ export default function WordCloud({
           //End of the game
           setIsGameEnded(true);
           
-          // //deleting the PIXI App
-          // if (refApp.current) {
-          //   refApp.current.destroy(true, { children: true, texture: true });
-          //   refApp.current = undefined;
-          // }
-          // //deleting the canvas
-          // if (refCanvas.current) {
-          //   while (refCanvas.current.firstChild) {
-          //     refCanvas.current.removeChild(refCanvas.current.firstChild);
-          //   }
-          // }
+          //deleting the PIXI App
+          if (refApp.current) {
+            refApp.current.destroy(true, { children: true, texture: true });
+            refApp.current = undefined;
+          }
+          //deleting the canvas
+          if (refCanvas.current) {
+            while (refCanvas.current.firstChild) {
+              refCanvas.current.removeChild(refCanvas.current.firstChild);
+            }
+          }
         }
       };
   
@@ -242,26 +308,51 @@ export default function WordCloud({
    * @param event
    */
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setInputValue(event.target.value);
+    const newVal = event.target.value;
+    setInputValue(newVal);
     const nv = event.nativeEvent as InputEvent;
     if (nv.data != null) {
       fightSession.current?.submitLetter(nv.data);
     }
+
+    //higlighting the user's progress (words that correspond to what the user typed)
+    for (const word of refWords.current) {
+      let res = "";
+      let i = 0;
+      const txt = word.getText();
+      while (i < newVal.length && i < txt.length && txt.startsWith(newVal.substring(0, i+1))) {
+        res += txt[i];
+        i++;
+        if (res === txt) {
+          word.setHighlighted(true);
+          break;
+        }
+        if (word.getHighlighted()) {
+          console.log("désactivation");
+          
+          word.setHighlighted(false);
+        }
+      }
+      word.getPixiText2().text = res
+    }
+  }
+  
+  function resetUserProgress() {
+    for (const word of refWords.current) {
+      word.getPixiText2().text = "";
+    }
   }
 
-  function deleteWordByIndex(index: number) {
-    refWords.current[index].getPixiText().removeFromParent();
-    refWords.current.splice(index, 1);
-  }
-
-  //function deleteWord(wordToDelete: string) {
   useEffect(() => {
     refDeleteWord.current = (wordToDelete: string) => {
       for (let i = refWords.current.length - 1; i >= 0; i--) {
         const word = refWords.current[i];
 
         if (word.getText() === wordToDelete) {
-          deleteWordByIndex(i);
+          refWords.current[i].getPixiText().removeFromParent();
+          refWords.current[i].getPixiText2().removeFromParent();
+          refWords.current[i].getPixiGraphics().removeFromParent();
+          refWords.current.splice(i, 1);
           break;
         }
       }
@@ -289,18 +380,10 @@ export default function WordCloud({
         new Point(Math.random() * canvasSizeX, Math.random() * canvasSizeY),
         10 + weightDisparity * Math.random(),
       );
-
-      newWord.getPixiText().style = {
-        //TODO replace by a new class method setStyle ?
-        fontFamily: "Arial",
-        fontSize: 24,
-        fill: 0xffffff,
-      };
       newWord.setPosition(
         new Vector(newWord.getPosition().x, newWord.getPosition().y),
       );
 
-      //app.stage.addChild(newWord.getPixiText());
       refWords.current.push(newWord);
       pushWord(newWord);
     };
@@ -313,8 +396,6 @@ export default function WordCloud({
     refWords.current = [];
   }
 
-  /* const updateSpeed = useCallback(
-    (word: Word) => { */
   function updateSpeed(word: Word) {
     if (refContainer.current == undefined) return word;
 
@@ -353,17 +434,9 @@ export default function WordCloud({
       console.error("App or stage not initialized. Skipping word push.");
       return;
     }
-    const tigerSvg = await PIXI.Assets.load({
-      src: 'C:\Users\arnau\Documents\Travail\polytech\web avancé\repo\app5-broccolii\src-front\src\assets\rectangle.svg',
-      data: {
-          parseAsGraphicsContext: true,
-      },
-    });
-
-    const graphics = new PIXI.Graphics(tigerSvg);
-    
-    refApp.current.stage.addChild(graphics);
+    refApp.current.stage.addChild(word.getPixiGraphics());
     refApp.current.stage.addChild(word.getPixiText());
+    refApp.current.stage.addChild(word.getPixiText2());
   }, []);
 
   //cleanup function that erases the canvas when the page unmounts
@@ -409,6 +482,7 @@ export default function WordCloud({
 
           if (word.getText() === inputValue) {
             setInputValue("");
+            resetUserProgress();
             fightSession.current?.submitWord();
           }
         }
@@ -434,16 +508,17 @@ export default function WordCloud({
 
   return (
     <div ref={refContainer} className={styles.container}>
-      {/* {isGameEnded ? (
+      {isGameEnded ? (
         <div className={styles.game_over}>
           <h1>Game Over</h1>
           <Link to="/clicker">Back to clicker !</Link>
         </div>
-      ) : ( */}
+      ) : (
         <>
           <div ref={refCanvas}></div>
           <input
             type="text"
+            id="playerInput"
             value={inputValue}
             onChange={handleInputChange}
             className={styles.entry}
@@ -459,7 +534,7 @@ export default function WordCloud({
             <p>Time remaining: {formatTime(remainingTime)}</p>
           </div>
         </>
-      {/* )} */}
+      )}
     </div>
   );
 }
