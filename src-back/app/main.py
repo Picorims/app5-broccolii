@@ -16,6 +16,9 @@ from .front_provider import router as front_router
 from .auth.auth import router as auth_router
 from .user.user import router as user_router
 
+print('\n\n-------------------------------')
+from .broccoli_counter import single_click
+print('\n\n-------------------------------')
 app = FastAPI()
 
 origins = [

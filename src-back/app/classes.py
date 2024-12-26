@@ -75,6 +75,7 @@ class Card:
 class UserInfo(BaseModel):
     username: str
     broccolis: int
+    user: str
 
 
 class Account:
@@ -85,15 +86,23 @@ class Account:
         self.cards = cards
 
     def add_card(self, card):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
         self.cards.append([card, 0])
         cursor.execute(f"INSERT INTO AccountCard VALUES ({self.id}, {card.id}, 0)")
+        cursor.close()
+        connection.close()
 
     def equip_card(self, card):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         cursor.execute(
-            f"UPDATE TABLE AccountCard SET isEquipped = 1 WHERE idAccount = {self.id}\n"
+            f"UPDATE AccountCard SET isEquipped = 1 WHERE (idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
         )
+        cursor.close()
+        connection.close()
 
     def unequip_card(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
@@ -165,7 +174,7 @@ class Account:
         return re.match(r"^[a-zA-Z0-9_]{3,32}$", username) is not None
 
     @staticmethod
-    def get_user_info(username: str):
+    def get_user_info(self, username: str):
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
         cursor.execute("SELECT username, broccolis FROM Account WHERE username = ?", (username,))
@@ -175,7 +184,7 @@ class Account:
 
         if result is None:
             return None
-        return UserInfo(username=result[0], broccolis=result[1])
+        return UserInfo(username=result[0], broccolis=result[1], user=self)
 
 
 class Token:
