@@ -12,20 +12,19 @@ import {
 import { FightSession } from "../../lib/fight_session";
 import { Link } from "react-router-dom";
 
-
 class Word {
   private static colWordBox = "#444";
   private static colWordBoxBorderHighlighted = "#090";
   private static colWordBoxBorder = "#777";
   private static colText = "#cdb";
 
-  private static pixiTextStyle1 = new PIXI.TextStyle({ 
+  private static pixiTextStyle1 = new PIXI.TextStyle({
     fontSize: 50,
     fontFamily: "EnterCommand",
-    fill: Word.colText
+    fill: Word.colText,
   });
 
-  private static pixiTextStyle2 = new PIXI.TextStyle({ 
+  private static pixiTextStyle2 = new PIXI.TextStyle({
     fontSize: 50,
     fontFamily: "EnterCommand",
     fill: "#5c5",
@@ -42,16 +41,22 @@ class Word {
     private position: Point,
     public mass: number,
   ) {
-    this.pixiText = new PIXI.Text({ text: text, style: Word.pixiTextStyle1});
-    this.pixiText.anchor._x = 0.5
-    this.pixiText.anchor._y = 0.5
-    
-    this.pixiText2 = new PIXI.Text({ text: "", style: Word.pixiTextStyle2});
-    this.pixiText2.anchor._x = 0
-    this.pixiText2.anchor._y = 0.5
-    
+    this.pixiText = new PIXI.Text({ text: text, style: Word.pixiTextStyle1 });
+    this.pixiText.anchor._x = 0.5;
+    this.pixiText.anchor._y = 0.5;
+
+    this.pixiText2 = new PIXI.Text({ text: "", style: Word.pixiTextStyle2 });
+    this.pixiText2.anchor._x = 0;
+    this.pixiText2.anchor._y = 0.5;
+
     this.pixiGraphics = new PIXI.Graphics();
-    this.pixiGraphics.roundRect(-this.pixiText.bounds.maxX*1.2, -20, this.pixiText.bounds.maxX*2.4, 40, 15);
+    this.pixiGraphics.roundRect(
+      -this.pixiText.bounds.maxX * 1.2,
+      -20,
+      this.pixiText.bounds.maxX * 2.4,
+      40,
+      15,
+    );
     this.pixiGraphics.stroke({ color: Word.colWordBoxBorder, width: 7 });
     this.pixiGraphics.fill(Word.colWordBox);
     this.pixiGraphics.position.set(position.x, position.y);
@@ -92,26 +97,43 @@ class Word {
   setHighlighted(highlight: boolean) {
     this.isHighlighted = highlight;
     this.pixiGraphics.clear();
-    
+
     if (highlight) {
-      this.pixiGraphics.roundRect(-this.pixiText.bounds.maxX*1.2, -20, this.pixiText.bounds.maxX*2.4, 40, 15);
-      this.pixiGraphics.stroke({ color: Word.colWordBoxBorderHighlighted, width: 10 });
+      this.pixiGraphics.roundRect(
+        -this.pixiText.bounds.maxX * 1.2,
+        -20,
+        this.pixiText.bounds.maxX * 2.4,
+        40,
+        15,
+      );
+      this.pixiGraphics.stroke({
+        color: Word.colWordBoxBorderHighlighted,
+        width: 10,
+      });
       this.pixiGraphics.fill(Word.colWordBox);
       this.pixiGraphics.position.set(this.position.x, this.position.y);
     } else {
-      this.pixiGraphics.roundRect(-this.pixiText.bounds.maxX*1.2, -20, this.pixiText.bounds.maxX*2.4, 40, 15);
+      this.pixiGraphics.roundRect(
+        -this.pixiText.bounds.maxX * 1.2,
+        -20,
+        this.pixiText.bounds.maxX * 2.4,
+        40,
+        15,
+      );
       this.pixiGraphics.stroke({ color: Word.colWordBoxBorder, width: 10 });
       this.pixiGraphics.fill(Word.colWordBox);
       this.pixiGraphics.position.set(this.position.x, this.position.y);
     }
-    
   }
 
   setPosition(position: Point = new Point(0, 0)) {
     this.position = position;
     this.pixiText.position.set(this.position.x, this.position.y);
-    this.pixiText2.position.set(this.position.x + this.pixiText.bounds.minX, this.position.y);
-    this.pixiGraphics.position.set(this.position.x, this.position.y)
+    this.pixiText2.position.set(
+      this.position.x + this.pixiText.bounds.minX,
+      this.position.y,
+    );
+    this.pixiGraphics.position.set(this.position.x, this.position.y);
   }
 }
 
@@ -232,7 +254,7 @@ export default function WordCloud({
         refAddWord.current?.(wordStr);
       }
     });
-    
+
     session.onAcknowledgeLetterThen((accepted, currentState) => {
       console.log("Letter acknowledged", accepted, currentState);
     });
@@ -264,16 +286,15 @@ export default function WordCloud({
   useEffect(() => {
     if (gameEndEpoch > 0) {
       const updateRemainingTime = () => {
-        
         const now = Math.floor(Date.now() / 1000);
         const timeRemaining = gameEndEpoch - now;
-        
+
         if (timeRemaining > 0) {
           setRemainingTime(timeRemaining);
         } else {
           //End of the game
           setIsGameEnded(true);
-          
+
           //deleting the PIXI App
           if (refApp.current) {
             refApp.current.destroy(true, { children: true, texture: true });
@@ -287,17 +308,19 @@ export default function WordCloud({
           }
         }
       };
-  
+
       updateRemainingTime();
       const interval = setInterval(updateRemainingTime, 1000);
-  
+
       return () => clearInterval(interval); //cleanup when unmounting
     }
   }, [gameEndEpoch]);
-  
+
   // Format remaining time as MM:SS
   const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60).toString().padStart(2, "0");
+    const minutes = Math.floor(time / 60)
+      .toString()
+      .padStart(2, "0");
     const seconds = (time % 60).toString().padStart(2, "0");
     return `${minutes}:${seconds}`;
   };
@@ -308,6 +331,7 @@ export default function WordCloud({
    * @param event
    */
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    console.log(wordsBestProgress);
     const newVal = event.target.value;
     setInputValue(newVal);
     const nv = event.nativeEvent as InputEvent;
@@ -320,7 +344,11 @@ export default function WordCloud({
       let res = "";
       let i = 0;
       const txt = word.getText();
-      while (i < newVal.length && i < txt.length && txt.startsWith(newVal.substring(0, i+1))) {
+      while (
+        i < newVal.length &&
+        i < txt.length &&
+        txt.startsWith(newVal.substring(0, i + 1))
+      ) {
         res += txt[i];
         i++;
         if (res === txt) {
@@ -329,14 +357,14 @@ export default function WordCloud({
         }
         if (word.getHighlighted()) {
           console.log("désactivation");
-          
+
           word.setHighlighted(false);
         }
       }
-      word.getPixiText2().text = res
+      word.getPixiText2().text = res;
     }
   }
-  
+
   function resetUserProgress() {
     for (const word of refWords.current) {
       word.getPixiText2().text = "";
@@ -429,7 +457,7 @@ export default function WordCloud({
     return word;
   }
 
-  const pushWord = useCallback( async (word: Word) => {
+  const pushWord = useCallback(async (word: Word) => {
     if (!refApp.current || !refApp.current.stage) {
       console.error("App or stage not initialized. Skipping word push.");
       return;
