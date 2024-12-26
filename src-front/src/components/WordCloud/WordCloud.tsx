@@ -356,8 +356,6 @@ export default function WordCloud({
           break;
         }
         if (word.getHighlighted()) {
-          console.log("désactivation");
-
           word.setHighlighted(false);
         }
       }
