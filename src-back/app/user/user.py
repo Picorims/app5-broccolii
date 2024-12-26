@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from ..auth import jwt_utils
 from fastapi import APIRouter, status
 from app.classes import Account
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -32,3 +33,33 @@ async def me(credentials: jwt_utils.Credentials):
         )
 
     return user_info
+
+
+
+
+
+
+class ClickBody(BaseModel):
+    username: str
+
+
+@router.patch(
+    "/user/click",
+    status_code=status.HTTP_200_OK,
+    description="Registers the click on the broccoli",
+)
+async def click(body: ClickBody):
+    print("click by :", body.username)
+    # check that all API values are present
+    if body.username is None:
+        print("Missing username")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username"
+        )
+
+    response = Account.route_click_placeholder(body.username)
+
+    return JSONResponse(
+        content=response,
+        media_type="application/json",
+    )

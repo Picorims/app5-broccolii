@@ -28,6 +28,7 @@ const ClickerPage = () => {
 
   const [currentItem, setCurrentItem] = useState(items[0]);
 
+  let username: string = '';
   // Function to switch to a random image (not the current one) when the button is clicked.
   const handleClick = () => {
     let randomIndex;
@@ -37,8 +38,9 @@ const ClickerPage = () => {
 
     setCurrentItem(items[randomIndex]);
 
-    API.patchClick();
+    API.patchClick(username);
   };
+
 
   useEffect(() => {
     async function getCurrentUserInfo() {
@@ -46,9 +48,10 @@ const ClickerPage = () => {
       if (resp.ok) {
         const data = await resp.json();
         console.log(data);
+        username = data.username
       }
     }
-
+    
     getCurrentUserInfo();
   });
 

@@ -214,7 +214,7 @@ class Account:
             """SELECT idCard FROM AccountCard
                 INNER JOIN Account ON AccountCard.idAccount = Account.id
                 WHERE Account.username = username"""
-        )
+        )#TODO: fix the username with a f-string
         result = cursor.fetchone()
         cursor.close()
         connection.close()
@@ -294,6 +294,10 @@ class Account:
         if result is None:
             return None
         return UserInfo(username=result[0], broccolis=result[1])
+    
+    @staticmethod
+    def route_click_placeholder(username):
+        return {"status": "unknown", "message": "TODO"}
 
 
 class Token:
