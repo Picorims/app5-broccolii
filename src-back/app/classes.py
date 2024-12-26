@@ -90,6 +90,27 @@ class Account:
         self.cards.append([card, 0])
         cursor.execute(f"INSERT INTO AccountCard VALUES ({self.id}, {card.id}, 0)")
 
+    @staticmethod
+    def add_card_from_username(username, card_id):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
+        req = f"SELECT id FROM Account WHERE Account.username = '{username}'"
+        cursor.execute(req)
+        resultId = cursor.fetchone()
+        if resultId is None:
+            return {"status": "error", "message": "Account not found."}
+        user_id = resultId[0]
+
+        req2 = f"INSERT INTO AccountCard VALUES ({user_id}, {card_id}, 0)"
+        cursor.execute(req2)
+        print("res insertion : ", cursor.fetchone())
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return {"status": "success", "message": "Card added to account."}
+
     def equip_card(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         cursor.execute(
@@ -97,12 +118,78 @@ class Account:
             f"AND idCard = {card.id})"
         )
 
+    def equip_card_from_username(username, cardId):
+        # WARNING this function equips ALL the cards that have cardId
+        # (if the user possesses multiple times the same card)
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
+        req = f"SELECT id FROM Account WHERE Account.username = '{username}'"
+        cursor.execute(req)
+        resultId = cursor.fetchone()
+        if resultId is None:
+            return {"status": "error", "message": "Account not found."}
+        user_id = resultId[0]
+
+        req2 = f"SELECT * FROM AccountCard WHERE idAccount = {user_id} AND idCard = {cardId}"
+        cursor.execute(req2)
+        resultCards = cursor.fetchone()
+
+        if resultCards is None:
+            return {"status": "error", "message": "Account does not own the card."}
+
+        req3 = "UPDATE AccountCard SET isEquipped = 1 "
+        req3 += f"WHERE idAccount = {user_id} AND idCard = {cardId}"
+        cursor.execute(req3)
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        # TODO make the following line work
+        # self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
+        return {"status": "success", "message": "Equipped card."}
+
     def unequip_card(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         cursor.execute(
             f"UPDATE TABLE AccountCard SET isEquipped = 0 WHERE idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
         )
+
+    def unequip_card_from_username(username, cardId):
+        # WARNING this function unequips ALL the cards that have cardId
+        # (if the user possesses multiple times the same card)
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
+        req = f"SELECT id FROM Account WHERE Account.username = '{username}'"
+        cursor.execute(req)
+        resultId = cursor.fetchone()
+        if resultId is None:
+            return {"status": "error", "message": "Account not found."}
+        user_id = resultId[0]
+        print("id user", user_id)
+
+        req2 = f"SELECT * FROM AccountCard WHERE idAccount = {user_id} AND idCard = {cardId}"
+        cursor.execute(req2)
+        resultCards = cursor.fetchone()
+        print("la carte :", resultCards)
+
+        if resultCards is None:
+            return {"status": "error", "message": "Account does not own the card."}
+
+        req3 = "UPDATE AccountCard SET isEquipped = 0 "
+        req3 += f"WHERE idAccount = {user_id} AND idCard = {cardId}"
+        cursor.execute(req3)
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        # TODO make the following line work
+        # self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
+        return {"status": "success", "message": "Equipped card."}
 
     @staticmethod
     def user_exists(login):
