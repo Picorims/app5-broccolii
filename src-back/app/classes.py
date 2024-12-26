@@ -139,7 +139,8 @@ class Account:
             return {"status": "error", "message": "Account not found."}
         user_id = resultId[0]
 
-        req2 = f"SELECT * FROM AccountCard WHERE idAccount = {user_id} AND idCard = {cardId}"
+        req2 = f"SELECT * FROM AccountCard WHERE idAccount = {user_id}"
+        req2 += f"AND idCard = {cardId} AND isEquipped = 0"
         cursor.execute(req2)
         resultCards = cursor.fetchone()
 
@@ -149,6 +150,10 @@ class Account:
         req3 = "UPDATE AccountCard SET isEquipped = 1 "
         req3 += f"WHERE idAccount = {user_id} AND idCard = {cardId}"
         cursor.execute(req3)
+
+        # req4 = f"SELECT * from AccountCard WHERE idAccount = {user_id}"
+        # cursor.execute(req4)
+        # print("fin :", cursor.fetchall())
 
         connection.commit()
         cursor.close()
@@ -160,7 +165,7 @@ class Account:
 
     def unequip_card(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
-        #TODO: this request won't work. modify inpired by above working request
+        # TODO: this request won't work. modify inpired by above working request
         cursor.execute(
             f"UPDATE TABLE AccountCard SET isEquipped = 0 WHERE idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
@@ -180,7 +185,8 @@ class Account:
         user_id = resultId[0]
         print("id user", user_id)
 
-        req2 = f"SELECT * FROM AccountCard WHERE idAccount = {user_id} AND idCard = {cardId}"
+        req2 = f"SELECT * FROM AccountCard WHERE idAccount = {user_id}"
+        req2 += f"AND idCard = {cardId} AND isEquipped = 1"
         cursor.execute(req2)
         resultCards = cursor.fetchone()
         print("la carte :", resultCards)

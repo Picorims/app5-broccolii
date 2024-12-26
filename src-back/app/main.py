@@ -17,9 +17,10 @@ from .auth.auth import router as auth_router
 from .user.user import router as user_router
 from .card.card import router as card_router
 
-print('\n\n-------------------------------')
-from .broccoli_counter import single_click
-print('\n\n-------------------------------')
+print("\n\n-------------------------------")
+# from .broccoli_counter import single_click
+
+print("\n\n-------------------------------")
 app = FastAPI()
 
 origins = [

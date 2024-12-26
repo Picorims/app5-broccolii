@@ -38,7 +38,6 @@ const ClickerPage = () => {
     setCurrentItem(items[randomIndex]);
 
     API.patchClick();
-    
   };
 
   useEffect(() => {
