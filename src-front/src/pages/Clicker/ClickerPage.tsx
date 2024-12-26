@@ -36,6 +36,9 @@ const ClickerPage = () => {
     } while (items[randomIndex].id === currentItem.id); // Ensure it's not the current image.
 
     setCurrentItem(items[randomIndex]);
+
+    API.patchClick();
+    
   };
 
   useEffect(() => {

@@ -1,14 +1,45 @@
 import pickle
 from .classes import Account, Card
 import random
+from fastapi import APIRouter, status
+from .auth import jwt_utils
 
-'''
+
+
 Account.create_user('Brocolivier2', 'pwd')
 test_user = Account.get_user_info('Brocolivier2')[2]
 eggplant = Card(9, 'Eggplant', 'Will multiply your click effects by 2 !', 'Rare', 0, 'Nan', 2)
 test_user.add_card(eggplant)
 test_user.equip_card(eggplant)
-print(test_user.cards)'''
+print(test_user.cards)
+
+'''Click route'''
+router = APIRouter()
+
+
+@router.patch(
+    "/click",
+    status_code=status.HTTP_200_OK,
+    description="Get the current user's information.",
+)
+async def me(credentials: jwt_utils.Credentials):
+    token_data = jwt_utils.verify_token(credentials)
+
+    user_info = Account.get_user_info(token_data.sub)
+    print(user_info)
+    
+    #if requete blabla pas réussi :
+    '''
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "User not found"},
+        )
+    '''
+
+    return user_info
+
+
+
 
 
 def single_click(account, cards):

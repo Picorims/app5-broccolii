@@ -124,4 +124,18 @@ export class API {
       }),
     });
   }
+
+  public static patchClick() {
+    const url = `${getEnv().backendUrl}/api/v1/click`;
+    console.log("[API] [PATCH] " + url);
+  
+    return fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    });
+  }
 }
+

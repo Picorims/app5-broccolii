@@ -75,7 +75,6 @@ class Card:
 class UserInfo(BaseModel):
     username: str
     broccolis: int
-    user: str
 
 
 class Account:
@@ -106,10 +105,25 @@ class Account:
 
     def unequip_card(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
+        #TODO: this request won't work. modify inpired by above working request
         cursor.execute(
             f"UPDATE TABLE AccountCard SET isEquipped = 0 WHERE idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
         )
+
+    @staticmethod
+    def get_cards(username):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        cursor.execute(
+            """SELECT idCard FROM AccountCard
+                INNER JOIN Account ON AccountCard.idAccount = Account.id
+                WHERE Account.username = username"""
+        )
+        result = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        return result
 
     @staticmethod
     def user_exists(login):
@@ -174,7 +188,7 @@ class Account:
         return re.match(r"^[a-zA-Z0-9_]{3,32}$", username) is not None
 
     @staticmethod
-    def get_user_info(self, username: str):
+    def get_user_info(username: str):
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
         cursor.execute("SELECT username, broccolis FROM Account WHERE username = ?", (username,))
@@ -184,7 +198,7 @@ class Account:
 
         if result is None:
             return None
-        return UserInfo(username=result[0], broccolis=result[1], user=self)
+        return UserInfo(username=result[0], broccolis=result[1])
 
 
 class Token:
