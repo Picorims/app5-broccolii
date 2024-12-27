@@ -99,15 +99,15 @@ class Account:
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
 
-        req = f"SELECT id FROM Account WHERE Account.username = '{username}'"
-        cursor.execute(req)
+        req = "SELECT id FROM Account WHERE Account.username = ?"
+        cursor.execute(req, (username,))
         resultId = cursor.fetchone()
         if resultId is None:
             return {"status": "error", "message": "Account not found."}
         user_id = resultId[0]
 
-        req2 = f"INSERT INTO AccountCard VALUES ({user_id}, {card_id}, 0)"
-        cursor.execute(req2)
+        req2 = "INSERT INTO AccountCard VALUES (?, ?, 0)"
+        cursor.execute(req2, (user_id, card_id))
         print("res insertion : ", cursor.fetchone())
 
         connection.commit()
@@ -132,28 +132,28 @@ class Account:
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
 
-        req = f"SELECT id FROM Account WHERE Account.username = '{username}'"
-        cursor.execute(req)
+        req = "SELECT id FROM Account WHERE Account.username = ?"
+        cursor.execute(req, (username,))
         resultId = cursor.fetchone()
         if resultId is None:
             return {"status": "error", "message": "Account not found."}
         user_id = resultId[0]
 
-        req2 = f"SELECT * FROM AccountCard WHERE idAccount = {user_id}"
-        req2 += f"AND idCard = {cardId} AND isEquipped = 0"
-        cursor.execute(req2)
+        req2 = "SELECT * FROM AccountCard WHERE idAccount = ?"
+        req2 += "AND idCard = ? AND isEquipped = 0"
+        cursor.execute(req2, (user_id, cardId))
         resultCards = cursor.fetchone()
 
         if resultCards is None:
             return {"status": "error", "message": "Account does not own the card."}
 
         req3 = "UPDATE AccountCard SET isEquipped = 1 "
-        req3 += f"WHERE idAccount = {user_id} AND idCard = {cardId}"
-        cursor.execute(req3)
+        req3 += "WHERE idAccount = ? AND idCard = ?"
+        cursor.execute(req3, (user_id, cardId))
 
-        # req4 = f"SELECT * from AccountCard WHERE idAccount = {user_id}"
-        # cursor.execute(req4)
-        # print("fin :", cursor.fetchall())
+        req4 = "SELECT * from AccountCard WHERE idAccount = ?"
+        cursor.execute(req4, (user_id,))
+        print(f"all cards from {username}\n:, {cursor.fetchall()}")
 
         connection.commit()
         cursor.close()
@@ -177,17 +177,17 @@ class Account:
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
 
-        req = f"SELECT id FROM Account WHERE Account.username = '{username}'"
-        cursor.execute(req)
+        req = "SELECT id FROM Account WHERE Account.username = ?"
+        cursor.execute(req, (username,))
         resultId = cursor.fetchone()
         if resultId is None:
             return {"status": "error", "message": "Account not found."}
         user_id = resultId[0]
         print("id user", user_id)
 
-        req2 = f"SELECT * FROM AccountCard WHERE idAccount = {user_id}"
-        req2 += f"AND idCard = {cardId} AND isEquipped = 1"
-        cursor.execute(req2)
+        req2 = "SELECT * FROM AccountCard WHERE idAccount = ?"
+        req2 += "AND idCard = ? AND isEquipped = 1"
+        cursor.execute(req2, (user_id, cardId))
         resultCards = cursor.fetchone()
         print("la carte :", resultCards)
 
@@ -195,8 +195,8 @@ class Account:
             return {"status": "error", "message": "Account does not own the card."}
 
         req3 = "UPDATE AccountCard SET isEquipped = 0 "
-        req3 += f"WHERE idAccount = {user_id} AND idCard = {cardId}"
-        cursor.execute(req3)
+        req3 += "WHERE idAccount = ? AND idCard = ?"
+        cursor.execute(req3, (user_id, cardId))
 
         connection.commit()
         cursor.close()
