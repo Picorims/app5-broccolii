@@ -43,7 +43,6 @@ const ClickerPage = () => {
     getCurrentUserInfo();
   });
 
-
   // Function to switch to a random image (not the current one) when the button is clicked.
   const handleClick = () => {
     let randomIndex;
