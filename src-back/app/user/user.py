@@ -9,7 +9,7 @@
 
 from fastapi.responses import JSONResponse
 from ..auth import jwt_utils
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException
 from app.classes import Account
 from pydantic import BaseModel
 
@@ -35,10 +35,6 @@ async def me(credentials: jwt_utils.Credentials):
     return user_info
 
 
-
-
-
-
 class ClickBody(BaseModel):
     username: str
 
@@ -53,9 +49,7 @@ async def click(body: ClickBody):
     # check that all API values are present
     if body.username is None:
         print("Missing username")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username")
 
     response = Account.route_click_placeholder(body.username)
 
