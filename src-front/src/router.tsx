@@ -12,6 +12,8 @@ import App from "./App";
 import FightRoom from "./pages/FightRoom/FightRoom";
 import LoginPage from "./pages/Login/LoginPage";
 import ClickerPage from "./pages/Clicker/ClickerPage";
+import TempWebSocketFight from "./pages/TempWebSocketFight/TempWebSocketFight";
+import Lobby from "./pages/Lobby/Lobby";
 
 export const router = createBrowserRouter([
   {
@@ -33,5 +35,13 @@ export const router = createBrowserRouter([
   {
     path: "/clicker",
     element: <ClickerPage />,
+  },
+  {
+    path: "/ws",
+    element: <TempWebSocketFight />,
+  },
+  {
+    path: "/lobby",
+    element: <Lobby />,
   },
 ]);

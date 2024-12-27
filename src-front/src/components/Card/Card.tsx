@@ -11,8 +11,11 @@ import styles from "./Card.module.css";
 
 export interface Props {
   children: React.ReactNode;
+  className?: string;
 }
 
-export default function Card({ children }: Props) {
-  return <div className={styles.container}>{children}</div>;
+export default function Card({ children, className }: Props) {
+  return (
+    <div className={`${styles.container} ${className || ""}`}>{children}</div>
+  );
 }

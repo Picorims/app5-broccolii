@@ -13,6 +13,12 @@ npm ci # like install, but install the exact same versions as the initial instal
 npm run dev -- --open
 ```
 
+#### Formatting
+```bash
+npm run lint
+npm run format
+```
+
 ### Back
 
 Requirements:
@@ -36,16 +42,33 @@ py -m venv env
 py -m pip install -r requirements.txt
 ```
 
+- Launch the server:
+```
+fastapi run ./app/main.py
+```
+
 - Deactivate the environment:
 ```
 deactivate
 ```
+
+#### Initializing the environment
+
+- in `src_back`, create `JWT_SECRET` with `openssl rand -hex 32 > JWT_SECRET`. `openssl` is bundled with Git Bash, or you can install it manually.
+
+- With the environment active, run `py ./app/sql_script.py` to initialize the database. (If you built a docker image, it should already be done by the docker file.) This script should never be imported into the app, as it erases any existing database!
 
 #### Updating dependencies
 
 after installation or updates, do:
 ```
 py -m pip freeze > requirements.txt
+```
+
+#### Formatting
+```bash
+flake8 .
+black .
 ```
 
 ## Creating a new version
@@ -55,3 +78,8 @@ py -m pip freeze > requirements.txt
 - tag the commit (`git tag -a v1.0.0 -m "v1.0.0"`)
 - optionally, create a branch `release-v1.0.0`. Do **NOT** call it with the same name as the tag, this will confuse many tools.
     - This is useful if patches need to be done on a version in prod without needing to merge all work in progress work.
+
+## Docker
+
+- build: `. docker_build.sh` (if it is intended for production, generate a new `JWT_SECRET`).
+- run (example): `docker run -p 8000:8000 app5-broccolii`
