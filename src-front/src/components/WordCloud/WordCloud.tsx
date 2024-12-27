@@ -163,7 +163,6 @@ export default function WordCloud({
 
   //WordCloud initialization
   const init = useCallback(async () => {
-    // PIXI.Assets.add({alias:"font", src:""})
     const app = new Application();
 
     if (refContainer.current) {
