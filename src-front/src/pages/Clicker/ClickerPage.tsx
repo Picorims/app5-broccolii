@@ -34,20 +34,6 @@ const ClickerPage = () => {
   const username = useRef<string>("");
   const navigate = useNavigate();
 
-  //Initialization of the page
-  useEffect(() => {
-    async function getCurrentUserInfo() {
-      const resp = await API.getCurrentUserInfo();
-      if (resp.ok) {
-        const data = await resp.json();
-        console.log(data);
-        username.current = data.username;
-      }
-    }
-
-    getCurrentUserInfo();
-  });
-
   // Function to switch to a random image (not the current one) when the button is clicked.
   const handleBroccoliiClick = () => {
     let randomIndex;
@@ -66,7 +52,7 @@ const ClickerPage = () => {
 
   const userInfo = usePlayerInfo();
   useEffect(() => {
-    console.log(userInfo); // just here so that the linter doesn't complain
+    username.current = userInfo?.username ?? "";
   });
 
   return (

@@ -9,6 +9,10 @@
 
 import { getEnv } from "../environment";
 
+export interface UserInfo {
+  username: string;
+}
+
 /**
  * Contains static methods for interacting with the API.
  *

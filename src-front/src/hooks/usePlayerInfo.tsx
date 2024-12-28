@@ -9,14 +9,14 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { API } from "../lib/api";
+import { API, UserInfo } from "../lib/api";
 
 /**
  * Hook that fetches the API for user info. Redirects to login if not logged in.
  * @returns the current user info
  */
 export function usePlayerInfo() {
-  const [userInfo, setUserInfo] = useState(null);
+  const [userInfo, setUserInfo] = useState<null | UserInfo>(null);
   const navigate = useNavigate();
   useEffect(() => {
     async function getCurrentUserInfo() {
