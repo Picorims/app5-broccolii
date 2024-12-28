@@ -16,6 +16,8 @@ import image2 from "../../assets/broccolii/broccolii(2).png";
 import image3 from "../../assets/broccolii/broccolii(3).png";
 import image4 from "../../assets/broccolii/broccolii(4).png";
 import { API } from "../../lib/api";
+import Button from "../../components/Button/Button";
+import { useNavigate } from "react-router";
 
 const ClickerPage = () => {
   // Array of objects representing images and their corresponding texts.
@@ -28,6 +30,7 @@ const ClickerPage = () => {
 
   const [currentItem, setCurrentItem] = useState(items[0]);
   const username = useRef<string>("");
+  const navigate = useNavigate();
 
   //Initialization of the page
   useEffect(() => {
@@ -56,14 +59,23 @@ const ClickerPage = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <h1>Page Clicker</h1>
-      <BroccoliiButton
-        image={currentItem.image}
-        text={currentItem.text}
-        onClick={handleClick}
-      />
-    </div>
+    <>
+      <div className={styles.container}>
+        <h1>Page Clicker</h1>
+        <BroccoliiButton
+          image={currentItem.image}
+          text={currentItem.text}
+          onClick={handleClick}
+        />
+      </div>
+      <Button
+        type="button"
+        variant="primary"
+        onClick={() => navigate("/lobby")}
+      >
+        Fight!
+      </Button>
+    </>
   );
 };
 
