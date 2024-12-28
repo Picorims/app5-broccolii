@@ -37,7 +37,7 @@ export default function TempWebSocketFight() {
       setScores(state.scores);
       setAvailableWords(state.availableWords);
       setWordsBestProgress(state.wordsBestProgress);
-      setGameEndEpoch(state.gameEndEpoch);
+      setGameEndEpoch(state.gameEndEpochMs);
     });
     session.onAcknowledgeLetterThen((accepted, currentState) => {
       console.log("Letter acknowledged", accepted, currentState);
