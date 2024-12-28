@@ -1,18 +1,18 @@
 html,
 body {
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  display: initial;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: initial !important;
 }
 
 :global(#root) {
   padding: 0;
   margin: 0;
-  height: 100%;
-  width: 100%;
-  min-width: 100%;
-  max-width: 100%;
+  height: 100vh;
+  width: 100vw;
+  min-width: 100vw;
+  max-width: 100vw;
   overflow: hidden;
 }
 
@@ -72,4 +72,21 @@ body {
   color: white;
   font-size: 2rem;
   text-align: center;
+}
+
+@media screen and (max-width: 640px) {
+  .score_board {
+    font-size: 1rem;
+    top: var(--spacing-xs);
+    left: var(--spacing-xs);
+    margin: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    padding: var(--spacing-xs);
+  }
+
+  .entry {
+    font-size: 1rem;
+    top: var(--spacing-3xl);
+    bottom: unset;
+  }
 }
