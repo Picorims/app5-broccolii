@@ -42,6 +42,7 @@ const ClickerPage = () => {
   const handleBoosterClick = () => {
     console.log("BoosterCard clicked!");
   };
+
   useEffect(() => {
     async function getCurrentUserInfo() {
       const resp = await API.getCurrentUserInfo();
