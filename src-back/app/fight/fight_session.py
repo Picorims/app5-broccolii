@@ -335,19 +335,6 @@ async def websocket_endpoint(fightId, websocket: WebSocket):
             print(f"Could not remove {user} from session {fightId}: {e}")
 
 
-"""@router.post("/fight/create")
-async def create_session(player_list: list[str]):
-    print("CREATION DE LA NOUVELLE SESSION")
-    newFightId = str(uuid.uuid4())[:8]
-    while newFightId in sessions:
-        newFightId = str(uuid.uuid4())[:8]
-
-    sessions[newFightId] = FightSession(newFightId, [])
-
-
-    return {"fightId": newFightId, "message": "Session created successfully"}"""
-
-
 class CreateFightSessionBody(BaseModel):
     players_list: list[str]
 

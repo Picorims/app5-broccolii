@@ -7,7 +7,7 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BroccoliiButton from "../../components/BroccoliiButton/BroccoliiButton";
 import BoosterCard from "../../components/BoosterCard/BoosterCard";
 import styles from "./ClickerPage.module.css";
@@ -28,6 +28,21 @@ const ClickerPage = () => {
   ];
 
   const [currentItem, setCurrentItem] = useState(items[0]);
+  const username = useRef<string>("");
+
+  //Initialization of the page
+  useEffect(() => {
+    async function getCurrentUserInfo() {
+      const resp = await API.getCurrentUserInfo();
+      if (resp.ok) {
+        const data = await resp.json();
+        console.log(data);
+        username.current = data.username;
+      }
+    }
+
+    getCurrentUserInfo();
+  });
 
   // Function to switch to a random image (not the current one) when the button is clicked.
   const handleBroccoliiClick = () => {
@@ -37,6 +52,8 @@ const ClickerPage = () => {
     } while (items[randomIndex].id === currentItem.id); // Ensure it's not the current image.
 
     setCurrentItem(items[randomIndex]);
+
+    API.patchClick(username.current);
   };
 
   const handleBoosterClick = () => {
