@@ -1,0 +1,38 @@
+/*
+  Copyright (c) 2024 Charly Schmidt aka Picorims<picorims.contact@gmail.com>,
+  Alexis Hu, Olivier Proquez, Arnaud Bulteau, Maxime Le Bot
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
+.container {
+  position: absolute;
+  left: 50%;
+  z-index: 1000;
+  top: 100vh;
+  animation: ease-in-out moveUp 1s;
+}
+
+.text {
+  font-size: 10rem;
+  filter: url(#border);
+}
+
+@keyframes moveUp {
+  0% {
+    top: 100vh;
+  }
+  20% {
+    animation-timing-function: linear;
+    top: 50vh;
+  }
+  80% {
+    animation-timing-function: ease-in-out;
+    top: 30vh;
+  }
+  100% {
+    top: -30vh;
+  }
+}
