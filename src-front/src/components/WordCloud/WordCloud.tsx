@@ -164,11 +164,6 @@ export default function WordCloud({
   const refAddWord = useRef<(wordStr: string) => void>();
   const refDeleteWord = useRef<(wordToDelete: string) => void>();
 
-  const userInfo = usePlayerInfo();
-  useEffect(() => {
-    console.log(userInfo); // just here so that the linter doesn't complain
-  });
-
   //WordCloud initialization
   const init = useCallback(async () => {
     const app = new Application();

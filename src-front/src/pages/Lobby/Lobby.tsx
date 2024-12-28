@@ -11,12 +11,11 @@ export default function Lobby() {
   const navigate = useNavigate();
   //const refLink = useRef<string>();
   const [fightId, setFightID] = useState<string>("");
-  const [userId, setUserID] = useState<string>("");
 
   const userInfo = usePlayerInfo();
   useEffect(() => {
-    console.log(userInfo); // just here so that the linter doesn't complain
-  });
+    console.log(userInfo); // This is here so that the linter doesn't complain
+  }, [userInfo]);
 
   useEffect(() => {
     const initializeFight = async () => {
@@ -29,19 +28,7 @@ export default function Lobby() {
   }, []); // Empty dependency array means this effect runs once on mount
 
   const createRoom = async () => {
-    const userIdInput = document.getElementById(
-      "debugUserId",
-    ) as HTMLInputElement;
-
-    if (userIdInput == null) {
-      console.log("Error while searching for input fields.");
-      return;
-    }
-    setUserID(userIdInput?.value);
-
-    console.log(userId);
-
-    navigate("/fight?fightId=" + fightId + "&userId=" + userIdInput?.value);
+    navigate("/fight?fightId=" + fightId);
   };
 
   return (
@@ -79,8 +66,6 @@ export default function Lobby() {
             <h3>{fightId}</h3>
           </div>
           <div className={styles.horizontalDiv}>
-            <input type="text" id="debugUserId" />
-            userId
             <button onClick={() => createRoom()} className={styles.button}>
               JOIN ROOM
             </button>
