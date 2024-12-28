@@ -9,6 +9,10 @@
 
 import { getEnv } from "../environment";
 
+export interface UserInfo {
+  username: string;
+}
+
 /**
  * Contains static methods for interacting with the API.
  *
@@ -99,6 +103,13 @@ export class API {
   }
 
   public static getCurrentUserInfo() {
+    if (
+      localStorage.getItem("access_token") === "undefined" ||
+      localStorage.getItem("access_token") === null ||
+      localStorage.getItem("access_token") === undefined
+    ) {
+      return Promise.resolve(null);
+    }
     const url = `${getEnv().backendUrl}/api/v1/user/me`;
     console.log("[API] [GET] " + url);
 

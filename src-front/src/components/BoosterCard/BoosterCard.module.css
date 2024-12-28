@@ -1,0 +1,102 @@
+/* BoosterCard */
+.boosterContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  bottom: 10px;
+  z-index: 1000;
+  user-select: none;
+}
+
+.boostercard {
+  bottom: 10px;
+  left: 50%;
+  margin: 0 15px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.boosterImage {
+  width: 90px;
+  height: auto;
+  transition: transform 0.2s ease-in-out;
+}
+
+.boostercard:hover .boosterImage {
+  transform: scale(1.1);
+}
+
+/* BoosterStatsCard */
+.statsContainer {
+  position: fixed;
+  left: 20px;
+  top: 30%;
+  opacity: 0;
+  transition:
+    transform 0.2s ease-out,
+    opacity 0.2s ease-out;
+  z-index: 1000;
+}
+
+.statsContainer.show {
+  opacity: 1;
+}
+
+.statsContainer.hide {
+  opacity: 0;
+}
+
+.statsImage {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  transform: translateX(90%);
+  transition: opacity 0.1s ease-in-out;
+}
+
+/* Cross to close a Booster Card */
+.closeButton {
+  position: absolute;
+  background-color: black;
+  color: #dbf5dc;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 1100;
+  justify-content: center;
+  align-items: center;
+}
+
+.closeButton:hover {
+  background-color: red;
+}
+
+.dropdownMenu {
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  position: absolute;
+  bottom: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdownImage {
+  width: 40px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.dropdownImage:hover {
+  transform: scale(1.2);
+}
