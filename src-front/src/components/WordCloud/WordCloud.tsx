@@ -12,7 +12,6 @@ import {
 import { FightSession } from "../../lib/fight_session";
 import { Link } from "react-router-dom";
 import WordCloudMovingText from "../WordCloudMovingText/WordCloudMovingText";
-import { usePlayerInfo } from "../../hooks/usePlayerInfo";
 
 class Word {
   private static colWordBox = "#444";
