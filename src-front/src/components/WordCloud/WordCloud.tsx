@@ -156,7 +156,8 @@ export default function WordCloud({
   const [wordsBestProgress, setWordsBestProgress] = useState<
     Record<string, number>
   >({});
-  const [gameEndEpoch, setGameEndEpoch] = useState(0);
+  const [gameEndEpochMs, setGameEndEpochMs] = useState(0);
+  const [gameStartEpochMs, setGameStartEpochMs] = useState(0);
   const fightSession = useRef<FightSession | null>(null);
   const refAddWord = useRef<(wordStr: string) => void>();
   const refDeleteWord = useRef<(wordToDelete: string) => void>();
@@ -247,7 +248,8 @@ export default function WordCloud({
     session.onSendGameStateThen((state) => {
       setScores(state.scores);
       setWordsBestProgress(state.wordsBestProgress);
-      setGameEndEpoch(state.gameEndEpoch);
+      setGameEndEpochMs(state.gameEndEpochMs);
+      setGameStartEpochMs(state.gameStartEpochMs);
 
       for (const wordStr of state.availableWords) {
         refAddWord.current?.(wordStr);
@@ -283,15 +285,23 @@ export default function WordCloud({
   }, [fightId, userId]);
 
   const [remainingTime, setRemainingTime] = useState(0);
+  const [timeBeforeStart, setTimeBeforeStart] = useState(0);
   const [isGameEnded, setIsGameEnded] = useState(false);
 
   useEffect(() => {
-    if (gameEndEpoch > 0) {
+    if (gameEndEpochMs > 0) {
       const updateRemainingTime = () => {
-        const now = Math.floor(Date.now() / 1000);
-        const timeRemaining = gameEndEpoch - now;
+        const now = Date.now();
+        // For time before start, ceil is used to only start the game when it's truly 0
+        const timeBeforeStartCeil = Math.ceil((gameStartEpochMs - now) / 1000);
+        const timeRemaining = Math.floor((gameEndEpochMs - now) / 1000);
+        const duration = Math.round((gameEndEpochMs - gameStartEpochMs) / 1000);
 
-        if (timeRemaining > 0) {
+        if (timeBeforeStartCeil > 0) {
+          setTimeBeforeStart(timeBeforeStartCeil);
+          setRemainingTime(duration);
+        } else if (timeRemaining > 0) {
+          setTimeBeforeStart(0);
           setRemainingTime(timeRemaining);
         } else {
           //End of the game
@@ -312,14 +322,17 @@ export default function WordCloud({
       };
 
       updateRemainingTime();
-      const interval = setInterval(updateRemainingTime, 1000);
+      const interval = setInterval(updateRemainingTime, 100);
 
       return () => clearInterval(interval); //cleanup when unmounting
     }
-  }, [gameEndEpoch]);
+  }, [gameEndEpochMs, gameStartEpochMs]);
 
   // Format remaining time as MM:SS
   const formatTime = (time: number) => {
+    if (time  < 0) {
+      return "00:00";
+    }
     const minutes = Math.floor(time / 60)
       .toString()
       .padStart(2, "0");
@@ -550,6 +563,8 @@ export default function WordCloud({
             value={inputValue}
             onChange={handleInputChange}
             className={styles.entry}
+            disabled={timeBeforeStart > 0 || remainingTime <= 0}
+            placeholder={timeBeforeStart > 0 ? "Game starts soon..." : "Enter a word."}
           />
           <div className={styles.score_board}>
             <pre>
@@ -560,6 +575,9 @@ export default function WordCloud({
                 .join("\n")}
             </pre>
             <p>Time remaining: {formatTime(remainingTime)}</p>
+            {timeBeforeStart > 0 && (
+              <p>Game starts in: {formatTime(timeBeforeStart)}</p>
+            )}
           </div>
         </>
       )}

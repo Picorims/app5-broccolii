@@ -57,7 +57,9 @@ interface GameStateResponse {
   scores: Record<string, number>;
   availableWords: string[];
   wordsBestProgress: Record<string, number>;
-  gameEndEpoch: number;
+  gameEndEpochMs: number;
+  gameStartEpochMs: number;
+  gameRunning: boolean;
 }
 
 interface AcknowledgeLetterResponse {
