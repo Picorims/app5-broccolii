@@ -124,4 +124,65 @@ export class API {
       }),
     });
   }
+
+  public static patchClick(username: string) {
+    const url = `${getEnv().backendUrl}/api/v1/user/click`;
+    console.log("[API] [PATCH] " + url);
+
+    return fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      body: JSON.stringify({
+        username: username,
+      }),
+    });
+  }
+
+  public static async addCard(username: string, cardId: string) {
+    const url = `${getEnv().backendUrl}/api/v1/card/add`;
+
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username,
+        cardId: cardId,
+      }),
+    });
+  }
+
+  public static async equipCard(username: string, cardId: string) {
+    const url = `${getEnv().backendUrl}/api/v1/card/equip`;
+
+    return fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username,
+        cardId: cardId,
+      }),
+    });
+  }
+
+  public static async unequipCard(username: string, cardId: string) {
+    const url = `${getEnv().backendUrl}/api/v1/card/unequip`;
+
+    return fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username,
+        cardId: cardId,
+      }),
+    });
+  }
 }

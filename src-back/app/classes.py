@@ -87,22 +87,138 @@ class Account:
         self.cards = cards
 
     def add_card(self, card):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
         self.cards.append([card, 0])
         cursor.execute(f"INSERT INTO AccountCard VALUES ({self.id}, {card.id}, 0)")
+        cursor.close()
+        connection.close()
+
+    @staticmethod
+    def add_card_from_username(username, card_id):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
+        req = "SELECT id FROM Account WHERE Account.username = ?"
+        cursor.execute(req, (username,))
+        resultId = cursor.fetchone()
+        if resultId is None:
+            return {"status": "error", "message": "Account not found."}
+        user_id = resultId[0]
+
+        req2 = "INSERT INTO AccountCard VALUES (?, ?, 0)"
+        cursor.execute(req2, (user_id, card_id))
+        print("res insertion : ", cursor.fetchone())
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return {"status": "success", "message": "Card added to account."}
 
     def equip_card(self, card):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         cursor.execute(
-            f"UPDATE TABLE AccountCard SET isEquipped = 1 WHERE idAccount = {self.id}\n"
+            f"UPDATE AccountCard SET isEquipped = 1 WHERE (idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
         )
+        cursor.close()
+        connection.close()
+
+    def equip_card_from_username(username, cardId):
+        # WARNING this function equips ALL the cards that have cardId
+        # (if the user possesses multiple times the same card)
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
+        req = "SELECT id FROM Account WHERE Account.username = ?"
+        cursor.execute(req, (username,))
+        resultId = cursor.fetchone()
+        if resultId is None:
+            return {"status": "error", "message": "Account not found."}
+        user_id = resultId[0]
+
+        req2 = "SELECT * FROM AccountCard WHERE idAccount = ?"
+        req2 += "AND idCard = ? AND isEquipped = 0"
+        cursor.execute(req2, (user_id, cardId))
+        resultCards = cursor.fetchone()
+
+        if resultCards is None:
+            return {"status": "error", "message": "Account does not own the card."}
+
+        req3 = "UPDATE AccountCard SET isEquipped = 1 "
+        req3 += "WHERE idAccount = ? AND idCard = ?"
+        cursor.execute(req3, (user_id, cardId))
+
+        req4 = "SELECT * from AccountCard WHERE idAccount = ?"
+        cursor.execute(req4, (user_id,))
+        print(f"all cards from {username}\n:, {cursor.fetchall()}")
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        # TODO make the following line work
+        # self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
+        return {"status": "success", "message": "Equipped card."}
 
     def unequip_card(self, card):
         self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
+        # TODO: this request won't work. modify inpired by above working request
         cursor.execute(
             f"UPDATE TABLE AccountCard SET isEquipped = 0 WHERE idAccount = {self.id}\n"
             f"AND idCard = {card.id})"
         )
+
+    def unequip_card_from_username(username, cardId):
+        # WARNING this function unequips ALL the cards that have cardId
+        # (if the user possesses multiple times the same card)
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
+        req = "SELECT id FROM Account WHERE Account.username = ?"
+        cursor.execute(req, (username,))
+        resultId = cursor.fetchone()
+        if resultId is None:
+            return {"status": "error", "message": "Account not found."}
+        user_id = resultId[0]
+        print("id user", user_id)
+
+        req2 = "SELECT * FROM AccountCard WHERE idAccount = ?"
+        req2 += "AND idCard = ? AND isEquipped = 1"
+        cursor.execute(req2, (user_id, cardId))
+        resultCards = cursor.fetchone()
+        print("la carte :", resultCards)
+
+        if resultCards is None:
+            return {"status": "error", "message": "Account does not own the card."}
+
+        req3 = "UPDATE AccountCard SET isEquipped = 0 "
+        req3 += "WHERE idAccount = ? AND idCard = ?"
+        cursor.execute(req3, (user_id, cardId))
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        # TODO make the following line work
+        # self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
+        return {"status": "success", "message": "Equipped card."}
+
+    @staticmethod
+    def get_cards(username):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        cursor.execute(
+            """SELECT idCard FROM AccountCard
+                INNER JOIN Account ON AccountCard.idAccount = Account.id
+                WHERE Account.username = username"""
+        )  # TODO: fix the username with a f-string
+        result = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        return result
 
     @staticmethod
     def user_exists(login):
@@ -178,6 +294,10 @@ class Account:
         if result is None:
             return None
         return UserInfo(username=result[0], broccolis=result[1])
+
+    @staticmethod
+    def route_click_placeholder(username):
+        return {"status": "unknown", "message": "TODO"}
 
 
 class Token:

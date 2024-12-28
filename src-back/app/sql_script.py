@@ -2,7 +2,7 @@
 import sqlite3
 import bcrypt
 import os
-
+import pickle
 
 db_name = "broccolii.db"
 if os.path.exists(db_name):
@@ -1234,6 +1234,9 @@ for card in cards:
     print(f"{card[0]}: {negative}{card[1]} - {card[3]}")
     print(f" {card[2]}")
     print(f" {card[5]}: {card[6]}")
+
+with open("cards.pkl", "wb") as file:  # saving the cards for the broccoli counter
+    pickle.dump(cards, file)
 # %%
 
 # %% Word & Category insert's verification

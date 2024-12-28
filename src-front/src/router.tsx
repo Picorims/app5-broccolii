@@ -14,6 +14,7 @@ import LoginPage from "./pages/Login/LoginPage";
 import ClickerPage from "./pages/Clicker/ClickerPage";
 import TempWebSocketFight from "./pages/TempWebSocketFight/TempWebSocketFight";
 import Lobby from "./pages/Lobby/Lobby";
+import DebugAddCards from "./pages/DebugAddCards/DebugAddCards";
 
 export const router = createBrowserRouter([
   {
@@ -43,5 +44,9 @@ export const router = createBrowserRouter([
   {
     path: "/lobby",
     element: <Lobby />,
+  },
+  {
+    path: "/addcards",
+    element: <DebugAddCards />,
   },
 ]);
