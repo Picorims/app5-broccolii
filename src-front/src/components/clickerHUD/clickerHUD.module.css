@@ -1,0 +1,19 @@
+.container {
+  /* I know it's ugly we'll change this later */
+  width: 20em;
+  padding: 1em;
+  margin: 1em;
+  border-radius: 1em;
+  background-color: #6ba503;
+  border: solid #446605 0.2em;
+}
+
+.statBrocco {
+  font-size: 2em;
+  margin: 0;
+}
+
+.stat {
+  font-size: 1.5em;
+  margin: 0;
+}

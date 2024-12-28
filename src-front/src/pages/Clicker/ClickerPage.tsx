@@ -10,6 +10,7 @@
 import { useEffect, useRef, useState } from "react";
 import BroccoliiButton from "../../components/BroccoliiButton/BroccoliiButton";
 import BoosterCard from "../../components/BoosterCard/BoosterCard";
+import ClickerHUD from "../../components/ClickerHUD/clickerHUD";
 import styles from "./ClickerPage.module.css";
 
 import image1 from "../../assets/broccolii/broccolii(1).png";
@@ -22,6 +23,9 @@ import { useNavigate } from "react-router";
 import { usePlayerInfo } from "../../hooks/usePlayerInfo";
 
 const ClickerPage = () => {
+  const [statNbBroccos, setStatNbBroccos] = useState<number>(0);
+  const [statClickrate, setStatClickrate] = useState<number>(0);
+
   // Array of objects representing images and their corresponding texts.
   const items = [
     { id: 1, image: image1, text: ": )" },
@@ -58,6 +62,10 @@ const ClickerPage = () => {
   return (
     <>
       <div className={styles.container}>
+        <ClickerHUD
+          statNbBroccos={statNbBroccos}
+          statClickrate={statClickrate}
+        />
         <h1>Page Clicker</h1>
         <BroccoliiButton
           image={currentItem.image}
@@ -73,6 +81,25 @@ const ClickerPage = () => {
         onClick={() => navigate("/lobby")}
       >
         Fight!
+      </Button>
+      {/* Example of how to change the displayed stats */}
+      <Button
+        type="button"
+        variant="primary"
+        onClick={() => {
+          setStatNbBroccos(statNbBroccos + 10);
+        }}
+      >
+        Change brocos
+      </Button>
+      <Button
+        type="button"
+        variant="primary"
+        onClick={() => {
+          setStatClickrate(statClickrate + 10);
+        }}
+      >
+        Change rate
       </Button>
     </>
   );
