@@ -331,7 +331,7 @@ export default function WordCloud({
 
   // Format remaining time as MM:SS
   const formatTime = (time: number) => {
-    if (time  < 0) {
+    if (time < 0) {
       return "00:00";
     }
     const minutes = Math.floor(time / 60)
@@ -565,7 +565,9 @@ export default function WordCloud({
             onChange={handleInputChange}
             className={styles.entry}
             disabled={timeBeforeStart > 0 || remainingTime <= 0}
-            placeholder={timeBeforeStart > 0 ? "Game starts soon..." : "Enter a word."}
+            placeholder={
+              timeBeforeStart > 0 ? "Game starts soon..." : "Enter a word."
+            }
           />
           <div className={styles.score_board}>
             <pre>

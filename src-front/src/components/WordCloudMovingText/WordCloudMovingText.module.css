@@ -8,31 +8,31 @@
 */
 
 .container {
-    position: absolute;
-    left: 50%;
-    z-index: 1000;
-    top: 100vh;
-    animation: ease-in-out moveUp 1s;
+  position: absolute;
+  left: 50%;
+  z-index: 1000;
+  top: 100vh;
+  animation: ease-in-out moveUp 1s;
 }
 
 .text {
-    font-size: 10rem;
-    filter: url(#border);
+  font-size: 10rem;
+  filter: url(#border);
 }
 
 @keyframes moveUp {
-    0% {
-        top: 100vh;
-    }
-    20% {
-        animation-timing-function: linear;
-        top: 50vh;
-    }
-    80% {
-        animation-timing-function: ease-in-out;
-        top: 30vh;
-    }
-    100% {
-        top: -30vh;
-    }
+  0% {
+    top: 100vh;
+  }
+  20% {
+    animation-timing-function: linear;
+    top: 50vh;
+  }
+  80% {
+    animation-timing-function: ease-in-out;
+    top: 30vh;
+  }
+  100% {
+    top: -30vh;
+  }
 }

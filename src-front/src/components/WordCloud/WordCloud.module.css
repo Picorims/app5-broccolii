@@ -50,7 +50,8 @@ body {
   opacity: 0.8;
 }
 
-.score_board > p, .score_board > pre {
+.score_board > p,
+.score_board > pre {
   margin: 0;
   line-height: 1.1;
 }
