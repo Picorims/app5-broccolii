@@ -11,6 +11,7 @@ import {
 } from "../../lib/vectorsUtility";
 import { FightSession } from "../../lib/fight_session";
 import { Link } from "react-router-dom";
+import WordCloudMovingText from "../WordCloudMovingText/WordCloudMovingText";
 
 class Word {
   private static colWordBox = "#444";
@@ -322,7 +323,7 @@ export default function WordCloud({
       };
 
       updateRemainingTime();
-      const interval = setInterval(updateRemainingTime, 100);
+      const interval = setInterval(updateRemainingTime, 50);
 
       return () => clearInterval(interval); //cleanup when unmounting
     }
@@ -580,6 +581,15 @@ export default function WordCloud({
             )}
           </div>
         </>
+      )}
+      {timeBeforeStart <= 3 && timeBeforeStart > 0 && (
+        <WordCloudMovingText text="3" />
+      )}
+      {timeBeforeStart <= 2 && timeBeforeStart > 0 && (
+        <WordCloudMovingText text="2" />
+      )}
+      {timeBeforeStart <= 1 && timeBeforeStart > 0 && (
+        <WordCloudMovingText text="1" />
       )}
     </div>
   );
