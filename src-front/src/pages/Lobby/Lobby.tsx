@@ -3,6 +3,7 @@ import styles from "./Lobby.module.css";
 import Card from "../../components/Card/Card";
 import { useEffect, useState } from "react";
 import { API } from "../../lib/api";
+import { usePlayerInfo } from "../../hooks/usePlayerInfo";
 
 // import { getEnv } from "../../environment";
 
@@ -11,6 +12,11 @@ export default function Lobby() {
   //const refLink = useRef<string>();
   const [fightId, setFightID] = useState<string>("");
   const [userId, setUserID] = useState<string>("");
+
+  const userInfo = usePlayerInfo();
+  useEffect(() => {
+    console.log(userInfo); // just here so that the linter doesn't complain
+  });
 
   useEffect(() => {
     const initializeFight = async () => {
