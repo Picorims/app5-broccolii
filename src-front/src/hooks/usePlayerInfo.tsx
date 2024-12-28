@@ -30,6 +30,6 @@ export function usePlayerInfo() {
     }
 
     getCurrentUserInfo();
-  }, []);
+  }, [navigate]);
   return userInfo;
 }
