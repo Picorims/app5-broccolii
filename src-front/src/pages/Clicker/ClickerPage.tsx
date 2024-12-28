@@ -82,7 +82,8 @@ const ClickerPage = () => {
         <BroccoliiButton
           image={currentItem.image}
           text={currentItem.text}
-          onClick={handleBroccoliiClick} />
+          onClick={handleBroccoliiClick}
+        />
 
         <BoosterCard onClick={handleBoosterClick} />
       </div>
