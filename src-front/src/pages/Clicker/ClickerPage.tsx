@@ -19,6 +19,7 @@ import image4 from "../../assets/broccolii/broccolii(4).png";
 import { API } from "../../lib/api";
 import Button from "../../components/Button/Button";
 import { useNavigate } from "react-router";
+import { usePlayerInfo } from "../../hooks/usePlayerInfo";
 
 const ClickerPage = () => {
   // Array of objects representing images and their corresponding texts.
@@ -63,16 +64,9 @@ const ClickerPage = () => {
     console.log("BoosterCard clicked!");
   };
 
+  const userInfo = usePlayerInfo();
   useEffect(() => {
-    async function getCurrentUserInfo() {
-      const resp = await API.getCurrentUserInfo();
-      if (resp.ok) {
-        const data = await resp.json();
-        console.log(data);
-      }
-    }
-
-    getCurrentUserInfo();
+    console.log(userInfo); // just here so that the linter doesn't complain
   });
 
   return (

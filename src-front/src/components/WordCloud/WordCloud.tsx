@@ -12,6 +12,7 @@ import {
 import { FightSession } from "../../lib/fight_session";
 import { Link } from "react-router-dom";
 import WordCloudMovingText from "../WordCloudMovingText/WordCloudMovingText";
+import { usePlayerInfo } from "../../hooks/usePlayerInfo";
 
 class Word {
   private static colWordBox = "#444";
@@ -162,6 +163,11 @@ export default function WordCloud({
   const fightSession = useRef<FightSession | null>(null);
   const refAddWord = useRef<(wordStr: string) => void>();
   const refDeleteWord = useRef<(wordToDelete: string) => void>();
+
+  const userInfo = usePlayerInfo();
+  useEffect(() => {
+    console.log(userInfo); // just here so that the linter doesn't complain
+  });
 
   //WordCloud initialization
   const init = useCallback(async () => {
