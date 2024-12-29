@@ -33,8 +33,8 @@ class FightSession:
         self._words_to_find = get_random_word_list(amount=100)
         self._words_found = []
         self._word_best_progress = {}
-        self._game_start_wait_ms = 5_000
-        self._game_duration_ms = 600_000
+        self._game_start_wait_ms = 30_000
+        self._game_duration_ms = 60_000
         self._game_start_epoch_ms = int(time.time() * 1000) + self._game_start_wait_ms
         self._game_end_epoch_ms = self._game_start_epoch_ms + self._game_duration_ms
 
