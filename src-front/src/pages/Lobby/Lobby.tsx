@@ -11,7 +11,7 @@ import BasePage from "../../components/BasePage/BasePage";
 export default function Lobby() {
   const navigate = useNavigate();
   //const refLink = useRef<string>();
-  const [fightId, setFightID] = useState<string>("");
+  const [fightIdCreate, setFightIDCreate] = useState<string>("");
 
   const userInfo = usePlayerInfo();
   useEffect(() => {
@@ -22,14 +22,22 @@ export default function Lobby() {
     const initializeFight = async () => {
       const request = await API.createFight([]);
       const response = await request.json();
-      setFightID(response["fightId"]);
+      setFightIDCreate(response["fightId"]);
     };
 
     initializeFight();
   }, []); // Empty dependency array means this effect runs once on mount
 
   const createRoom = async () => {
-    navigate("/fight?fightId=" + fightId);
+    navigate("/fight?fightId=" + fightIdCreate);
+  };
+
+  const joinRoom = async () => {
+    const input = document.getElementById("joinFightId") as HTMLInputElement;
+    const fightIdJoin = input.value;
+    //TODO check if the room exists before trying to join it
+
+    navigate("/fight?fightId=" + fightIdJoin);
   };
 
   return (
@@ -37,8 +45,14 @@ export default function Lobby() {
       <div className={styles.mainContainer}>
         <Card>
           <h1>ENTER A ROOM</h1>
-          <input type="text" className={styles.searchBar} />{" "}
-          {/*placeholder for a searchbar*/}
+          <input
+            type="text"
+            className={styles.searchBar}
+            id="joinFightId"
+          />{" "}
+          <button onClick={() => joinRoom()} className={styles.button}>
+            Join !
+          </button>
         </Card>
         <Card>
           <h1>CREATE A ROOM</h1>
@@ -64,7 +78,7 @@ export default function Lobby() {
           </div>
           <div className={styles.horizontalDiv}>
             <h3>Room link :</h3>
-            <h3>{fightId}</h3>
+            <h3>{fightIdCreate}</h3>
           </div>
           <div className={styles.horizontalDiv}>
             <button onClick={() => createRoom()} className={styles.button}>
