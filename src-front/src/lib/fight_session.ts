@@ -268,9 +268,7 @@ export class FightSession {
   onPrizeReceivedThen(f: (prize: unknown /*TODO define*/) => void) {
     this.onPrizeReceived = f;
   }
-  onWordsBestProgressUpdatedThen(
-    f: (words: Record<string, number>) => void,
-  ) {
+  onWordsBestProgressUpdatedThen(f: (words: Record<string, number>) => void) {
     this.onWordsBestProgressUpdated = f;
   }
 
