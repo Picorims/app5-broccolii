@@ -103,7 +103,8 @@ async def login(body: LoginBody) -> jwt_utils.Token:
 @router.get(
     "/user/auth_test",
     dependencies=[Depends(HTTPBearer())],
-    description="A blank route to test authentication against a protected route.")
+    description="A blank route to test authentication against a protected route.",
+)
 async def auth_test(credentials: jwt_utils.Credentials) -> JSONResponse:
     jwt_utils.verify_token(credentials)
 

@@ -52,7 +52,7 @@ class ClickBody(BaseModel):
     status_code=status.HTTP_200_OK,
     description="Registers the click on the broccoli",
     tags=["user", "clicker"],
-    response_model=dict[str,str],
+    response_model=dict[str, str],
     responses={
         200: {
             "description": "Click registered successfully",

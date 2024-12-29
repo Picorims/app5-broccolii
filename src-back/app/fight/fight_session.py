@@ -307,6 +307,7 @@ sessions["test"] = FightSession("test", ["alice", "bob"])
 
 # See the docs directory for events documentation
 
+
 @router.websocket(
     "/fight/{fightId}/ws",
 )
@@ -345,6 +346,7 @@ class CreateFightSessionBody(BaseModel):
 
 class CreateSessionResponse(BaseModel):
     fightId: str
+
 
 @router.post(
     "/fight/create",
