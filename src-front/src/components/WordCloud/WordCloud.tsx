@@ -309,11 +309,6 @@ export default function WordCloud({
           //End of the game
           setIsGameEnded(true);
 
-          //deleting the PIXI App
-          if (refApp.current) {
-            refApp.current.destroy(true, { children: true, texture: true });
-            refApp.current = undefined;
-          }
           //deleting the canvas
           if (refCanvas.current) {
             while (refCanvas.current.firstChild) {
