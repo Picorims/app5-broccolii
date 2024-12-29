@@ -235,6 +235,7 @@ export default function WordCloud({
   //session initialization
   useEffect(() => {
     //setError("");
+    if (userId == null || userId.length == 0) return;
     console.log("Initializing session...");
     fightSession.current = new FightSession(userId, fightId, () => {
       console.log("WebSocket open. Getting state...");
