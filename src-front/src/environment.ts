@@ -19,8 +19,8 @@ export const environment: Record<EnvironmentType, Environment> = {
     backendWebSocketUrl: "ws://localhost:8000",
   },
   prod: {
-    backendUrl: "", // TODO
-    backendWebSocketUrl: "", // TODO
+    backendUrl: "http://broccolii.picorims.fr", 
+    backendWebSocketUrl: "ws://broccolii.picorims.fr",
   },
 };
 
