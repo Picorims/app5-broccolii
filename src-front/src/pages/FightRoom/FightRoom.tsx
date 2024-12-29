@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import WorldCloud from "../../components/WordCloud/WordCloud";
 import { usePlayerInfo } from "../../hooks/usePlayerInfo";
 import BasePage from "../../components/BasePage/BasePage";
+import styles from "./FightRoom.module.css";
 
 function FightRoom() {
   // const inputRef = useRef<HTMLInputElement>(null);
@@ -21,7 +22,7 @@ function FightRoom() {
   return (
     <BasePage bodyNamespace="fight">
       {(userId == null || fightId == null) ? (
-        <div>Loading...</div>
+        <div className={styles.loading}>Loading...</div>
       ) : (
         <WorldCloud userId={userId} fightId={fightId} />
       )}
