@@ -26,6 +26,16 @@ class RegisterBody(BaseModel):
     "/user/register",
     status_code=status.HTTP_201_CREATED,
     description="Register a new user, if the username does not already exist.",
+    response_model=jwt_utils.Token,
+    response_description="The access and refresh tokens if the user was created successfully.",
+    tags=["user"],
+    responses={
+        201: {
+            "description": "User created successfully",
+        },
+        400: {"description": "Missing username or password"},
+        403: {"description": "Invalid username or Username already exists"},
+    },
 )
 async def register(body: RegisterBody):
     # check that all API values are present
@@ -57,7 +67,21 @@ class LoginBody(BaseModel):
     password: str
 
 
-@router.post("/user/login", status_code=status.HTTP_200_OK, description="Login a user.")
+@router.post(
+    "/user/login",
+    status_code=status.HTTP_200_OK,
+    description="Login a user.",
+    response_model=jwt_utils.Token,
+    response_description="The access and refresh tokens if the user was created successfully.",
+    tags=["user"],
+    responses={
+        200: {
+            "description": "User logged in successfully",
+        },
+        400: {"description": "Missing username or password"},
+        403: {"description": "Connection refused"},
+    },
+)
 async def login(body: LoginBody) -> jwt_utils.Token:
     # check that all API values are present
     if not body.username or not body.password:
@@ -76,7 +100,10 @@ async def login(body: LoginBody) -> jwt_utils.Token:
     return jwt_utils.create_token_pair(body.username)
 
 
-@router.get("/user/auth_test", dependencies=[Depends(HTTPBearer())])
+@router.get(
+    "/user/auth_test",
+    dependencies=[Depends(HTTPBearer())],
+    description="A blank route to test authentication against a protected route.")
 async def auth_test(credentials: jwt_utils.Credentials) -> JSONResponse:
     jwt_utils.verify_token(credentials)
 
@@ -88,7 +115,17 @@ async def auth_test(credentials: jwt_utils.Credentials) -> JSONResponse:
 
 @router.get(
     "/user/refresh_token",
-    description="Refresh the access token. The bearer must be the refresh token.",
+    description="Refresh the access token. The bearer must be the refresh token!",
+    status_code=status.HTTP_200_OK,
+    response_model=jwt_utils.Token,
+    response_description="The new access and refresh tokens if the refresh token is valid.",
+    tags=["user"],
+    responses={
+        200: {
+            "description": "Token refreshed successfully",
+        },
+        401: {"description": "Invalid or expired token"},
+    },
 )
 async def refresh_token(credentials: jwt_utils.Credentials) -> jwt_utils.Token:
     token_data = jwt_utils.verify_token(credentials)
@@ -101,7 +138,12 @@ async def refresh_token(credentials: jwt_utils.Credentials) -> jwt_utils.Token:
     return jwt_utils.create_token_pair(token_data.sub)
 
 
-@router.get("/user/logout", description="Logout the user. The bearer must be the access token.")
+@router.get(
+    "/user/logout",
+    description="Logout the user. The bearer must be the access token.",
+    status_code=status.HTTP_200_OK,
+    tags=["user"],
+)
 async def logout(credentials: jwt_utils.Credentials):
     token_data = jwt_utils.verify_token(credentials)
 
