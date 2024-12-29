@@ -18,6 +18,7 @@ export interface Props {
   required?: boolean;
   pattern?: RegExp;
   className?: string;
+  onChange?: (e: FormEvent<HTMLInputElement>) => void;
 }
 
 export default function LabeledInput({
@@ -28,6 +29,7 @@ export default function LabeledInput({
   required = false,
   pattern,
   className,
+  onChange,
 }: Props) {
   const onInput = (e: FormEvent<HTMLInputElement>) => {
     (e.target as HTMLInputElement).setCustomValidity("");
@@ -50,6 +52,7 @@ export default function LabeledInput({
           type={type}
           className={styles.input}
           name={name}
+          onChange={onChange}
           onInput={onInput}
           ref={inputRef}
           required={required}

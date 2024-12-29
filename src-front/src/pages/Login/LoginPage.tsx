@@ -11,11 +11,13 @@ import { FormEvent, useState } from "react";
 import Button from "../../components/Button/Button";
 import Card from "../../components/Card/Card";
 import LabeledInput from "../../components/LabeledInput/LabeledInput";
+import { PasswordStrengthChecker } from "../../components/PasswordStrengthChecker/PasswordStrenghtChecker";
 import styles from "./LoginPage.module.css";
 import { API } from "../../lib/api";
 import { useNavigate } from "react-router";
 
 export default function LoginPage() {
+  const [registerPassword, setRegisterPassword] = useState("");
   const [registerPasswordError, setRegisterPasswordError] = useState("");
   const [registerUsernameError, setRegisterUsernameError] = useState("");
   const navigate = useNavigate();
@@ -121,7 +123,9 @@ export default function LoginPage() {
             label="Password"
             name="password"
             required
-          />
+            onChange={(e) => setRegisterPassword((e.target as HTMLInputElement).value)}
+            />
+          <PasswordStrengthChecker password={registerPassword} />
           <LabeledInput
             type="password"
             label="Confirm Password"
