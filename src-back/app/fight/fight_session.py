@@ -258,14 +258,19 @@ class FightSession:
 
     async def _update_words_best_progress(self):
         self._word_best_progress = {}
-        for player_progress in self._players_typing_history:
+
+        for player in self._players_typing_history:
+            player_progress = self._players_typing_history[player]
             if len(player_progress) > 0:
-                for word in self._words_to_find:
+                player_progress_str = "".join(player_progress)
+                for i in range(len(self._words_to_find)):
+                    word = self._words_to_find[i]
                     if len(word) >= len(player_progress):
-                        if word.startswith(player_progress):
+                        if word.startswith(player_progress_str):
                             current_best = self._word_best_progress.get(word, 0)
                             new_best = max(current_best, len(player_progress))
                             self._word_best_progress[word] = new_best
+
         await self._broadcast(
             build_json_event("sendWordsBestProgress", {"words": self._word_best_progress})
         )
