@@ -564,11 +564,16 @@ export default function WordCloud({
     document.addEventListener("keydown", onkeydown);
 
     //forbids ctrl + z
-    playerInput.addEventListener("paste", onpaste);
+    if (playerInput) {
+      playerInput.addEventListener("paste", onpaste);
+    }
+    
 
     return () => {
       document.removeEventListener("keydown", onkeydown);
-      playerInput.removeEventListener("paste", onpaste);
+      if (playerInput) {
+        playerInput.removeEventListener("paste", onpaste);
+      }
     };
   });
 
