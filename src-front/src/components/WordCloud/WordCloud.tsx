@@ -241,6 +241,7 @@ export default function WordCloud({
   //session initialization
   useEffect(() => {
     //setError("");
+    if (userId == null || userId.length == 0) return;
     console.log("Initializing session...");
     fightSession.current = new FightSession(userId, fightId, () => {
       console.log("WebSocket open. Getting state...");
@@ -314,11 +315,6 @@ export default function WordCloud({
           //End of the game
           setIsGameEnded(true);
 
-          //deleting the PIXI App
-          if (refApp.current) {
-            refApp.current.destroy(true, { children: true, texture: true });
-            refApp.current = undefined;
-          }
           //deleting the canvas
           if (refCanvas.current) {
             while (refCanvas.current.firstChild) {
