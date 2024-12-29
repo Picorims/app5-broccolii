@@ -16,6 +16,14 @@ class AddCardBody(BaseModel):
     "/card/add",
     status_code=status.HTTP_201_CREATED,
     description="Adds a card.",
+    tags=["user", "card"],
+    responses={
+        201: {
+            "description": "Card added successfully",
+        },
+        400: {"description": "Missing username or cardId"},
+    },
+    response_model=dict[str, str],
 )
 async def addCard(body: AddCardBody):
     print("addCard :", body.username, body.cardId)
@@ -43,6 +51,14 @@ class EquipCardBody(BaseModel):
     "/card/equip",
     status_code=status.HTTP_201_CREATED,
     description="Equips a card for a user.",
+    tags=["user", "card"],
+    responses={
+        201: {
+            "description": "Card equipped successfully",
+        },
+        400: {"description": "Missing username or cardId"},
+    },
+    response_model=dict[str, str],
 )
 async def equipCard(body: EquipCardBody):
     print("equipCard :", body.username, body.cardId)
@@ -70,6 +86,14 @@ class UnequipCardBody(BaseModel):
     "/card/unequip",
     status_code=status.HTTP_201_CREATED,
     description="Unequips a card for a user.",
+    tags=["user", "card"],
+    responses={
+        201: {
+            "description": "Card unequipped successfully",
+        },
+        400: {"description": "Missing username or cardId"},
+    },
+    response_model=dict[str, str],
 )
 async def unequipCard(body: UnequipCardBody):
     print("unequipCard :", body.username, body.cardId)

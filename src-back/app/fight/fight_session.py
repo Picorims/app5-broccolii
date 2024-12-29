@@ -305,7 +305,12 @@ class FightSession:
 sessions["test"] = FightSession("test", ["alice", "bob"])
 
 
-@router.websocket("/fight/{fightId}/ws")
+# See the docs directory for events documentation
+
+
+@router.websocket(
+    "/fight/{fightId}/ws",
+)
 async def websocket_endpoint(fightId, websocket: WebSocket):
     print(f"new connection to {fightId}")
     await websocket.accept()
@@ -339,10 +344,23 @@ class CreateFightSessionBody(BaseModel):
     players_list: list[str]
 
 
+class CreateSessionResponse(BaseModel):
+    fightId: str
+
+
 @router.post(
     "/fight/create",
     status_code=status.HTTP_201_CREATED,
     description="Creates a session.",
+    tags=["fight"],
+    responses={
+        201: {
+            "description": "Session created successfully",
+        },
+        400: {"description": "Missing players_list"},
+    },
+    response_description="The fightId of the created session in `fightId`.",
+    response_model=CreateSessionResponse,
 )
 async def create_session(body: CreateFightSessionBody):
     # check that all API values are present

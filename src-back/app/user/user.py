@@ -10,7 +10,7 @@
 from fastapi.responses import JSONResponse
 from ..auth import jwt_utils
 from fastapi import APIRouter, status, HTTPException
-from app.classes import Account
+from app.classes import Account, UserInfo
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -20,6 +20,14 @@ router = APIRouter()
     "/user/me",
     status_code=status.HTTP_200_OK,
     description="Get the current user's information.",
+    tags=["user"],
+    responses={
+        200: {
+            "description": "User information retrieved successfully",
+        },
+        404: {"description": "User not found"},
+    },
+    response_model=UserInfo,
 )
 async def me(credentials: jwt_utils.Credentials):
     token_data = jwt_utils.verify_token(credentials)
@@ -43,6 +51,14 @@ class ClickBody(BaseModel):
     "/user/click",
     status_code=status.HTTP_200_OK,
     description="Registers the click on the broccoli",
+    tags=["user", "clicker"],
+    response_model=dict[str, str],
+    responses={
+        200: {
+            "description": "Click registered successfully",
+        },
+        400: {"description": "Missing username"},
+    },
 )
 async def click(body: ClickBody):
     print("click by :", body.username)
