@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import WorldCloud from "../../components/WordCloud/WordCloud";
 import { usePlayerInfo } from "../../hooks/usePlayerInfo";
+import BasePage from "../../components/BasePage/BasePage";
 
 function FightRoom() {
   // const inputRef = useRef<HTMLInputElement>(null);
@@ -17,10 +18,15 @@ function FightRoom() {
     setFightId(queryParameters.get("fightId") as string);
   }, [fightId, userId]);
 
-  if (userId == null || fightId == null) {
-    return <div>Loading...</div>;
-  }
-  return <WorldCloud userId={userId} fightId={fightId} />;
+  return (
+    <BasePage bodyNamespace="fight">
+      {(userId == null || fightId == null) ? (
+        <div>Loading...</div>
+      ) : (
+        <WorldCloud userId={userId} fightId={fightId} />
+      )}
+    </BasePage>
+  );
 }
 
 export default FightRoom;
