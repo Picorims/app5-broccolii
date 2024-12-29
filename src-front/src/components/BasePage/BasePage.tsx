@@ -7,21 +7,20 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import React, { useEffect } from "react"
+import React, { useEffect } from "react";
 
 export interface Props {
-    bodyNamespace: string
-    children: React.ReactNode
+  bodyNamespace: string;
+  children: React.ReactNode;
 }
 
 export default function BasePage({ bodyNamespace, children }: Props) {
-    
-    useEffect(() => {
-        document.body.classList.add(bodyNamespace);
-        return () => {
-            document.body.classList.remove(bodyNamespace);
-        };
-    });
+  useEffect(() => {
+    document.body.classList.add(bodyNamespace);
+    return () => {
+      document.body.classList.remove(bodyNamespace);
+    };
+  });
 
-    return children;
-};
+  return children;
+}

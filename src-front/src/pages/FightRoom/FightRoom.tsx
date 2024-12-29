@@ -21,7 +21,7 @@ function FightRoom() {
 
   return (
     <BasePage bodyNamespace="fight">
-      {(userId == null || fightId == null) ? (
+      {userId == null || fightId == null ? (
         <div className={styles.loading}>Loading...</div>
       ) : (
         <WorldCloud userId={userId} fightId={fightId} />
