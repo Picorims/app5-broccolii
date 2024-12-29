@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import styles from "./BoosterCard.module.css";
 
-import beetrootImage from "../../assets/boosterCard/beetrootImage.png";
-import butternutImage from "../../assets/boosterCard/ButternutImage.png";
-import carrotImage from "../../assets/boosterCard/CarrotImage.png";
+import beetrootImage from "../../assets/boosterCard/beetroot.png";
+import butternutImage from "../../assets/boosterCard/butternut.png";
+import carrotImage from "../../assets/boosterCard/carrot.png";
 
-import emptyCardImage from "../../assets/boosterCard/emptyCardImage.png";
+import emptyCardImage from "../../assets/boosterCard/empty_card.png";
 
-import beetrootStatsImage from "../../assets/boosterCard/beetrootStatsImage.png";
-import butternutStatsImage from "../../assets/boosterCard/ButternutStatsImage.png";
-import carrotStatsImage from "../../assets/boosterCard/CarrotStatsImage.png";
+import beetrootStatsImage from "../../assets/boosterCard/beetroot_stats.png";
+import butternutStatsImage from "../../assets/boosterCard/butternut_stats.png";
+import carrotStatsImage from "../../assets/boosterCard/carrot_stats.png";
 
 const BoosterCard: React.FC<{ onClick: () => void }> = () => {
   // Constants for image mapping

@@ -10,6 +10,7 @@
 import { useEffect, useRef, useState } from "react";
 import BroccoliiButton from "../../components/BroccoliiButton/BroccoliiButton";
 import BoosterCard from "../../components/BoosterCard/BoosterCard";
+import ClickerHUD from "../../components/ClickerHUD/clickerHUD";
 import styles from "./ClickerPage.module.css";
 
 import image1 from "../../assets/broccolii/broccolii(1).png";
@@ -20,8 +21,12 @@ import { API } from "../../lib/api";
 import Button from "../../components/Button/Button";
 import { useNavigate } from "react-router";
 import { usePlayerInfo } from "../../hooks/usePlayerInfo";
+import BasePage from "../../components/BasePage/BasePage";
 
 const ClickerPage = () => {
+  const [statNbBroccos, setStatNbBroccos] = useState<number>(0);
+  const [statClickrate, setStatClickrate] = useState<number>(0);
+
   // Array of objects representing images and their corresponding texts.
   const items = [
     { id: 1, image: image1, text: ": )" },
@@ -56,8 +61,12 @@ const ClickerPage = () => {
   });
 
   return (
-    <>
+    <BasePage bodyNamespace="clicker">
       <div className={styles.container}>
+        <ClickerHUD
+          statNbBroccos={statNbBroccos}
+          statClickrate={statClickrate}
+        />
         <h1>Page Clicker</h1>
         <BroccoliiButton
           image={currentItem.image}
@@ -74,7 +83,26 @@ const ClickerPage = () => {
       >
         Fight!
       </Button>
-    </>
+      {/* Example of how to change the displayed stats */}
+      <Button
+        type="button"
+        variant="primary"
+        onClick={() => {
+          setStatNbBroccos(statNbBroccos + 10);
+        }}
+      >
+        Change brocos
+      </Button>
+      <Button
+        type="button"
+        variant="primary"
+        onClick={() => {
+          setStatClickrate(statClickrate + 10);
+        }}
+      >
+        Change rate
+      </Button>
+    </BasePage>
   );
 };
 
