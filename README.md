@@ -10,6 +10,10 @@ run those 2 commands :
 
 Then, Ctrl+click the link given to launch the website
 
+Please note :
+This will install nodeJs as well as Python3 on your computer if they are not available.
+
+Alternatively, the following steps can be followed to fully manualy setup the project.
 
 ### Front
 
@@ -49,6 +53,16 @@ py -m venv env
 - Install dependencies:
 ```
 py -m pip install -r requirements.txt
+```
+
+Create DB file:
+```
+python ./app/sql_script.py
+```
+
+Create JWT-Secret file:
+```
+openssl rand -hex 32 > JWT_SECRET
 ```
 
 - Launch the server:
