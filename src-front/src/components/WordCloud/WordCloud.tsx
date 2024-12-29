@@ -165,6 +165,11 @@ export default function WordCloud({
 
   //WordCloud initialization
   const init = useCallback(async () => {
+
+    //forbid pasting text
+    const myInput = document.getElementById('playerInput') as HTMLInputElement;
+    myInput.onpaste = e => e.preventDefault();
+
     const app = new Application();
 
     if (refContainer.current) {
