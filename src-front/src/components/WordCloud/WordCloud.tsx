@@ -171,14 +171,6 @@ export default function WordCloud({
       "playerInput",
     ) as HTMLInputElement;
     playerInput.onpaste = (e) => e.preventDefault();
-    //forbids text selection
-    playerInput.addEventListener(
-      "select",
-      function () {
-        this.selectionStart = this.selectionEnd;
-      },
-      false,
-    );
     //forbids ctrl + z
     document.onkeydown = function (e) {
       if (e.ctrlKey && e.key === "z") {
