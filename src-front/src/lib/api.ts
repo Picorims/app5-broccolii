@@ -229,7 +229,9 @@ export class API {
     }
 
     const access_token_expire_date = new Date(parseFloat(access_token_expire));
-    const refresh_token_expire_date = new Date(parseFloat(refresh_token_expire));
+    const refresh_token_expire_date = new Date(
+      parseFloat(refresh_token_expire),
+    );
 
     const now = new Date();
 
