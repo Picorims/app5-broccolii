@@ -1227,8 +1227,8 @@ with open("cards.pkl", "wb") as file:  # saving the cards for the broccoli count
 # %%
 
 results = cursor.fetchall()
-"""for result in results:
-    print(f"{result[1]}: {result[0]}, ")"""
+for result in results:
+    print(f"{result[1]}: {result[0]}, ")
 # %%
 
 connection.commit()
