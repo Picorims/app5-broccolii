@@ -28,7 +28,7 @@ class RegisterBody(BaseModel):
     description="Register a new user, if the username does not already exist.",
     response_model=jwt_utils.Token,
     response_description="The access and refresh tokens if the user was created successfully.",
-    tags=["user"],
+    tags=["user", "authentication"],
     responses={
         201: {
             "description": "User created successfully",
@@ -73,7 +73,7 @@ class LoginBody(BaseModel):
     description="Login a user.",
     response_model=jwt_utils.Token,
     response_description="The access and refresh tokens if the user was created successfully.",
-    tags=["user"],
+    tags=["user", "authentication"],
     responses={
         200: {
             "description": "User logged in successfully",
@@ -119,7 +119,7 @@ async def auth_test(credentials: jwt_utils.Credentials) -> JSONResponse:
     status_code=status.HTTP_200_OK,
     response_model=jwt_utils.Token,
     response_description="The new access and refresh tokens if the refresh token is valid.",
-    tags=["user"],
+    tags=["user", "authentication"],
     responses={
         200: {
             "description": "Token refreshed successfully",
@@ -142,7 +142,7 @@ async def refresh_token(credentials: jwt_utils.Credentials) -> jwt_utils.Token:
     "/user/logout",
     description="Logout the user. The bearer must be the access token.",
     status_code=status.HTTP_200_OK,
-    tags=["user"],
+    tags=["user", "authentication"],
 )
 async def logout(credentials: jwt_utils.Credentials):
     token_data = jwt_utils.verify_token(credentials)
