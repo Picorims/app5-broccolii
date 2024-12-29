@@ -21,6 +21,7 @@ import { API } from "../../lib/api";
 import Button from "../../components/Button/Button";
 import { useNavigate } from "react-router";
 import { usePlayerInfo } from "../../hooks/usePlayerInfo";
+import BasePage from "../../components/BasePage/BasePage";
 
 const ClickerPage = () => {
   const [statNbBroccos, setStatNbBroccos] = useState<number>(0);
@@ -60,7 +61,7 @@ const ClickerPage = () => {
   });
 
   return (
-    <>
+    <BasePage bodyNamespace="clicker">
       <div className={styles.container}>
         <ClickerHUD
           statNbBroccos={statNbBroccos}
@@ -101,7 +102,7 @@ const ClickerPage = () => {
       >
         Change rate
       </Button>
-    </>
+    </BasePage>
   );
 };
 

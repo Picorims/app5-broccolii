@@ -1,7 +1,4 @@
-html,
-body,
-#app,
-#app > div {
+:global(body.lobby) {
   height: 100%;
   width: 100%;
 }

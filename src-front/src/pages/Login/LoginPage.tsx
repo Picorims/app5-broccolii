@@ -15,6 +15,7 @@ import { PasswordStrengthChecker } from "../../components/PasswordStrengthChecke
 import styles from "./LoginPage.module.css";
 import { API } from "../../lib/api";
 import { useNavigate } from "react-router";
+import BasePage from "../../components/BasePage/BasePage";
 
 export default function LoginPage() {
   const [registerPassword, setRegisterPassword] = useState("");
@@ -88,58 +89,60 @@ export default function LoginPage() {
   };
 
   return (
-    <main className={styles.main}>
-      <h1>Broccolii</h1>
-      <Card>
-        <h2>Login</h2>
-        {/* TODO: adjust form */}
-        <form action="" method="post" onSubmit={onSubmitLogin}>
-          <LabeledInput type="text" label="Username" name="login" required />
-          <LabeledInput
-            type="password"
-            label="Password"
-            name="password"
-            required
-          />
-          <Button type="submit" variant="primary">
-            Login
-          </Button>
-        </form>
-      </Card>
-      <Card>
-        <h2>Register</h2>
-        {/* TODO: adjust form */}
-        <form action="" method="post" onSubmit={onSubmitRegister}>
-          <LabeledInput
-            type="text"
-            label="Username (between 3 and 32 alphanumeric characters separated by underscores)"
-            name="login"
-            error={registerUsernameError}
-            pattern={usernameRegex}
-            required
-          />
-          <LabeledInput
-            type="password"
-            label="Password"
-            name="password"
-            required
-            onChange={(e) =>
-              setRegisterPassword((e.target as HTMLInputElement).value)
-            }
-          />
-          <PasswordStrengthChecker password={registerPassword} />
-          <LabeledInput
-            type="password"
-            label="Confirm Password"
-            name="confirm_password"
-            error={registerPasswordError}
-            required
-          />
-          <Button type="submit" variant="primary">
-            Register
-          </Button>
-        </form>
-      </Card>
-    </main>
+    <BasePage bodyNamespace="login">
+      <main className={styles.main}>
+        <h1>Broccolii</h1>
+        <Card>
+          <h2>Login</h2>
+          {/* TODO: adjust form */}
+          <form action="" method="post" onSubmit={onSubmitLogin}>
+            <LabeledInput type="text" label="Username" name="login" required />
+            <LabeledInput
+              type="password"
+              label="Password"
+              name="password"
+              required
+            />
+            <Button type="submit" variant="primary">
+              Login
+            </Button>
+          </form>
+        </Card>
+        <Card>
+          <h2>Register</h2>
+          {/* TODO: adjust form */}
+          <form action="" method="post" onSubmit={onSubmitRegister}>
+            <LabeledInput
+              type="text"
+              label="Username (between 3 and 32 alphanumeric characters separated by underscores)"
+              name="login"
+              error={registerUsernameError}
+              pattern={usernameRegex}
+              required
+            />
+            <LabeledInput
+              type="password"
+              label="Password"
+              name="password"
+              required
+              onChange={(e) =>
+                setRegisterPassword((e.target as HTMLInputElement).value)
+              }
+            />
+            <PasswordStrengthChecker password={registerPassword} />
+            <LabeledInput
+              type="password"
+              label="Confirm Password"
+              name="confirm_password"
+              error={registerPasswordError}
+              required
+            />
+            <Button type="submit" variant="primary">
+              Register
+            </Button>
+          </form>
+        </Card>
+      </main>
+    </BasePage>
   );
 }

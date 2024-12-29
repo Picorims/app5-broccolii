@@ -4,6 +4,7 @@ import Card from "../../components/Card/Card";
 import { useEffect, useState } from "react";
 import { API } from "../../lib/api";
 import { usePlayerInfo } from "../../hooks/usePlayerInfo";
+import BasePage from "../../components/BasePage/BasePage";
 
 // import { getEnv } from "../../environment";
 
@@ -32,7 +33,7 @@ export default function Lobby() {
   };
 
   return (
-    <>
+    <BasePage bodyNamespace="lobby">
       <div className={styles.mainContainer}>
         <Card>
           <h1>ENTER A ROOM</h1>
@@ -72,6 +73,6 @@ export default function Lobby() {
           </div>
         </Card>
       </div>
-    </>
+    </BasePage>
   );
 }
