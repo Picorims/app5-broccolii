@@ -280,6 +280,10 @@ export default function WordCloud({
     session.onPrizeReceivedThen((prize) => {
       console.log("Prize received", prize);
     });
+    session.onWordsBestProgressUpdatedThen((words) => {
+      console.log("Words best progress updated", words);
+      setWordsBestProgress(words);
+    });
 
     return () => {
       fightSession.current?.close();

@@ -23,6 +23,7 @@ type ServerEvent =
   | "acknowledgeLetter"
   | "wonPrize"
   | "acknowledgeLetterErased"
+  | "sendWordsBestProgress"
   | "acknowledgeSubmit";
 type EventType = ClientEvent | ServerEvent;
 
@@ -82,6 +83,10 @@ interface scoresUpdatedResponse {
   scores: Record<string, number>;
 }
 
+interface WordsBestProgressUpdatedResponse {
+  words: Record<string, number>;
+}
+
 /**
  * Handles the backend communication for a fight session.
  */
@@ -105,6 +110,8 @@ export class FightSession {
   private onAcknowledgeSubmit: (success: boolean, testedState: string) => void =
     () => {};
   private onPrizeReceived: (prize: unknown /*TODO define*/) => void = () => {};
+  private onWordsBestProgressUpdated: (words: Record<string, number>) => void =
+    () => {};
 
   /**
    * Open the connection.
@@ -221,6 +228,12 @@ export class FightSession {
         this.onPrizeReceived(e);
         break;
       }
+      case "sendWordsBestProgress": {
+        const payload = e as unknown as WordsBestProgressUpdatedResponse;
+        console.log(e, "sendWordsBestProgress");
+        this.onWordsBestProgressUpdated(payload.words);
+        break;
+      }
       default: {
         console.warn("Unknown event type", eventType);
       }
@@ -254,6 +267,11 @@ export class FightSession {
   }
   onPrizeReceivedThen(f: (prize: unknown /*TODO define*/) => void) {
     this.onPrizeReceived = f;
+  }
+  onWordsBestProgressUpdatedThen(
+    f: (words: Record<string, number>) => void,
+  ) {
+    this.onWordsBestProgressUpdated = f;
   }
 
   submitLetter(letter: string) {
