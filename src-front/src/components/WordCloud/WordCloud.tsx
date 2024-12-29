@@ -154,9 +154,9 @@ export default function WordCloud({
   const [inputValue, setInputValue] = useState("");
   //const [error, setError] = useState("");
   const [scores, setScores] = useState<Record<string, number>>({});
-  // const [wordsBestProgress, setWordsBestProgress] = useState<
-  //   Record<string, number>
-  // >({});
+  const [wordsBestProgress, setWordsBestProgress] = useState<
+    Record<string, number>
+  >({});
   const [gameEndEpochMs, setGameEndEpochMs] = useState(0);
   const [gameStartEpochMs, setGameStartEpochMs] = useState(0);
   const fightSession = useRef<FightSession | null>(null);
