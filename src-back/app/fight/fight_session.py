@@ -305,7 +305,11 @@ class FightSession:
 sessions["test"] = FightSession("test", ["alice", "bob"])
 
 
-@router.websocket("/fight/{fightId}/ws")
+# See the docs directory for events documentation
+
+@router.websocket(
+    "/fight/{fightId}/ws",
+)
 async def websocket_endpoint(fightId, websocket: WebSocket):
     print(f"new connection to {fightId}")
     await websocket.accept()
