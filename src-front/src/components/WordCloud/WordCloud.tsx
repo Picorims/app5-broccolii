@@ -166,18 +166,6 @@ export default function WordCloud({
 
   //WordCloud initialization
   const init = useCallback(async () => {
-    //forbids pasting text
-    const playerInput = document.getElementById(
-      "playerInput",
-    ) as HTMLInputElement;
-    playerInput.onpaste = (e) => e.preventDefault();
-    //forbids ctrl + z
-    document.onkeydown = function (e) {
-      if (e.ctrlKey && e.key === "z") {
-        e.preventDefault();
-      }
-    };
-
     const app = new Application();
 
     if (refContainer.current) {
@@ -557,6 +545,32 @@ export default function WordCloud({
 
     return () => window.removeEventListener("resize", updateSize);
   }, [refContainerSize]);
+
+  useEffect(() => {
+    const playerInput = document.getElementById(
+      "playerInput",
+    ) as HTMLInputElement;
+
+    const onkeydown = function (e: KeyboardEvent) {
+      if (e.ctrlKey && e.key === "z") {
+        e.preventDefault();
+      }
+    };
+    const onpaste = function (e: ClipboardEvent) {
+      e.preventDefault();
+    };
+
+    //forbids pasting text
+    document.addEventListener("keydown", onkeydown);
+
+    //forbids ctrl + z
+    playerInput.addEventListener("paste", onpaste);
+
+    return () => {
+      document.removeEventListener("keydown", onkeydown);
+      playerInput.removeEventListener("paste", onpaste);
+    };
+  });
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
