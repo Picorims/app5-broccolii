@@ -108,11 +108,17 @@ def create_token_pair(username: str) -> Token:
     uuid = str(uuid4())
     access_token, access_token_expire = _create_access_token(uuid, username)
     refresh_token, refresh_token_expire = _create_refresh_token(uuid, username)
-    
+
     # convert expire to epoch in ms
     access_token_expire = access_token_expire.timestamp() * 1000
     refresh_token_expire = refresh_token_expire.timestamp() * 1000
-    return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer", access_token_expire=access_token_expire, refresh_token_expire=refresh_token_expire)
+    return Token(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        access_token_expire=access_token_expire,
+        refresh_token_expire=refresh_token_expire,
+    )
 
 
 Credentials: TypeAlias = Annotated[HTTPAuthorizationCredentials, Depends(HTTPBearer())]
