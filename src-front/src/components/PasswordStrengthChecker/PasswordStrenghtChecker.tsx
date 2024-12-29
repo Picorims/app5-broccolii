@@ -15,7 +15,7 @@ export function PasswordStrengthChecker({
       let score = 0;
       const tests = [/[0-9]/, /[a-z]/, /[A-Z]/, /[^0-9a-zA-Z]/];
 
-      if (password.length >= 6) {
+      if (password.length >= 12) {
         tests.forEach((test) => {
           if (test.test(password)) score++;
         });
