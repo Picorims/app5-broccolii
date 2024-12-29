@@ -162,13 +162,14 @@ export default function WordCloud({
   const fightSession = useRef<FightSession | null>(null);
   const refAddWord = useRef<(wordStr: string) => void>();
   const refDeleteWord = useRef<(wordToDelete: string) => void>();
+  const refPreviousEntry = useRef<string>("");
 
   //WordCloud initialization
   const init = useCallback(async () => {
 
     //forbid pasting text
-    const myInput = document.getElementById('playerInput') as HTMLInputElement;
-    myInput.onpaste = e => e.preventDefault();
+    const playerInput = document.getElementById('playerInput') as HTMLInputElement;
+    playerInput.onpaste = e => e.preventDefault();
 
     const app = new Application();
 
@@ -352,13 +353,31 @@ export default function WordCloud({
    * @param event
    */
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    console.log(wordsBestProgress);
+    //submitting user's input to the server
     const newVal = event.target.value;
+    const preVal = refPreviousEntry.current;
     setInputValue(newVal);
-    const nv = event.nativeEvent as InputEvent;
-    if (nv.data != null) {
-      fightSession.current?.submitLetter(nv.data);
+
+    //----if the player wrote
+    if (newVal.length > preVal.length) {
+      const nv = event.nativeEvent as InputEvent;
+      const newLetters = nv.data;
+      
+      if (newLetters != null) {
+        for (const letter of newLetters) {
+          fightSession.current?.submitLetter(letter);
+        }
+      }
     }
+
+    //----if the player erased
+    if (newVal.length < preVal.length) {
+      for (let i = preVal.length; i > newVal.length; i--) {
+        fightSession.current?.submitEraseLetter();
+      }
+    }
+    refPreviousEntry.current = newVal;
+
 
     //higlighting the user's progress (words that correspond to what the user typed)
     for (const word of refWords.current) {
@@ -538,7 +557,7 @@ export default function WordCloud({
         // FIXME this sends only 1 event even if the player deleted multiple letters at once,
         // fix this by checking how many letters have been deleted
         // (maybe in an other way entirely ikd)
-        fightSession.current?.submitEraseLetter();
+        // fightSession.current?.submitEraseLetter();
       }
     },
     [inputValue],
