@@ -2,6 +2,16 @@
 
 ## Development Setup
 
+
+How to install the app :
+Run the setup_project.bat file
+run those 2 commands :
+    cd src-front
+    npm run dev
+
+Then, Ctrl+click the link given to launch the website
+
+
 ### Front
 
 Requirements:

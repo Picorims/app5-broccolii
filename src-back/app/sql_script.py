@@ -15,7 +15,6 @@ else:
 db_name = "broccolii.db"
 connection = sqlite3.connect(db_name)
 cursor = connection.cursor()
-print("Connected to the database")
 
 # %% Database Creation
 sql_command = """
@@ -113,12 +112,6 @@ cursor.execute("INSERT INTO Account (username, password) VALUES ('Brocolivier', 
 cursor.execute("INSERT INTO Account (username, password) VALUES ('Picorims', ?)", (passwordC,))
 cursor.execute("INSERT INTO Account (username, password) VALUES ('Ar-No', ?)", (passwordD,))
 cursor.execute("INSERT INTO Account (username, password) VALUES ('Maximator', ?)", (passwordE,))
-
-cursor.execute("SELECT id, username FROM Account;")
-accounts = cursor.fetchall()
-print("Accounts in the database:")
-for account in accounts:
-    print(f"ID: {account[0]}, Username: {account[1]}")
 # %%
 
 # %% Category Insertion
@@ -1228,36 +1221,14 @@ cursor.execute(
             WHERE c.idCardEffect = ce.id;"""
 )
 cards = cursor.fetchall()
-print("Cards in the database:")
-for card in cards:
-    negative = "Negative " if card[4] else ""
-    print(f"{card[0]}: {negative}{card[1]} - {card[3]}")
-    print(f" {card[2]}")
-    print(f" {card[5]}: {card[6]}")
 
 with open("cards.pkl", "wb") as file:  # saving the cards for the broccoli counter
     pickle.dump(cards, file)
 # %%
 
-# %% Word & Category insert's verification
-sql_command = """
-    WITH RankedWords AS (
-        SELECT w.id, w.word, c.name AS category_name,
-               ROW_NUMBER() OVER (PARTITION BY c.name ORDER BY w.id) AS row_num
-        FROM Word w
-        JOIN WordCategory wc ON w.id = wc.idWord
-        JOIN Category c ON wc.idCategory = c.id
-    )
-    SELECT word, category_name
-    FROM RankedWords
-    WHERE row_num <= 20
-    ORDER BY category_name, row_num;
-"""
-
-cursor.execute(sql_command)
 results = cursor.fetchall()
-for result in results:
-    print(f"{result[1]}: {result[0]}, ")
+"""for result in results:
+    print(f"{result[1]}: {result[0]}, ")"""
 # %%
 
 connection.commit()
