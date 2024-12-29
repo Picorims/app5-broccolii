@@ -123,8 +123,10 @@ export default function LoginPage() {
             label="Password"
             name="password"
             required
-            onChange={(e) => setRegisterPassword((e.target as HTMLInputElement).value)}
-            />
+            onChange={(e) =>
+              setRegisterPassword((e.target as HTMLInputElement).value)
+            }
+          />
           <PasswordStrengthChecker password={registerPassword} />
           <LabeledInput
             type="password"
