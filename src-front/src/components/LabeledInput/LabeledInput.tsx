@@ -23,6 +23,7 @@ export interface Props {
   value?: string | number;
   checked?: boolean;
   id?: string;
+  min?: string;
 }
 
 export default function LabeledInput({
@@ -38,6 +39,7 @@ export default function LabeledInput({
   value,
   checked,
   id,
+  min,
 }: Props) {
   const onInputLocal = (e: FormEvent<HTMLInputElement>) => {
     (e.target as HTMLInputElement).setCustomValidity("");
@@ -71,6 +73,7 @@ export default function LabeledInput({
           value={value}
           checked={checked}
           id={id}
+          min={min}
         />
       </label>
       {error !== "" && <span className={styles.error}>{error}</span>}

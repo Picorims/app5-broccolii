@@ -20,6 +20,9 @@ export default function Lobby() {
   const [gameDuration, setGameDuration] = useState(60);
   const [wordCount, setWordCount] = useState(200);
   const [roomName, setRoomName] = useState("");
+  const LOBBY_DURATION_MIN = 10;
+  const GAME_DURATION_MIN = 10;
+  const WORD_COUNT_MIN = 1;
 
   const userInfo = usePlayerInfo();
   useEffect(() => {
@@ -55,6 +58,20 @@ export default function Lobby() {
       alert("Please select at least one word category.");
       return;
     }
+
+    if (lobbyDuration < LOBBY_DURATION_MIN) {
+      alert(`Lobby duration must be at least ${LOBBY_DURATION_MIN} seconds.`);
+      return;
+    }
+    if (gameDuration < GAME_DURATION_MIN) {
+      alert(`Game duration must be at least ${GAME_DURATION_MIN} seconds.`);
+      return;
+    }
+    if (wordCount < WORD_COUNT_MIN) {
+      alert(`Word count must be at least ${WORD_COUNT_MIN}.`);
+      return;
+    }
+
     const request = await API.createFight({
       name: roomName,
       players_list: [],
@@ -136,18 +153,21 @@ export default function Lobby() {
           <LabeledInput
             label="Lobby duration"
             type="number"
+            min={LOBBY_DURATION_MIN.toString()}
             value={lobbyDuration}
             onInput={(e) => setLobbyDuration(parseInt(e.currentTarget.value))}
           />
           <LabeledInput
             label="Game duration"
             type="number"
+            min={GAME_DURATION_MIN.toString()}
             value={gameDuration}
             onInput={(e) => setGameDuration(parseInt(e.currentTarget.value))}
           />
           <LabeledInput
             label="Word count"
             type="number"
+            min={WORD_COUNT_MIN.toString()}
             value={wordCount}
             onInput={(e) => setWordCount(parseInt(e.currentTarget.value))}
           />
