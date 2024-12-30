@@ -26,6 +26,8 @@ npm ci # like install, but install the exact same versions as the initial instal
 npm run dev -- --open
 ```
 
+**Note:** React's strict mode can cause unexpected behavior in development mode. In particular, the first load of the word cloud page fails in development mode. You may either disable strict mode for this page, or test a built vversion (`npm run build && npm run preview`, or a docker image)
+
 #### Formatting
 ```bash
 npm run lint
