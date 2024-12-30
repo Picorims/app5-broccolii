@@ -45,6 +45,8 @@ class Word:
 
     def word_in_category(self, category):
         return category in self.category
+    def word_in_category_str(self, category: str):
+        return any(category == c.name for c in self.category)
 
     def print_category(self):
         for i in self.category:
@@ -434,7 +436,7 @@ if VERBOSE:
 connection.commit()
 connection.close()
 
-class WordCategory(Enum):
+class WordCategory(): # inheriting from Enum causes equality with strings to fail
     AGRICULTURE = "Agriculture"
     GREEN = "Green"
     B_WORDS = "B_words"
@@ -451,7 +453,7 @@ def get_random_word_list(categories: List[str]=[], amount=300):
         words_copy = words.copy()
     else:
         for word in words:
-            if any(word.word_in_category(category) for category in categories):
+            if any(word.word_in_category_str(category) for category in categories):
                 words_copy.append(word)
 
     # shuffle
