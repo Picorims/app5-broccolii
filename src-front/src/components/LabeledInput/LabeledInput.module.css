@@ -17,6 +17,14 @@
   font-size: 1.2rem;
   line-height: 1;
 }
+.label:has(.input[type="checkbox"]) {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: left;
+  gap: var(--spacing-xs);
+}
 
 .input {
   width: 100%;
@@ -27,6 +35,10 @@
   color: var(--text-950);
   border: var(--border-s) solid var(--background-800);
   border-radius: var(--border-radius-s);
+}
+.input[type="checkbox"] {
+  width: var(--size-s);
+  height: var(--size-s);
 }
 
 .input:invalid {

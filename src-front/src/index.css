@@ -45,3 +45,14 @@ body {
   padding: var(--spacing-xl);
   text-align: center;
 }
+
+fieldset {
+  border-radius: var(--border-radius-s);
+  border: 2px solid var(--background-800);
+  margin-bottom: var(--spacing-s);
+}
+
+fieldset > legend {
+  font-weight: bold;
+  font-size: 1.2rem;
+}

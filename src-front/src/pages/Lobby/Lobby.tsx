@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { API } from "../../lib/api";
 import { usePlayerInfo } from "../../hooks/usePlayerInfo";
 import BasePage from "../../components/BasePage/BasePage";
+import Button from "../../components/Button/Button";
+import LabeledInput from "../../components/LabeledInput/LabeledInput";
 
 // import { getEnv } from "../../environment";
 
@@ -72,49 +74,71 @@ export default function Lobby() {
 
   return (
     <BasePage bodyNamespace="lobby">
+      <h1>Fight lobby</h1>
       <div className={styles.mainContainer}>
         <Card>
-          <h1>ENTER A ROOM</h1>
-          <input
+          <h2>ENTER A ROOM</h2>
+          <LabeledInput
+            label="Room ID"
             type="text"
-            className={styles.searchBar}
             id="joinFightId"
-          />{" "}
-          <button onClick={() => joinRoom()} className={styles.button}>
-            Join !
-          </button>
+          />
+          <Button type="button" variant="secondary" onClick={() => joinRoom()}>JOIN!</Button>
         </Card>
         <Card>
-          <h1>CREATE A ROOM</h1>
-          <div className={styles.horizontalDiv}>
-            <h3>Room name :</h3>
-            <input type="text" value={roomName} onInput={(e) => setRoomName(e.currentTarget.value)} />
-          </div>
-          <input type="checkbox" checked={flagAllWords} onChange={(e) => setFlagAllWords(e.currentTarget.checked)} />
-          ALL WORDS
-          <input type="checkbox" checked={flagWordsStartingWithB} onChange={(e) => setFlagWordsStartingWithB(e.currentTarget.checked)} />
-          WORD START WITH B
-          <input type="checkbox" checked={flagGreenThings} onChange={(e) => setFlagGreenThings(e.currentTarget.checked)}/>
-          GREEN THINGS
-          <input type="checkbox" checked={flagAgriculture} onChange={(e) => setFlagAgriculture(e.currentTarget.checked)}/>
-          AGRICULTURE
-          <div className={styles.horizontalDiv}>
-            <h3>Lobby duration:</h3>
-            <input type="number" value={lobbyDuration} onInput={(e) => setLobbyDuration(parseInt(e.currentTarget.value))} />
-          </div>
-          <div className={styles.horizontalDiv}>
-            <h3>Game duration:</h3>
-            <input type="number" value={gameDuration} onInput={(e) => setGameDuration(parseInt(e.currentTarget.value))} />
-          </div>
-          <div className={styles.horizontalDiv}>
-            <h3>Word count:</h3>
-            <input type="number" value={wordCount} onInput={(e) => setWordCount(parseInt(e.currentTarget.value))} />
-          </div>
-          <div className={styles.horizontalDiv}>
-            <button onClick={() => createRoom()} className={styles.button}>
-              JOIN ROOM
-            </button>
-          </div>
+          <h2>CREATE A ROOM</h2>
+          <LabeledInput
+            label="Room name"
+            type="text"
+            value={roomName}
+            onInput={(e) => setRoomName(e.currentTarget.value)}
+          />
+          <fieldset>
+            <legend>Enabled words</legend>
+            <LabeledInput
+              label="All words"
+              type="checkbox"
+              checked={flagAllWords}
+              onChange={(e) => setFlagAllWords(e.currentTarget.checked)}
+            />
+            <LabeledInput
+              label="Words starting with B"
+              type="checkbox"
+              checked={flagWordsStartingWithB}
+              onChange={(e) => setFlagWordsStartingWithB(e.currentTarget.checked)}
+            />
+            <LabeledInput
+              label="Green things"
+              type="checkbox"
+              checked={flagGreenThings}
+              onChange={(e) => setFlagGreenThings(e.currentTarget.checked)}
+              />
+            <LabeledInput
+              label="Agriculture"
+              type="checkbox"
+              checked={flagAgriculture}
+              onChange={(e) => setFlagAgriculture(e.currentTarget.checked)}
+              />
+          </fieldset>
+          <LabeledInput
+            label="Lobby duration"
+            type="number"
+            value={lobbyDuration}
+            onInput={(e) => setLobbyDuration(parseInt(e.currentTarget.value))}
+          />
+          <LabeledInput
+            label="Game duration"
+            type="number"
+            value={gameDuration}
+            onInput={(e) => setGameDuration(parseInt(e.currentTarget.value))}
+          />
+          <LabeledInput
+            label="Word count"
+            type="number"
+            value={wordCount}
+            onInput={(e) => setWordCount(parseInt(e.currentTarget.value))}
+          />
+          <Button type="button" variant="primary" onClick={() => createRoom()}>CREATE ROOM</Button>
         </Card>
       </div>
     </BasePage>
