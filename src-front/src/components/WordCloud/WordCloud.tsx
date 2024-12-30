@@ -188,7 +188,7 @@ export default function WordCloud({
   //WordCloud initialization
   const init = useCallback(async () => {
     console.log("Initializing Pixi.JS...");
-    
+
     const app = new Application();
 
     if (refContainer.current) {
@@ -200,13 +200,13 @@ export default function WordCloud({
       });
     }
     app.canvas.id = "pixi-canvas";
-    
+
     clearWords(); //deletes words from previous renders
-    
+
     if (refCanvas.current) {
       refCanvas.current.appendChild(app.canvas);
     }
-    
+
     //setApp(app);
     refApp.current = app;
 
@@ -565,7 +565,9 @@ export default function WordCloud({
 
   const pushWord = useCallback(async (word: Word) => {
     if (!refApp.current || !refApp.current.stage) {
-      console.error("App or stage not initialized. Skipping word push. Note that React's strict mode may cause this.");
+      console.error(
+        "App or stage not initialized. Skipping word push. Note that React's strict mode may cause this.",
+      );
       return;
     }
     refApp.current.stage.addChild(word.getPixiGraphics());
