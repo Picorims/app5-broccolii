@@ -182,9 +182,13 @@ export default function WordCloud({
   const refDisplayBestProgress =
     useRef<(wordsBestProgress: Record<string, number>) => void>();
   const refPreviousEntry = useRef<string>("");
+  const [pixiReady, setPixiReady] = useState(false);
+  const [webSocketReady, setWebSocketReady] = useState(false);
 
   //WordCloud initialization
   const init = useCallback(async () => {
+    console.log("Initializing Pixi.JS...");
+
     const app = new Application();
 
     if (refContainer.current) {
@@ -249,6 +253,7 @@ export default function WordCloud({
     });
 
     updateSize();
+    setPixiReady(true);
     return app;
   }, []);
 
@@ -258,8 +263,8 @@ export default function WordCloud({
     if (userId == null || userId.length == 0) return;
     console.log("Initializing session...");
     fightSession.current = new FightSession(userId, fightId, () => {
-      console.log("WebSocket open. Getting state...");
-      fightSession.current?.requestGameState();
+      console.log("WebSocket open.");
+      setWebSocketReady(true);
     });
 
     const session = fightSession.current;
@@ -309,6 +314,12 @@ export default function WordCloud({
       fightSession.current?.close();
     };
   }, [fightId, userId]);
+
+  useEffect(() => {
+    if (pixiReady && webSocketReady) {
+      fightSession.current?.requestGameState();
+    }
+  }, [pixiReady, webSocketReady]);
 
   const [remainingTime, setRemainingTime] = useState(0);
   const [timeBeforeStart, setTimeBeforeStart] = useState(0);
@@ -554,7 +565,9 @@ export default function WordCloud({
 
   const pushWord = useCallback(async (word: Word) => {
     if (!refApp.current || !refApp.current.stage) {
-      console.error("App or stage not initialized. Skipping word push.");
+      console.error(
+        "App or stage not initialized. Skipping word push. Note that React's strict mode may cause this.",
+      );
       return;
     }
     refApp.current.stage.addChild(word.getPixiGraphics());
@@ -565,8 +578,12 @@ export default function WordCloud({
 
   //cleanup function that erases the canvas when the page unmounts
   useEffect(() => {
-    const app = init();
     const currentRefCanvas = refCanvas.current;
+    if (!currentRefCanvas) {
+      console.log("No canvas to use for initialization");
+      return;
+    }
+    const app = init();
 
     return () => {
       app.then((appV) => {
@@ -579,7 +596,7 @@ export default function WordCloud({
         }
       });
     };
-  }, [init]);
+  }, [init, refCanvas]);
 
   /* const updateSize = useCallback(() => { */
   function updateSize() {
