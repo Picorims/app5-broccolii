@@ -15,6 +15,7 @@ import WordCloudMovingText from "../WordCloudMovingText/WordCloudMovingText";
 
 class Word {
   private static colWordBox = "#444";
+  private static colWordBoxHighlighted = "#362";
   private static colWordBoxBorderHighlighted = "#090";
   private static colWordBoxBorder = "#777";
   private static colText = "#cdb";
@@ -31,8 +32,15 @@ class Word {
     fill: "#5c5",
   });
 
+  private static pixiTextStyle3 = new PIXI.TextStyle({
+    fontSize: 50,
+    fontFamily: "EnterCommand",
+    fill: "#555",
+  });
+
   private pixiText: PIXI.Text;
   private pixiText2: PIXI.Text;
+  private pixiText3: PIXI.Text;
   private pixiGraphics: PIXI.Graphics;
   private isHighlighted: boolean;
   public speed: Vector;
@@ -49,6 +57,10 @@ class Word {
     this.pixiText2 = new PIXI.Text({ text: "", style: Word.pixiTextStyle2 });
     this.pixiText2.anchor._x = 0;
     this.pixiText2.anchor._y = 0.5;
+
+    this.pixiText3 = new PIXI.Text({ text: "", style: Word.pixiTextStyle3 });
+    this.pixiText3.anchor._x = 0;
+    this.pixiText3.anchor._y = 0.5;
 
     this.pixiGraphics = new PIXI.Graphics();
     this.pixiGraphics.roundRect(
@@ -83,6 +95,10 @@ class Word {
     return this.pixiText2;
   }
 
+  getPixiText3() {
+    return this.pixiText3;
+  }
+
   getPixiGraphics() {
     return this.pixiGraphics;
   }
@@ -111,7 +127,7 @@ class Word {
         color: Word.colWordBoxBorderHighlighted,
         width: 10,
       });
-      this.pixiGraphics.fill(Word.colWordBox);
+      this.pixiGraphics.fill(Word.colWordBoxHighlighted);
       this.pixiGraphics.position.set(this.position.x, this.position.y);
     } else {
       this.pixiGraphics.roundRect(
@@ -131,6 +147,10 @@ class Word {
     this.position = position;
     this.pixiText.position.set(this.position.x, this.position.y);
     this.pixiText2.position.set(
+      this.position.x + this.pixiText.bounds.minX,
+      this.position.y,
+    );
+    this.pixiText3.position.set(
       this.position.x + this.pixiText.bounds.minX,
       this.position.y,
     );
@@ -154,14 +174,13 @@ export default function WordCloud({
   const [inputValue, setInputValue] = useState("");
   //const [error, setError] = useState("");
   const [scores, setScores] = useState<Record<string, number>>({});
-  const [wordsBestProgress, setWordsBestProgress] = useState<
-    Record<string, number>
-  >({});
   const [gameEndEpochMs, setGameEndEpochMs] = useState(0);
   const [gameStartEpochMs, setGameStartEpochMs] = useState(0);
   const fightSession = useRef<FightSession | null>(null);
   const refAddWord = useRef<(wordStr: string) => void>();
   const refDeleteWord = useRef<(wordToDelete: string) => void>();
+  const refDisplayBestProgress =
+    useRef<(wordsBestProgress: Record<string, number>) => void>();
   const refPreviousEntry = useRef<string>("");
 
   //WordCloud initialization
@@ -283,7 +302,7 @@ export default function WordCloud({
     });
     session.onWordsBestProgressUpdatedThen((words) => {
       console.log("Words best progress updated", words);
-      setWordsBestProgress(words);
+      refDisplayBestProgress.current?.(words);
     });
 
     return () => {
@@ -413,12 +432,6 @@ export default function WordCloud({
     }
   }
 
-  function resetUserProgress() {
-    for (const word of refWords.current) {
-      word.getPixiText2().text = "";
-    }
-  }
-
   useEffect(() => {
     refDeleteWord.current = (wordToDelete: string) => {
       for (let i = refWords.current.length - 1; i >= 0; i--) {
@@ -427,9 +440,43 @@ export default function WordCloud({
         if (word.getText() === wordToDelete) {
           refWords.current[i].getPixiText().removeFromParent();
           refWords.current[i].getPixiText2().removeFromParent();
+          refWords.current[i].getPixiText3().removeFromParent();
           refWords.current[i].getPixiGraphics().removeFromParent();
           refWords.current.splice(i, 1);
           break;
+        }
+      }
+    };
+  });
+
+  function resetUserProgress() {
+    for (const word of refWords.current) {
+      word.getPixiText2().text = "";
+    }
+  }
+
+  function resetBestProgress() {
+    for (const word of refWords.current) {
+      word.getPixiText3().text = "";
+    }
+  }
+
+  useEffect(() => {
+    refDisplayBestProgress.current = (
+      wordsBestProgress: Record<string, number>,
+    ) => {
+      if (Object.keys(wordsBestProgress).length == 0) {
+        resetBestProgress();
+      } else {
+        for (const key in wordsBestProgress) {
+          for (const word of refWords.current) {
+            if (word.getText() == key) {
+              word.getPixiText3().text = key.substring(
+                0,
+                wordsBestProgress[key],
+              );
+            }
+          }
         }
       }
     };
@@ -512,6 +559,7 @@ export default function WordCloud({
     }
     refApp.current.stage.addChild(word.getPixiGraphics());
     refApp.current.stage.addChild(word.getPixiText());
+    refApp.current.stage.addChild(word.getPixiText3());
     refApp.current.stage.addChild(word.getPixiText2());
   }, []);
 
