@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./Lobby.module.css";
 import Card from "../../components/Card/Card";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { API } from "../../lib/api";
 import { usePlayerInfo } from "../../hooks/usePlayerInfo";
 import BasePage from "../../components/BasePage/BasePage";
@@ -10,26 +10,16 @@ import BasePage from "../../components/BasePage/BasePage";
 
 export default function Lobby() {
   const navigate = useNavigate();
-  //const refLink = useRef<string>();
-  const [fightIdCreate, setFightIDCreate] = useState<string>("");
 
   const userInfo = usePlayerInfo();
   useEffect(() => {
     console.log(userInfo); // This is here so that the linter doesn't complain
   }, [userInfo]);
-
-  useEffect(() => {
-    const initializeFight = async () => {
-      const request = await API.createFight([]);
-      const response = await request.json();
-      setFightIDCreate(response["fightId"]);
-    };
-
-    initializeFight();
-  }, []); // Empty dependency array means this effect runs once on mount
-
+  
   const createRoom = async () => {
-    navigate("/fight?fightId=" + fightIdCreate);
+    const request = await API.createFight([]);
+    const response = await request.json();
+    navigate("/fight?fightId=" + response["fightId"]);
   };
 
   const joinRoom = async () => {
@@ -75,10 +65,6 @@ export default function Lobby() {
           <div className={styles.horizontalDiv}>
             <h3>Max players :</h3>
             <input type="number" className={styles.input} />
-          </div>
-          <div className={styles.horizontalDiv}>
-            <h3>Room link :</h3>
-            <h3>{fightIdCreate}</h3>
           </div>
           <div className={styles.horizontalDiv}>
             <button onClick={() => createRoom()} className={styles.button}>
