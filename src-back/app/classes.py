@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import random
 import sqlite3
+from typing import List
 import bcrypt
 from datetime import datetime
 
@@ -43,6 +44,9 @@ class Word:
 
     def word_in_category(self, category):
         return category in self.category
+
+    def word_in_category_str(self, category: str):
+        return any(category == c.name for c in self.category)
 
     def print_category(self):
         for i in self.category:
@@ -481,7 +485,13 @@ connection.commit()
 connection.close()
 
 
-def get_random_word_list(categories=[], amount=300):
+class WordCategory:  # inheriting from Enum causes equality with strings to fail
+    AGRICULTURE = "Agriculture"
+    GREEN = "Green"
+    B_WORDS = "B_words"
+
+
+def get_random_word_list(categories: List[str] = [], amount=300):
     # return all if not enough words
     if amount > len(words):
         return [word.get_word() for word in words]
@@ -493,7 +503,7 @@ def get_random_word_list(categories=[], amount=300):
         words_copy = words.copy()
     else:
         for word in words:
-            if any(word.word_in_category(category) for category in categories):
+            if any(word.word_in_category_str(category) for category in categories):
                 words_copy.append(word)
 
     # shuffle

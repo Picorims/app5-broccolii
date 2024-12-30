@@ -15,6 +15,7 @@ import WordCloudMovingText from "../WordCloudMovingText/WordCloudMovingText";
 
 class Word {
   private static colWordBox = "#444";
+  private static colWordBoxHighlighted = "#362";
   private static colWordBoxBorderHighlighted = "#090";
   private static colWordBoxBorder = "#777";
   private static colText = "#cdb";
@@ -31,8 +32,15 @@ class Word {
     fill: "#5c5",
   });
 
+  private static pixiTextStyle3 = new PIXI.TextStyle({
+    fontSize: 50,
+    fontFamily: "EnterCommand",
+    fill: "#555",
+  });
+
   private pixiText: PIXI.Text;
   private pixiText2: PIXI.Text;
+  private pixiText3: PIXI.Text;
   private pixiGraphics: PIXI.Graphics;
   private isHighlighted: boolean;
   public speed: Vector;
@@ -49,6 +57,10 @@ class Word {
     this.pixiText2 = new PIXI.Text({ text: "", style: Word.pixiTextStyle2 });
     this.pixiText2.anchor._x = 0;
     this.pixiText2.anchor._y = 0.5;
+
+    this.pixiText3 = new PIXI.Text({ text: "", style: Word.pixiTextStyle3 });
+    this.pixiText3.anchor._x = 0;
+    this.pixiText3.anchor._y = 0.5;
 
     this.pixiGraphics = new PIXI.Graphics();
     this.pixiGraphics.roundRect(
@@ -83,6 +95,10 @@ class Word {
     return this.pixiText2;
   }
 
+  getPixiText3() {
+    return this.pixiText3;
+  }
+
   getPixiGraphics() {
     return this.pixiGraphics;
   }
@@ -111,7 +127,7 @@ class Word {
         color: Word.colWordBoxBorderHighlighted,
         width: 10,
       });
-      this.pixiGraphics.fill(Word.colWordBox);
+      this.pixiGraphics.fill(Word.colWordBoxHighlighted);
       this.pixiGraphics.position.set(this.position.x, this.position.y);
     } else {
       this.pixiGraphics.roundRect(
@@ -131,6 +147,10 @@ class Word {
     this.position = position;
     this.pixiText.position.set(this.position.x, this.position.y);
     this.pixiText2.position.set(
+      this.position.x + this.pixiText.bounds.minX,
+      this.position.y,
+    );
+    this.pixiText3.position.set(
       this.position.x + this.pixiText.bounds.minX,
       this.position.y,
     );
@@ -154,18 +174,22 @@ export default function WordCloud({
   const [inputValue, setInputValue] = useState("");
   //const [error, setError] = useState("");
   const [scores, setScores] = useState<Record<string, number>>({});
-  // const [wordsBestProgress, setWordsBestProgress] = useState<
-  //   Record<string, number>
-  // >({});
   const [gameEndEpochMs, setGameEndEpochMs] = useState(0);
   const [gameStartEpochMs, setGameStartEpochMs] = useState(0);
+  const [roomName, setRoomName] = useState("");
   const fightSession = useRef<FightSession | null>(null);
   const refAddWord = useRef<(wordStr: string) => void>();
   const refDeleteWord = useRef<(wordToDelete: string) => void>();
+  const refDisplayBestProgress =
+    useRef<(wordsBestProgress: Record<string, number>) => void>();
   const refPreviousEntry = useRef<string>("");
+  const [pixiReady, setPixiReady] = useState(false);
+  const [webSocketReady, setWebSocketReady] = useState(false);
 
   //WordCloud initialization
   const init = useCallback(async () => {
+    console.log("Initializing Pixi.JS...");
+
     const app = new Application();
 
     if (refContainer.current) {
@@ -230,6 +254,7 @@ export default function WordCloud({
     });
 
     updateSize();
+    setPixiReady(true);
     return app;
   }, []);
 
@@ -239,8 +264,8 @@ export default function WordCloud({
     if (userId == null || userId.length == 0) return;
     console.log("Initializing session...");
     fightSession.current = new FightSession(userId, fightId, () => {
-      console.log("WebSocket open. Getting state...");
-      fightSession.current?.requestGameState();
+      console.log("WebSocket open.");
+      setWebSocketReady(true);
     });
 
     const session = fightSession.current;
@@ -253,6 +278,7 @@ export default function WordCloud({
       // setWordsBestProgress(state.wordsBestProgress);
       setGameEndEpochMs(state.gameEndEpochMs);
       setGameStartEpochMs(state.gameStartEpochMs);
+      setRoomName(state.name);
 
       for (const wordStr of state.availableWords) {
         refAddWord.current?.(wordStr);
@@ -283,13 +309,19 @@ export default function WordCloud({
     });
     session.onWordsBestProgressUpdatedThen((words) => {
       console.log("Words best progress updated", words);
-      setWordsBestProgress(words);
+      refDisplayBestProgress.current?.(words);
     });
 
     return () => {
       fightSession.current?.close();
     };
   }, [fightId, userId]);
+
+  useEffect(() => {
+    if (pixiReady && webSocketReady) {
+      fightSession.current?.requestGameState();
+    }
+  }, [pixiReady, webSocketReady]);
 
   const [remainingTime, setRemainingTime] = useState(0);
   const [timeBeforeStart, setTimeBeforeStart] = useState(0);
@@ -413,12 +445,6 @@ export default function WordCloud({
     }
   }
 
-  function resetUserProgress() {
-    for (const word of refWords.current) {
-      word.getPixiText2().text = "";
-    }
-  }
-
   useEffect(() => {
     refDeleteWord.current = (wordToDelete: string) => {
       for (let i = refWords.current.length - 1; i >= 0; i--) {
@@ -427,9 +453,43 @@ export default function WordCloud({
         if (word.getText() === wordToDelete) {
           refWords.current[i].getPixiText().removeFromParent();
           refWords.current[i].getPixiText2().removeFromParent();
+          refWords.current[i].getPixiText3().removeFromParent();
           refWords.current[i].getPixiGraphics().removeFromParent();
           refWords.current.splice(i, 1);
           break;
+        }
+      }
+    };
+  });
+
+  function resetUserProgress() {
+    for (const word of refWords.current) {
+      word.getPixiText2().text = "";
+    }
+  }
+
+  function resetBestProgress() {
+    for (const word of refWords.current) {
+      word.getPixiText3().text = "";
+    }
+  }
+
+  useEffect(() => {
+    refDisplayBestProgress.current = (
+      wordsBestProgress: Record<string, number>,
+    ) => {
+      if (Object.keys(wordsBestProgress).length == 0) {
+        resetBestProgress();
+      } else {
+        for (const key in wordsBestProgress) {
+          for (const word of refWords.current) {
+            if (word.getText() == key) {
+              word.getPixiText3().text = key.substring(
+                0,
+                wordsBestProgress[key],
+              );
+            }
+          }
         }
       }
     };
@@ -507,18 +567,25 @@ export default function WordCloud({
 
   const pushWord = useCallback(async (word: Word) => {
     if (!refApp.current || !refApp.current.stage) {
-      console.error("App or stage not initialized. Skipping word push.");
+      console.error(
+        "App or stage not initialized. Skipping word push. Note that React's strict mode may cause this.",
+      );
       return;
     }
     refApp.current.stage.addChild(word.getPixiGraphics());
     refApp.current.stage.addChild(word.getPixiText());
+    refApp.current.stage.addChild(word.getPixiText3());
     refApp.current.stage.addChild(word.getPixiText2());
   }, []);
 
   //cleanup function that erases the canvas when the page unmounts
   useEffect(() => {
-    const app = init();
     const currentRefCanvas = refCanvas.current;
+    if (!currentRefCanvas) {
+      console.log("No canvas to use for initialization");
+      return;
+    }
+    const app = init();
 
     return () => {
       app.then((appV) => {
@@ -531,7 +598,7 @@ export default function WordCloud({
         }
       });
     };
-  }, [init]);
+  }, [init, refCanvas]);
 
   /* const updateSize = useCallback(() => { */
   function updateSize() {
@@ -568,11 +635,15 @@ export default function WordCloud({
     document.addEventListener("keydown", onkeydown);
 
     //forbids ctrl + z
-    playerInput.addEventListener("paste", onpaste);
+    if (playerInput) {
+      playerInput.addEventListener("paste", onpaste);
+    }
 
     return () => {
       document.removeEventListener("keydown", onkeydown);
-      playerInput.removeEventListener("paste", onpaste);
+      if (playerInput) {
+        playerInput.removeEventListener("paste", onpaste);
+      }
     };
   });
 
@@ -613,6 +684,14 @@ export default function WordCloud({
       {isGameEnded ? (
         <div className={styles.game_over}>
           <h1>Game Over</h1>
+          <pre>
+            Scores:
+            <br />
+            {Object.entries(scores)
+              .map(([player, score]) => `${player}: ${score}`)
+              .join("\n")}
+          </pre>
+
           <Link to="/clicker">Back to clicker !</Link>
         </div>
       ) : (
@@ -630,6 +709,8 @@ export default function WordCloud({
             }
           />
           <div className={styles.score_board}>
+            <p>fight ID: {fightId}</p>
+            <p>name: {roomName}</p>
             <pre>
               Scores:
               <br />

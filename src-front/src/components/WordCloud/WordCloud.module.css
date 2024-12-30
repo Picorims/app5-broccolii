@@ -73,3 +73,7 @@
     bottom: unset;
   }
 }
+
+pre {
+  line-height: 1;
+}

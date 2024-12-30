@@ -20,7 +20,7 @@ export interface Props {
 export default function Button({
   type,
   children,
-  variant = "secondary",
+  variant = "primary",
   onClick,
 }: Props) {
   return (
