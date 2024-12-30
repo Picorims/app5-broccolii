@@ -13,8 +13,6 @@ export interface UserInfo {
   username: string;
 }
 
-// export interface FightConfig {
-
 export interface WordFlags {
   all_words: boolean;
   words_starting_with_b: boolean;
@@ -29,6 +27,13 @@ export interface FightSessionConfig {
   lobby_duration_seconds: number;
   game_duration_seconds: number;
   word_flags: WordFlags;
+}
+
+export interface LoginResponse {
+  access_token: string;
+  access_token_expire: string;
+  refresh_token: string;
+  refresh_token_expire: string;
 }
 
 /**
@@ -70,6 +75,7 @@ export class API {
   }
 
   public static authTest() {
+    API._refreshTokensIfNecessary();
     const url = `${getEnv().backendUrl}/api/v1/user/auth_test`;
     console.log("[API] [GET] " + url);
 
@@ -95,9 +101,8 @@ export class API {
     });
 
     if (resp.ok) {
-      const json = await resp.json();
-      localStorage.setItem("access_token", json.access_token);
-      localStorage.setItem("refresh_token", json.refresh_token);
+      const json: LoginResponse = await resp.json();
+      API.saveToken(json);
       return true;
     } else {
       return false;
@@ -105,6 +110,7 @@ export class API {
   }
 
   public static logout() {
+    API._refreshTokensIfNecessary();
     const url = `${getEnv().backendUrl}/api/v1/user/logout`;
     console.log("[API] [GET] " + url);
 
@@ -128,6 +134,8 @@ export class API {
     ) {
       return Promise.resolve(null);
     }
+    API._refreshTokensIfNecessary();
+
     const url = `${getEnv().backendUrl}/api/v1/user/me`;
     console.log("[API] [GET] " + url);
 
@@ -140,7 +148,10 @@ export class API {
     });
   }
 
+
   public static async createFight(config: FightSessionConfig) {
+    API._refreshTokensIfNecessary();
+
     const url = `${getEnv().backendUrl}/api/v1/fight/create`;
 
     return fetch(url, {
@@ -154,6 +165,8 @@ export class API {
   }
 
   public static patchClick(username: string) {
+    API._refreshTokensIfNecessary();
+
     const url = `${getEnv().backendUrl}/api/v1/user/click`;
     console.log("[API] [PATCH] " + url);
 
@@ -170,6 +183,7 @@ export class API {
   }
 
   public static async addCard(username: string, cardId: string) {
+    API._refreshTokensIfNecessary();
     const url = `${getEnv().backendUrl}/api/v1/card/add`;
 
     return fetch(url, {
@@ -185,6 +199,7 @@ export class API {
   }
 
   public static async equipCard(username: string, cardId: string) {
+    API._refreshTokensIfNecessary();
     const url = `${getEnv().backendUrl}/api/v1/card/equip`;
 
     return fetch(url, {
@@ -200,6 +215,7 @@ export class API {
   }
 
   public static async unequipCard(username: string, cardId: string) {
+    API._refreshTokensIfNecessary();
     const url = `${getEnv().backendUrl}/api/v1/card/unequip`;
 
     return fetch(url, {
@@ -212,5 +228,39 @@ export class API {
         cardId: cardId,
       }),
     });
+  }
+
+  public static saveToken(json: LoginResponse) {
+    localStorage.setItem("access_token", json.access_token);
+    localStorage.setItem("refresh_token", json.refresh_token);
+    localStorage.setItem("access_token_expire", json.access_token_expire);
+    localStorage.setItem("refresh_token_expire", json.refresh_token_expire);
+  }
+
+  private static async _refreshTokensIfNecessary() {
+    const access_token_expire = localStorage.getItem("access_token_expire");
+    const refresh_token_expire = localStorage.getItem("refresh_token_expire");
+
+    if (access_token_expire === null || refresh_token_expire === null) {
+      return;
+    }
+
+    const access_token_expire_date = new Date(parseFloat(access_token_expire));
+    const refresh_token_expire_date = new Date(
+      parseFloat(refresh_token_expire),
+    );
+
+    const now = new Date();
+
+    if (now > access_token_expire_date) {
+      if (now > refresh_token_expire_date) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        console.log("Tokens expired");
+        return;
+      }
+
+      await API.refreshToken();
+    }
   }
 }
