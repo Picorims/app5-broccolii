@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
 import random
 import sqlite3
 from typing import List
@@ -45,6 +44,7 @@ class Word:
 
     def word_in_category(self, category):
         return category in self.category
+
     def word_in_category_str(self, category: str):
         return any(category == c.name for c in self.category)
 
@@ -436,12 +436,14 @@ if VERBOSE:
 connection.commit()
 connection.close()
 
-class WordCategory(): # inheriting from Enum causes equality with strings to fail
+
+class WordCategory:  # inheriting from Enum causes equality with strings to fail
     AGRICULTURE = "Agriculture"
     GREEN = "Green"
     B_WORDS = "B_words"
 
-def get_random_word_list(categories: List[str]=[], amount=300):
+
+def get_random_word_list(categories: List[str] = [], amount=300):
     # return all if not enough words
     if amount > len(words):
         return [word.get_word() for word in words]

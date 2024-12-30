@@ -25,11 +25,13 @@ router = APIRouter()
 
 sessions = {}
 
+
 class WordFlags(BaseModel):
     all_words: bool
     words_starting_with_b: bool
     green_things: bool
     agriculture: bool
+
 
 class FightSessionConfig(BaseModel):
     name: str
@@ -334,8 +336,6 @@ class FightSession:
         return self._scores[player]
 
 
-
-
 # See the docs directory for events documentation
 
 
@@ -369,7 +369,6 @@ async def websocket_endpoint(fightId, websocket: WebSocket):
             sessions[fightId].remove_player_session(user)
         except Exception as e:
             print(f"Could not remove {user} from session {fightId}: {e}")
-
 
 
 class CreateSessionResponse(BaseModel):
