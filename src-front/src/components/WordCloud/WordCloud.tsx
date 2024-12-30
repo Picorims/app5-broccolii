@@ -154,14 +154,15 @@ export default function WordCloud({
   const [inputValue, setInputValue] = useState("");
   //const [error, setError] = useState("");
   const [scores, setScores] = useState<Record<string, number>>({});
-  const [wordsBestProgress, setWordsBestProgress] = useState<
-    Record<string, number>
-  >({});
+  // const [wordsBestProgress, setWordsBestProgress] = useState<
+  //   Record<string, number>
+  // >({});
   const [gameEndEpochMs, setGameEndEpochMs] = useState(0);
   const [gameStartEpochMs, setGameStartEpochMs] = useState(0);
   const fightSession = useRef<FightSession | null>(null);
   const refAddWord = useRef<(wordStr: string) => void>();
   const refDeleteWord = useRef<(wordToDelete: string) => void>();
+  const refPreviousEntry = useRef<string>("");
 
   //WordCloud initialization
   const init = useCallback(async () => {
@@ -235,6 +236,7 @@ export default function WordCloud({
   //session initialization
   useEffect(() => {
     //setError("");
+    if (userId == null || userId.length == 0) return;
     console.log("Initializing session...");
     fightSession.current = new FightSession(userId, fightId, () => {
       console.log("WebSocket open. Getting state...");
@@ -248,7 +250,7 @@ export default function WordCloud({
     });
     session.onSendGameStateThen((state) => {
       setScores(state.scores);
-      setWordsBestProgress(state.wordsBestProgress);
+      // setWordsBestProgress(state.wordsBestProgress);
       setGameEndEpochMs(state.gameEndEpochMs);
       setGameStartEpochMs(state.gameStartEpochMs);
 
@@ -279,6 +281,10 @@ export default function WordCloud({
     session.onPrizeReceivedThen((prize) => {
       console.log("Prize received", prize);
     });
+    session.onWordsBestProgressUpdatedThen((words) => {
+      console.log("Words best progress updated", words);
+      setWordsBestProgress(words);
+    });
 
     return () => {
       fightSession.current?.close();
@@ -308,11 +314,6 @@ export default function WordCloud({
           //End of the game
           setIsGameEnded(true);
 
-          //deleting the PIXI App
-          if (refApp.current) {
-            refApp.current.destroy(true, { children: true, texture: true });
-            refApp.current = undefined;
-          }
           //deleting the canvas
           if (refCanvas.current) {
             while (refCanvas.current.firstChild) {
@@ -347,13 +348,43 @@ export default function WordCloud({
    * @param event
    */
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    console.log(wordsBestProgress);
+    //submitting user's input to the server
     const newVal = event.target.value;
+    const preVal = refPreviousEntry.current;
     setInputValue(newVal);
-    const nv = event.nativeEvent as InputEvent;
-    if (nv.data != null) {
-      fightSession.current?.submitLetter(nv.data);
+
+    //----if the player wrote
+    if (newVal.length > preVal.length) {
+      const nv = event.nativeEvent as InputEvent;
+      const newLetters = nv.data;
+
+      if (newLetters != null) {
+        for (const letter of newLetters) {
+          fightSession.current?.submitLetter(letter);
+        }
+      }
     }
+
+    //----if the player erased
+    if (newVal.length < preVal.length) {
+      //if the word is entirely different
+      if (preVal.substring(0, newVal.length) != newVal) {
+        for (let i = 0; i < preVal.length; i++) {
+          //erase the whole previous word
+          fightSession.current?.submitEraseLetter();
+        }
+        for (const letter of newVal) {
+          //write the whole new word
+          fightSession.current?.submitLetter(letter);
+        }
+      } else {
+        //erase all letters that were deleted
+        for (let i = preVal.length; i > newVal.length; i--) {
+          fightSession.current?.submitEraseLetter();
+        }
+      }
+    }
+    refPreviousEntry.current = newVal;
 
     //higlighting the user's progress (words that correspond to what the user typed)
     for (const word of refWords.current) {
@@ -374,6 +405,9 @@ export default function WordCloud({
         if (word.getHighlighted()) {
           word.setHighlighted(false);
         }
+      }
+      if (word.getHighlighted() && newVal != txt) {
+        word.setHighlighted(false);
       }
       word.getPixiText2().text = res;
     }
@@ -516,6 +550,32 @@ export default function WordCloud({
     return () => window.removeEventListener("resize", updateSize);
   }, [refContainerSize]);
 
+  useEffect(() => {
+    const playerInput = document.getElementById(
+      "playerInput",
+    ) as HTMLInputElement;
+
+    const onkeydown = function (e: KeyboardEvent) {
+      if (e.ctrlKey && e.key === "z") {
+        e.preventDefault();
+      }
+    };
+    const onpaste = function (e: ClipboardEvent) {
+      e.preventDefault();
+    };
+
+    //forbids pasting text
+    document.addEventListener("keydown", onkeydown);
+
+    //forbids ctrl + z
+    playerInput.addEventListener("paste", onpaste);
+
+    return () => {
+      document.removeEventListener("keydown", onkeydown);
+      playerInput.removeEventListener("paste", onpaste);
+    };
+  });
+
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       if (event.code === "Enter") {
@@ -533,7 +593,7 @@ export default function WordCloud({
         // FIXME this sends only 1 event even if the player deleted multiple letters at once,
         // fix this by checking how many letters have been deleted
         // (maybe in an other way entirely ikd)
-        fightSession.current?.submitEraseLetter();
+        // fightSession.current?.submitEraseLetter();
       }
     },
     [inputValue],

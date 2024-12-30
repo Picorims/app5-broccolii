@@ -258,14 +258,19 @@ class FightSession:
 
     async def _update_words_best_progress(self):
         self._word_best_progress = {}
-        for player_progress in self._players_typing_history:
+
+        for player in self._players_typing_history:
+            player_progress = self._players_typing_history[player]
             if len(player_progress) > 0:
-                for word in self._words_to_find:
+                player_progress_str = "".join(player_progress)
+                for i in range(len(self._words_to_find)):
+                    word = self._words_to_find[i]
                     if len(word) >= len(player_progress):
-                        if word.startswith(player_progress):
+                        if word.startswith(player_progress_str):
                             current_best = self._word_best_progress.get(word, 0)
                             new_best = max(current_best, len(player_progress))
                             self._word_best_progress[word] = new_best
+
         await self._broadcast(
             build_json_event("sendWordsBestProgress", {"words": self._word_best_progress})
         )
@@ -305,7 +310,12 @@ class FightSession:
 sessions["test"] = FightSession("test", ["alice", "bob"])
 
 
-@router.websocket("/fight/{fightId}/ws")
+# See the docs directory for events documentation
+
+
+@router.websocket(
+    "/fight/{fightId}/ws",
+)
 async def websocket_endpoint(fightId, websocket: WebSocket):
     print(f"new connection to {fightId}")
     await websocket.accept()
@@ -339,10 +349,23 @@ class CreateFightSessionBody(BaseModel):
     players_list: list[str]
 
 
+class CreateSessionResponse(BaseModel):
+    fightId: str
+
+
 @router.post(
     "/fight/create",
     status_code=status.HTTP_201_CREATED,
     description="Creates a session.",
+    tags=["fight"],
+    responses={
+        201: {
+            "description": "Session created successfully",
+        },
+        400: {"description": "Missing players_list"},
+    },
+    response_description="The fightId of the created session in `fightId`.",
+    response_model=CreateSessionResponse,
 )
 async def create_session(body: CreateFightSessionBody):
     # check that all API values are present

@@ -1,7 +1,4 @@
-html,
-body,
-#app,
-#app > div {
+:global(body.lobby) {
   height: 100%;
   width: 100%;
 }
@@ -35,10 +32,10 @@ body,
 }
 
 .searchBar {
-  background-color: white;
-  height: 3em;
+  height: 1em;
   width: 90%;
   border-radius: 3em;
+  font-size: 2em;
 }
 
 .horizontalDiv {
@@ -48,6 +45,7 @@ body,
 }
 
 .button {
-  height: 2em;
+  height: 1.5em;
   width: 8em;
+  font-size: 1.5em;
 }

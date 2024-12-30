@@ -1,4 +1,4 @@
-from .classes import Account
+from .classes import Account, UserInfo
 import random
 from fastapi import APIRouter, status
 from .auth import jwt_utils
@@ -12,6 +12,13 @@ router = APIRouter()
     "/click",
     status_code=status.HTTP_200_OK,
     description="Get the current user's information.",
+    tags=["user", "clicker"],
+    responses={
+        200: {
+            "description": "Click handled successfully",
+        },
+    },
+    response_model=UserInfo,
 )
 async def me(credentials: jwt_utils.Credentials):
     token_data = jwt_utils.verify_token(credentials)
