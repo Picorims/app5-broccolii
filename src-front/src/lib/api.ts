@@ -13,6 +13,22 @@ export interface UserInfo {
   username: string;
 }
 
+export interface WordFlags {
+  all_words: boolean;
+  words_starting_with_b: boolean;
+  green_things: boolean;
+  agriculture: boolean;
+}
+
+export interface FightSessionConfig {
+  name: string;
+  players_list: string[];
+  word_count: number;
+  lobby_duration_seconds: number;
+  game_duration_seconds: number;
+  word_flags: WordFlags;
+}
+
 export interface LoginResponse {
   access_token: string;
   access_token_expire: string;
@@ -132,18 +148,18 @@ export class API {
     });
   }
 
-  public static async createFight(players_list: string[]) {
+  public static async createFight(config: FightSessionConfig) {
     API._refreshTokensIfNecessary();
+
     const url = `${getEnv().backendUrl}/api/v1/fight/create`;
 
     return fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
-      body: JSON.stringify({
-        players_list: players_list,
-      }),
+      body: JSON.stringify(config),
     });
   }
 

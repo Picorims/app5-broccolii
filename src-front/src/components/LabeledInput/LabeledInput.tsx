@@ -11,7 +11,7 @@ import { FormEvent, useEffect, useRef } from "react";
 import styles from "./LabeledInput.module.css";
 
 export interface Props {
-  type: "text" | "password";
+  type: "text" | "password" | "checkbox" | "number";
   label: string;
   name?: string;
   error?: string;
@@ -19,6 +19,11 @@ export interface Props {
   pattern?: RegExp;
   className?: string;
   onChange?: (e: FormEvent<HTMLInputElement>) => void;
+  onInput?: (e: FormEvent<HTMLInputElement>) => void;
+  value?: string | number;
+  checked?: boolean;
+  id?: string;
+  min?: string;
 }
 
 export default function LabeledInput({
@@ -30,9 +35,15 @@ export default function LabeledInput({
   pattern,
   className,
   onChange,
+  onInput,
+  value,
+  checked,
+  id,
+  min,
 }: Props) {
-  const onInput = (e: FormEvent<HTMLInputElement>) => {
+  const onInputLocal = (e: FormEvent<HTMLInputElement>) => {
     (e.target as HTMLInputElement).setCustomValidity("");
+    onInput?.(e);
   };
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -47,16 +58,22 @@ export default function LabeledInput({
   return (
     <div className={`${styles.container} ${className || ""}`}>
       <label className={styles.label}>
-        <span>{label}</span>
+        <span>
+          <strong>{label}</strong>
+        </span>
         <input
           type={type}
           className={styles.input}
           name={name}
           onChange={onChange}
-          onInput={onInput}
+          onInput={onInputLocal}
           ref={inputRef}
           required={required}
           pattern={pattern?.source}
+          value={value}
+          checked={checked}
+          id={id}
+          min={min}
         />
       </label>
       {error !== "" && <span className={styles.error}>{error}</span>}
