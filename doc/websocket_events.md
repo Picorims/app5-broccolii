@@ -82,6 +82,7 @@
     - params:
     ```json
     {
+        "name": "room name",
         "scores": {
             "player": 0, // for each player logged in to the session
         },

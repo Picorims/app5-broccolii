@@ -11,30 +11,56 @@ import asyncio
 import json
 from threading import Timer
 import time
+from typing import List
 import uuid
+from fastapi.security import HTTPBearer
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
-from fastapi import APIRouter, WebSocket, status, WebSocketDisconnect, HTTPException
-from ..classes import get_random_word_list
+from fastapi import APIRouter, Depends, WebSocket, status, WebSocketDisconnect, HTTPException
+from ..classes import WordCategory, get_random_word_list
+import app.auth.jwt_utils as jwt_utils
 
 
 router = APIRouter()
 
 sessions = {}
 
+class WordFlags(BaseModel):
+    all_words: bool
+    words_starting_with_b: bool
+    green_things: bool
+    agriculture: bool
+
+class FightSessionConfig(BaseModel):
+    name: str
+    players_list: list[str]
+    word_count: int
+    lobby_duration_seconds: int
+    game_duration_seconds: int
+    word_flags: WordFlags
+
 
 class FightSession:
-    def __init__(self, fight_id, player_list):
+    def __init__(self, fight_id: str, config: FightSessionConfig):
         self._fight_id = fight_id
-        self._players = [player for player in player_list]
+        self._name = config.name
+        self._players = [player for player in config.players_list]
         self._players_sessions: dict[str, WebSocket] = {}
-        self._players_typing_history = {player: [] for player in player_list}
-        self._scores = {player: 0 for player in player_list}
-        self._words_to_find = get_random_word_list(amount=100)
+        self._players_typing_history = {player: [] for player in config.players_list}
+        self._scores = {player: 0 for player in config.players_list}
+        categories: List[str] = []
+        if not config.word_flags.all_words:
+            if config.word_flags.green_things:
+                categories.append(WordCategory.GREEN)
+            if config.word_flags.words_starting_with_b:
+                categories.append(WordCategory.B_WORDS)
+            if config.word_flags.agriculture:
+                categories.append(WordCategory.AGRICULTURE)
+        self._words_to_find = get_random_word_list(amount=config.word_count, categories=categories)
         self._words_found = []
         self._word_best_progress = {}
-        self._game_start_wait_ms = 30_000
-        self._game_duration_ms = 60_000
+        self._game_start_wait_ms = config.lobby_duration_seconds * 1_000
+        self._game_duration_ms = config.game_duration_seconds * 1_000
         self._game_start_epoch_ms = int(time.time() * 1000) + self._game_start_wait_ms
         self._game_end_epoch_ms = self._game_start_epoch_ms + self._game_duration_ms
 
@@ -183,6 +209,7 @@ class FightSession:
 
     async def _handle_request_game_state(self, websocket: WebSocket):
         state = {}
+        state["name"] = self._name
         state["scores"] = {player: score for player, score in self._scores.items()}
         state["availableWords"] = [word for word in self._words_to_find]
         state["wordsBestProgress"] = {
@@ -307,7 +334,6 @@ class FightSession:
         return self._scores[player]
 
 
-sessions["test"] = FightSession("test", ["alice", "bob"])
 
 
 # See the docs directory for events documentation
@@ -345,9 +371,6 @@ async def websocket_endpoint(fightId, websocket: WebSocket):
             print(f"Could not remove {user} from session {fightId}: {e}")
 
 
-class CreateFightSessionBody(BaseModel):
-    players_list: list[str]
-
 
 class CreateSessionResponse(BaseModel):
     fightId: str
@@ -356,6 +379,7 @@ class CreateSessionResponse(BaseModel):
 @router.post(
     "/fight/create",
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(HTTPBearer())],
     description="Creates a session.",
     tags=["fight"],
     responses={
@@ -367,19 +391,50 @@ class CreateSessionResponse(BaseModel):
     response_description="The fightId of the created session in `fightId`.",
     response_model=CreateSessionResponse,
 )
-async def create_session(body: CreateFightSessionBody):
+async def create_session(body: FightSessionConfig, credentials: jwt_utils.Credentials):
+    jwt_utils.verify_token(credentials)
+
     # check that all API values are present
-    print("CALL ROUTE", body)
     if body.players_list is None:
         print("Missing players_list")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing players_list")
+    if body.word_count is None:
+        print("Missing word_count")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing word_count")
+    if body.lobby_duration_seconds is None:
+        print("Missing lobby_duration_seconds")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing lobby_duration_seconds"
+        )
+    if body.game_duration_seconds is None:
+        print("Missing game_duration_seconds")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing game_duration_seconds"
+        )
+    if body.word_flags is None:
+        print("Missing word_flags")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing word_flags")
+    if body.word_flags.all_words is None:
+        print("Missing all_words")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing all_words")
+    if body.word_flags.words_starting_with_b is None:
+        print("Missing words_starting_with_b")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing words_starting_with_b"
+        )
+    if body.word_flags.green_things is None:
+        print("Missing green_things")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing green_things")
+    if body.word_flags.agriculture is None:
+        print("Missing vegetables")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing vegetables")
 
-    print("CREATION DE LA NOUVELLE SESSION")
     newFightId = str(uuid.uuid4())[:8]
     while newFightId in sessions:
         newFightId = str(uuid.uuid4())[:8]
 
-    sessions[newFightId] = FightSession(newFightId, [])
+    print("Creating fight session", newFightId)
+    sessions[newFightId] = FightSession(newFightId, body)
 
     return JSONResponse(
         content={"status": "success", "message": "Game created", "fightId": newFightId},
