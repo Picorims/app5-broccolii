@@ -283,7 +283,7 @@ export default function WordCloud({
     });
     session.onWordsBestProgressUpdatedThen((words) => {
       console.log("Words best progress updated", words);
-      setWordsBestProgress(words);
+      // setWordsBestProgress(words);
     });
 
     return () => {
