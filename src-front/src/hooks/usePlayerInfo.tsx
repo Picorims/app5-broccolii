@@ -28,12 +28,12 @@ export function usePlayerInfo() {
       const refresh_token_expire = localStorage.getItem("refresh_token_expire");
       if (refresh_token_expire === null) {
         navigate("/login");
-        return
+        return;
       }
 
       const expire_date = new Date(parseFloat(refresh_token_expire));
       const now = new Date();
-      
+
       if (now > expire_date) {
         navigate("/login");
         return;
