@@ -40,7 +40,7 @@ const ClickerPage = () => {
   const navigate = useNavigate();
 
   // Function to switch to a random image (not the current one) when the button is clicked.
-  const handleBroccoliiClick = () => {
+  const handleBroccoliiClick = async () => {
     let randomIndex;
     do {
       randomIndex = Math.floor(Math.random() * items.length);
@@ -48,7 +48,11 @@ const ClickerPage = () => {
 
     setCurrentItem(items[randomIndex]);
 
-    API.patchClick(username.current);
+    
+    const resp = await API.patchClick(username.current);
+    const respJson = await resp.json();
+    console.log('respJson: ', respJson);
+    setStatClickrate(respJson.broccolis);
   };
 
   const handleBoosterClick = () => {
