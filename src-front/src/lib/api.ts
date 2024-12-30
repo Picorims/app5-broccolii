@@ -148,7 +148,6 @@ export class API {
     });
   }
 
-
   public static async createFight(config: FightSessionConfig) {
     API._refreshTokensIfNecessary();
 
