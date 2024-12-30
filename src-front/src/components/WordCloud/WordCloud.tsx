@@ -567,7 +567,6 @@ export default function WordCloud({
     if (playerInput) {
       playerInput.addEventListener("paste", onpaste);
     }
-    
 
     return () => {
       document.removeEventListener("keydown", onkeydown);
