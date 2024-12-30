@@ -37,7 +37,7 @@ export default function LabeledInput({
   onInput,
   value,
   checked,
-  id
+  id,
 }: Props) {
   const onInputLocal = (e: FormEvent<HTMLInputElement>) => {
     (e.target as HTMLInputElement).setCustomValidity("");
@@ -56,7 +56,9 @@ export default function LabeledInput({
   return (
     <div className={`${styles.container} ${className || ""}`}>
       <label className={styles.label}>
-        <span><strong>{label}</strong></span>
+        <span>
+          <strong>{label}</strong>
+        </span>
         <input
           type={type}
           className={styles.input}

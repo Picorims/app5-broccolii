@@ -25,20 +25,33 @@ export default function Lobby() {
   useEffect(() => {
     console.log(userInfo); // This is here so that the linter doesn't complain
   }, [userInfo]);
-  
+
   useEffect(() => {
-  if (flagAgriculture && flagGreenThings && flagWordsStartingWithB && flagAllWords) {
+    if (
+      flagAgriculture &&
+      flagGreenThings &&
+      flagWordsStartingWithB &&
+      flagAllWords
+    ) {
       setFlagAllWords(() => true);
       setFlagAgriculture(() => false);
       setFlagGreenThings(() => false);
       setFlagWordsStartingWithB(() => false);
-  } else if (flagAllWords && (flagAgriculture || flagGreenThings || flagWordsStartingWithB)) {
-    setFlagAllWords(() => false);
-  }
+    } else if (
+      flagAllWords &&
+      (flagAgriculture || flagGreenThings || flagWordsStartingWithB)
+    ) {
+      setFlagAllWords(() => false);
+    }
   }, [flagAllWords, flagAgriculture, flagGreenThings, flagWordsStartingWithB]);
 
   const createRoom = async () => {
-    if (!flagAllWords && !flagWordsStartingWithB && !flagGreenThings && !flagAgriculture) {
+    if (
+      !flagAllWords &&
+      !flagWordsStartingWithB &&
+      !flagGreenThings &&
+      !flagAgriculture
+    ) {
       alert("Please select at least one word category.");
       return;
     }
@@ -78,12 +91,10 @@ export default function Lobby() {
       <div className={styles.mainContainer}>
         <Card>
           <h2>ENTER A ROOM</h2>
-          <LabeledInput
-            label="Room ID"
-            type="text"
-            id="joinFightId"
-          />
-          <Button type="button" variant="secondary" onClick={() => joinRoom()}>JOIN!</Button>
+          <LabeledInput label="Room ID" type="text" id="joinFightId" />
+          <Button type="button" variant="secondary" onClick={() => joinRoom()}>
+            JOIN!
+          </Button>
         </Card>
         <Card>
           <h2>CREATE A ROOM</h2>
@@ -105,20 +116,22 @@ export default function Lobby() {
               label="Words starting with B"
               type="checkbox"
               checked={flagWordsStartingWithB}
-              onChange={(e) => setFlagWordsStartingWithB(e.currentTarget.checked)}
+              onChange={(e) =>
+                setFlagWordsStartingWithB(e.currentTarget.checked)
+              }
             />
             <LabeledInput
               label="Green things"
               type="checkbox"
               checked={flagGreenThings}
               onChange={(e) => setFlagGreenThings(e.currentTarget.checked)}
-              />
+            />
             <LabeledInput
               label="Agriculture"
               type="checkbox"
               checked={flagAgriculture}
               onChange={(e) => setFlagAgriculture(e.currentTarget.checked)}
-              />
+            />
           </fieldset>
           <LabeledInput
             label="Lobby duration"
@@ -138,7 +151,9 @@ export default function Lobby() {
             value={wordCount}
             onInput={(e) => setWordCount(parseInt(e.currentTarget.value))}
           />
-          <Button type="button" variant="primary" onClick={() => createRoom()}>CREATE ROOM</Button>
+          <Button type="button" variant="primary" onClick={() => createRoom()}>
+            CREATE ROOM
+          </Button>
         </Card>
       </div>
     </BasePage>

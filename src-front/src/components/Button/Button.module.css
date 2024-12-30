@@ -9,10 +9,10 @@
 
 .button {
   transition: 0.1s transform;
-  
+
   margin: var(--spacing-s) 0;
   padding: var(--spacing-xs) var(--spacing-s);
-  
+
   box-shadow: 0 2px 1px -2px var(--shadow-800);
   border: none;
   border-radius: var(--border-radius-s);
