@@ -159,6 +159,7 @@ export default function WordCloud({
   // >({});
   const [gameEndEpochMs, setGameEndEpochMs] = useState(0);
   const [gameStartEpochMs, setGameStartEpochMs] = useState(0);
+  const [roomName, setRoomName] = useState("");
   const fightSession = useRef<FightSession | null>(null);
   const refAddWord = useRef<(wordStr: string) => void>();
   const refDeleteWord = useRef<(wordToDelete: string) => void>();
@@ -253,6 +254,7 @@ export default function WordCloud({
       // setWordsBestProgress(state.wordsBestProgress);
       setGameEndEpochMs(state.gameEndEpochMs);
       setGameStartEpochMs(state.gameStartEpochMs);
+      setRoomName(state.name);
 
       for (const wordStr of state.availableWords) {
         refAddWord.current?.(wordStr);
@@ -631,6 +633,7 @@ export default function WordCloud({
           />
           <div className={styles.score_board}>
             <p>fight ID: {fightId}</p>
+            <p>name: {roomName}</p>
             <pre>
               Scores:
               <br />

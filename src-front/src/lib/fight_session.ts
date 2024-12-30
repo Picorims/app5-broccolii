@@ -55,6 +55,7 @@ interface ErrorResponse {
 }
 
 interface GameStateResponse {
+  name: string;
   scores: Record<string, number>;
   availableWords: string[];
   wordsBestProgress: Record<string, number>;
