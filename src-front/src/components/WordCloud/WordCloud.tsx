@@ -630,6 +630,7 @@ export default function WordCloud({
             }
           />
           <div className={styles.score_board}>
+            <p>fight ID: {fightId}</p>
             <pre>
               Scores:
               <br />
