@@ -38,6 +38,11 @@ export default function Lobby() {
         agriculture: flagAgriculture,
       },
     });
+    if (!request.ok || request.status >= 400) {
+      console.error("Error creating room");
+      alert("Error creating room, your session may have expired.");
+      return;
+    }
     const response = await request.json();
     navigate("/fight?fightId=" + response["fightId"]);
   };
