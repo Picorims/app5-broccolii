@@ -211,7 +211,7 @@ class Account:
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
         req = """
-            SELECT idCard 
+            SELECT idCard
             FROM AccountCard
             INNER JOIN Account ON AccountCard.idAccount = Account.id
             WHERE Account.username = ?
@@ -299,7 +299,9 @@ class Account:
 
     @staticmethod
     def route_click_placeholder(username):
-        cards = [elem[0] for elem in Account.get_cards(username)] # turning a list of tuples into a list of integers
+        cards = [
+            elem[0] for elem in Account.get_cards(username)
+        ]  # turning a list of tuples into a list of integers
         print(cards)
 
         broccoli_amount = 1
@@ -338,7 +340,12 @@ class Account:
                 case 12:
                     broccoli_amount += 5
 
-        return {"status": "unknown", "message": "TODO", "broccolis": broccoli_amount, 'cards': cards}
+        return {
+            "status": "unknown",
+            "message": "TODO",
+            "broccolis": broccoli_amount,
+            "cards": cards,
+        }
 
 
 class Token:

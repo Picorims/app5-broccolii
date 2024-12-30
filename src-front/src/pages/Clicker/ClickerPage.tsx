@@ -48,10 +48,9 @@ const ClickerPage = () => {
 
     setCurrentItem(items[randomIndex]);
 
-    
     const resp = await API.patchClick(username.current);
     const respJson = await resp.json();
-    console.log('respJson: ', respJson);
+    console.log("respJson: ", respJson);
     setStatClickrate(respJson.broccolis);
   };
 
