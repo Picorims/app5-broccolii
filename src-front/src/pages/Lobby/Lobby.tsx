@@ -24,7 +24,22 @@ export default function Lobby() {
     console.log(userInfo); // This is here so that the linter doesn't complain
   }, [userInfo]);
   
+  useEffect(() => {
+  if (flagAgriculture && flagGreenThings && flagWordsStartingWithB && flagAllWords) {
+      setFlagAllWords(() => true);
+      setFlagAgriculture(() => false);
+      setFlagGreenThings(() => false);
+      setFlagWordsStartingWithB(() => false);
+  } else if (flagAllWords && (flagAgriculture || flagGreenThings || flagWordsStartingWithB)) {
+    setFlagAllWords(() => false);
+  }
+  }, [flagAllWords, flagAgriculture, flagGreenThings, flagWordsStartingWithB]);
+
   const createRoom = async () => {
+    if (!flagAllWords && !flagWordsStartingWithB && !flagGreenThings && !flagAgriculture) {
+      alert("Please select at least one word category.");
+      return;
+    }
     const request = await API.createFight({
       name: roomName,
       players_list: [],
