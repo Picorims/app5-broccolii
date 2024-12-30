@@ -73,27 +73,27 @@ export default function Lobby() {
           <h1>CREATE A ROOM</h1>
           <div className={styles.horizontalDiv}>
             <h3>Room name :</h3>
-            <input type="text" onInput={(e) => setRoomName(e.currentTarget.value)} />
+            <input type="text" value={roomName} onInput={(e) => setRoomName(e.currentTarget.value)} />
           </div>
-          <input type="checkbox" onChange={(e) => setFlagAllWords(e.currentTarget.checked)} />
+          <input type="checkbox" checked={flagAllWords} onChange={(e) => setFlagAllWords(e.currentTarget.checked)} />
           ALL WORDS
-          <input type="checkbox" onChange={(e) => setFlagWordsStartingWithB(e.currentTarget.checked)} />
+          <input type="checkbox" checked={flagWordsStartingWithB} onChange={(e) => setFlagWordsStartingWithB(e.currentTarget.checked)} />
           WORD START WITH B
-          <input type="checkbox" onChange={(e) => setFlagGreenThings(e.currentTarget.checked)}/>
+          <input type="checkbox" checked={flagGreenThings} onChange={(e) => setFlagGreenThings(e.currentTarget.checked)}/>
           GREEN THINGS
-          <input type="checkbox" onChange={(e) => setFlagAgriculture(e.currentTarget.checked)}/>
+          <input type="checkbox" checked={flagAgriculture} onChange={(e) => setFlagAgriculture(e.currentTarget.checked)}/>
           AGRICULTURE
           <div className={styles.horizontalDiv}>
             <h3>Lobby duration:</h3>
-            <input type="number" onInput={(e) => setLobbyDuration(parseInt(e.currentTarget.value))} />
+            <input type="number" value={lobbyDuration} onInput={(e) => setLobbyDuration(parseInt(e.currentTarget.value))} />
           </div>
           <div className={styles.horizontalDiv}>
             <h3>Game duration:</h3>
-            <input type="number" onInput={(e) => setGameDuration(parseInt(e.currentTarget.value))} />
+            <input type="number" value={gameDuration} onInput={(e) => setGameDuration(parseInt(e.currentTarget.value))} />
           </div>
           <div className={styles.horizontalDiv}>
             <h3>Word count:</h3>
-            <input type="number" onInput={(e) => setWordCount(parseInt(e.currentTarget.value))} />
+            <input type="number" value={wordCount} onInput={(e) => setWordCount(parseInt(e.currentTarget.value))} />
           </div>
           <div className={styles.horizontalDiv}>
             <button onClick={() => createRoom()} className={styles.button}>
