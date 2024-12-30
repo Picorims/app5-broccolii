@@ -9,7 +9,7 @@
 
 from datetime import timedelta, timezone, datetime
 import os
-from typing import Annotated, TypeAlias
+from typing import Annotated, Tuple, TypeAlias
 from uuid import uuid4
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -44,7 +44,9 @@ class Token(BaseModel):
     """
 
     access_token: str
+    access_token_expire: float
     refresh_token: str
+    refresh_token_expire: float
     token_type: str
 
 
@@ -54,17 +56,17 @@ class TokenData(BaseModel):
     exp: datetime
 
 
-def _create_token(jti: str, expires_delta: timedelta, username: str):
+def _create_token(jti: str, expires_delta: timedelta, username: str) -> Tuple[str, datetime]:
     to_encode = dict()
     to_encode.update({"sub": username})
     to_encode.update({"jti": jti})
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return encoded_jwt
+    return (encoded_jwt, expire)
 
 
-def _create_access_token(jti: str, username: str) -> str:
+def _create_access_token(jti: str, username: str) -> Tuple[str, datetime]:
     """Create a token for accessing the API.
 
     Args:
@@ -76,7 +78,7 @@ def _create_access_token(jti: str, username: str) -> str:
     return _create_token(jti, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES), username)
 
 
-def _create_refresh_token(jti: str, username: str) -> str:
+def _create_refresh_token(jti: str, username: str) -> Tuple[str, datetime]:
     """Create a token for refreshing the access token.
 
     Args:
@@ -104,9 +106,19 @@ def create_token_pair(username: str) -> Token:
     # sharing the UUID allow to expire a refresh token
     # from an access token.
     uuid = str(uuid4())
-    access_token = _create_access_token(uuid, username)
-    refresh_token = _create_refresh_token(uuid, username)
-    return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
+    access_token, access_token_expire = _create_access_token(uuid, username)
+    refresh_token, refresh_token_expire = _create_refresh_token(uuid, username)
+
+    # convert expire to epoch in ms
+    access_token_expire = access_token_expire.timestamp() * 1000
+    refresh_token_expire = refresh_token_expire.timestamp() * 1000
+    return Token(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        access_token_expire=access_token_expire,
+        refresh_token_expire=refresh_token_expire,
+    )
 
 
 Credentials: TypeAlias = Annotated[HTTPAuthorizationCredentials, Depends(HTTPBearer())]
