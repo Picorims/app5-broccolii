@@ -682,6 +682,14 @@ export default function WordCloud({
       {isGameEnded ? (
         <div className={styles.game_over}>
           <h1>Game Over</h1>
+          <pre>
+            Scores:
+            <br />
+            {Object.entries(scores)
+              .map(([player, score]) => `${player}: ${score}`)
+              .join("\n")}
+          </pre>
+
           <Link to="/clicker">Back to clicker !</Link>
         </div>
       ) : (
