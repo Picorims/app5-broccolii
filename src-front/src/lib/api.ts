@@ -163,7 +163,7 @@ export class API {
     });
   }
 
-  public static patchClick(username: string) {
+  public static async patchClick(username: string) {
     API._refreshTokensIfNecessary();
 
     const url = `${getEnv().backendUrl}/api/v1/user/click`;

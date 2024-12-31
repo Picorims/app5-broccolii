@@ -40,7 +40,7 @@ const ClickerPage = () => {
   const navigate = useNavigate();
 
   // Function to switch to a random image (not the current one) when the button is clicked.
-  const handleBroccoliiClick = () => {
+  const handleBroccoliiClick = async () => {
     let randomIndex;
     do {
       randomIndex = Math.floor(Math.random() * items.length);
@@ -48,8 +48,26 @@ const ClickerPage = () => {
 
     setCurrentItem(items[randomIndex]);
 
-    API.patchClick(username.current);
+    const resp = await API.patchClick(username.current);
+    const respJson = await resp.json();
+    console.log("respJson: ", respJson);
+    setStatNbBroccos(respJson.broccolis);
+    //setStatClickrate(respJson.click_broccoli_value); # we nned to put this variable instead in the '+1' in BroccoliiButton.tsx
   };
+
+  /*
+  TODO: make the following function work
+  // Function to update the total amount of broccolis of current user when the page is loaded.
+  useEffect(() => {
+    const fetchBroccos = async () => {
+      const resp = await API.patchClick(username.current);
+      const respJson = await resp.json();
+      setStatNbBroccos(respJson.broccolis);
+    };
+    
+    fetchBroccos();
+  }, []);
+ */
 
   const handleBoosterClick = () => {
     console.log("BoosterCard clicked!");

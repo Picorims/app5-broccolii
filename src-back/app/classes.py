@@ -214,15 +214,53 @@ class Account:
     def get_cards(username):
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
-        cursor.execute(
-            """SELECT idCard FROM AccountCard
-                INNER JOIN Account ON AccountCard.idAccount = Account.id
-                WHERE Account.username = username"""
-        )  # TODO: fix the username with a f-string
-        result = cursor.fetchone()
+        req = """
+            SELECT idCard
+            FROM AccountCard
+            INNER JOIN Account ON AccountCard.idAccount = Account.id
+            WHERE Account.username = ?
+        """
+        cursor.execute(req, (username,))
+        result = cursor.fetchall()
         cursor.close()
         connection.close()
         return result
+
+    @staticmethod
+    def get_broccoli_amount(username):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        req = """
+            SELECT broccolis
+            FROM Account
+            WHERE username = ?
+        """
+        cursor.execute(req, (username,))
+        total_broccoli_amount = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        return total_broccoli_amount
+
+    @staticmethod
+    def update_broccoli_total_amount(username, broccoli_amount):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+
+        # Getting current total amount of broccolis
+        total_broccoli_amount = Account.get_broccoli_amount(username)[0]
+        new_broccoli_total_amount = total_broccoli_amount + broccoli_amount
+
+        # Modifying the total amount of broccolis with updated value
+        req = """
+            UPDATE Account
+            SET broccolis = ?
+            WHERE username = ?
+        """
+
+        cursor.execute(req, (new_broccoli_total_amount, username))
+        connection.commit()
+        cursor.close()
+        connection.close()
 
     @staticmethod
     def user_exists(login):
@@ -301,7 +339,54 @@ class Account:
 
     @staticmethod
     def route_click_placeholder(username):
-        return {"status": "unknown", "message": "TODO"}
+        cards = [
+            elem[0] for elem in Account.get_cards(username)
+        ]  # turning a list of tuples into a list of integers
+
+        broccoli_amount = 1
+
+        card_id_list = cards
+
+        # critical_click_chances = Account.get_critical_click_chances(username)
+        critical_click_chances = 1
+
+        """Checking for critical click occurence before applying score modifying cards"""
+        for card_id in card_id_list:
+            match card_id:
+                case 13:
+                    critical_click_chances += 10
+                case 14:
+                    critical_click_chances += 10
+                case 15:
+                    critical_click_chances *= 2
+                case 16:
+                    critical_click_chances *= 2
+
+        """If a critical click occurs, applying *5 score"""
+        if random.uniform(0, 100) < critical_click_chances:
+            broccoli_amount *= 5
+
+        """Applying score modifying cards"""
+        for card_id in card_id_list:
+            match card_id:
+                case 9:
+                    broccoli_amount *= 2
+                case 10:
+                    broccoli_amount *= 2
+                case 11:
+                    broccoli_amount += 5
+                case 12:
+                    broccoli_amount += 5
+
+        """Adding the click's broccoli value to the players's total amount of broccolis"""
+        Account.update_broccoli_total_amount(username, broccoli_amount)
+
+        return {
+            "status": "unknown",
+            "message": "TODO",
+            "broccolis": Account.get_broccoli_amount(username),
+            "click_broccoli_value": broccoli_amount,
+        }
 
 
 class Token:
