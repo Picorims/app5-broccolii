@@ -142,14 +142,28 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
   };
 
   // Handle image selection from dropdown
-  const handleChooseImage = (
+  const handleChooseImage = async (
     cardName: string,
     imageKey: keyof typeof CARD_NAME_AND_IMAGE_MAP,
   ) => {
-    console.log("Choosing card", imageKey, CARD_NAME_AND_IMAGE_MAP[imageKey]);
+
+    const resp = await API.getUnequippedCards(username);
+    const respJson = await resp.json();
+    unequipped_cards = respJson.cards_unequipped_ids;
+    for (const card_id in unequipped_cards) {
+      console.log(
+        "Recup avec table",
+        unequipped_cards[card_id],
+        CARDS_ID_CORRESPONDANCY[unequipped_cards[card_id]],
+      );
+      unequipped_cards_map[unequipped_cards[card_id]] =
+        CARDS_ID_CORRESPONDANCY[unequipped_cards[card_id]];
+    }
+
+    console.log("Choosing card", imageKey, unequipped_cards_map[imageKey]);
     setCardImages((prev) => ({
       ...prev,
-      [cardName]: CARD_NAME_AND_IMAGE_MAP[imageKey],
+      [cardName]: unequipped_cards_map[imageKey],
     }));
     setDropdownVisible((prev) => ({
       ...prev,
