@@ -63,6 +63,7 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
 
   const [visibleStats, setStatsVisible] = useState<string | null>(null); // Show or Hide stats
   const [animating, setAnimating] = useState<boolean>(false); // Show and Hide stats animations
+  const [unequippedCardsMap, setUnequippedCardsMap] = useState<Record<string, string>>({});
 
   // State to manage the current images for each card
   const initialImages = {
@@ -96,11 +97,20 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
         "of",
         username,
       );
+
+      // Update unequipped_cards_map
+      const newUnequippedCardsMap: Record<string, string> = {};
+      respJson.cards_unequipped_ids.forEach((card_id: string) => {
+        newUnequippedCardsMap[card_id] = CARDS_ID_CORRESPONDANCY[card_id];
+      });
+      setUnequippedCardsMap(newUnequippedCardsMap);
+      console.log("unequippedCardsMap:", newUnequippedCardsMap);
+
       unequipped_cards = respJson.cards_unequipped_ids;
       console.log("unequipped_cards : ", unequipped_cards);
       for (const card_id in unequipped_cards) {
         console.log(
-          "TODO recup avec table",
+          "Recup avec table",
           unequipped_cards[card_id],
           CARDS_ID_CORRESPONDANCY[unequipped_cards[card_id]],
         );
@@ -180,14 +190,10 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
           {/* Dropdown menu for choosing an image */}
           {dropdownVisible[cardName] && (
             <div className={styles.dropdownMenu}>
-              {Object.keys(unequipped_cards_map).map((key) => (
+              {Object.entries(unequippedCardsMap).map(([key, value]) => (
                 <img
                   key={key}
-                  src={
-                    unequipped_cards_map[
-                      key as keyof typeof unequipped_cards_map
-                    ]
-                  }
+                  src={value}
                   alt={key}
                   className={styles.dropdownImage}
                   onClick={() =>
