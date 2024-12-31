@@ -15,6 +15,8 @@ export interface Props {
   children: React.ReactNode;
   variant?: "primary" | "secondary" | "accent";
   onClick?: () => void;
+  className?: string;
+  disabled?: boolean;
 }
 
 export default function Button({
@@ -22,12 +24,15 @@ export default function Button({
   children,
   variant = "primary",
   onClick,
+  className,
+  disabled,
 }: Props) {
   return (
     <button
       type={type}
-      className={classList(styles.button, variant)}
+      className={classList(styles.button, variant, className ?? "")}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>
