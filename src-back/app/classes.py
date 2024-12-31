@@ -237,7 +237,6 @@ class Account:
         """
         cursor.execute(req, (username,))
         total_broccoli_amount = cursor.fetchone()
-        print(f"total broccoli amount of {username} : {total_broccoli_amount}")
         cursor.close()
         connection.close()
         return total_broccoli_amount
@@ -343,7 +342,6 @@ class Account:
         cards = [
             elem[0] for elem in Account.get_cards(username)
         ]  # turning a list of tuples into a list of integers
-        print(cards)
 
         broccoli_amount = 1
 
