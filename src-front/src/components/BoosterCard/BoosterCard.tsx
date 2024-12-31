@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import styles from "./BoosterCard.module.css";
 
 import beetrootImage from "../../assets/boosterCard/beetroot.png";
@@ -70,6 +70,7 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
   const [visibleStats, setStatsVisible] = useState<string | null>(null); // Show or Hide stats
   const [animating, setAnimating] = useState<boolean>(false); // Show and Hide stats animations
   const [unequippedCardsMap, setUnequippedCardsMap] = useState<Record<string, string>>({});
+  const [boosterMap, setBoosterMap] = useState<Record<string, string>>({});
 
   // State to manage the current images for each card
   const initialImages = {
@@ -91,18 +92,12 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
     booster3: false,
   });
 
+
   const handleImageClick = async (cardName: string) => {
-    console.log("Clicked Equip Slot", cardName);
     // If the clicked image is emptyCardImage, show dropdown to choose an image
     if (cardImages[cardName] === emptyCardImage) {
       const resp = await API.getUnequippedCards(username);
       const respJson = await resp.json();
-      console.log(
-        "Equip Slot respJson: ",
-        respJson.cards_unequipped_ids,
-        "of",
-        username,
-      );
 
       // Update unequipped_cards_map
       const newUnequippedCardsMap: Record<string, string> = {};
@@ -110,20 +105,12 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
         newUnequippedCardsMap[card_id] = CARDS_ID_CORRESPONDANCY[card_id];
       });
       setUnequippedCardsMap(newUnequippedCardsMap);
-      console.log("unequippedCardsMap:", newUnequippedCardsMap);
 
       unequipped_cards = respJson.cards_unequipped_ids;
-      console.log("unequipped_cards : ", unequipped_cards);
       for (const card_id in unequipped_cards) {
-        console.log(
-          "Recup avec table",
-          unequipped_cards[card_id],
-          CARDS_ID_CORRESPONDANCY[unequipped_cards[card_id]],
-        );
         unequipped_cards_map[unequipped_cards[card_id]] =
           CARDS_ID_CORRESPONDANCY[unequipped_cards[card_id]];
       }
-      console.log("unequipped_cards_map : ", unequipped_cards_map);
 
       setDropdownVisible((prev) => ({
         ...prev,
@@ -149,7 +136,7 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
 
   // Handle image selection from dropdown
   const handleChooseImage = async (
-    cardName: string,
+    boosterName: string,
     imageKey: keyof typeof CARD_NAME_AND_IMAGE_MAP,
   ) => {
 
@@ -157,31 +144,52 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
     const respJson = await resp.json();
     unequipped_cards = respJson.cards_unequipped_ids;
     for (const card_id in unequipped_cards) {
-      console.log(
-        "Recup avec table",
-        unequipped_cards[card_id],
-        CARDS_ID_CORRESPONDANCY[unequipped_cards[card_id]],
-      );
       unequipped_cards_map[unequipped_cards[card_id]] =
         CARDS_ID_CORRESPONDANCY[unequipped_cards[card_id]];
     }
+    
+    const resp2 = await API.equipCard(username, imageKey);
+    const resp2Json = await resp2.json();
+    console.log(resp2Json);
+    if (!resp2.ok) {
+      alert("Something went wrong when trying to equip the card.");
+      return;
+    }
+    let newBoosterMap = boosterMap;
+    newBoosterMap[boosterName] = imageKey;
+    setBoosterMap(newBoosterMap);
 
-    console.log("Choosing card", imageKey, unequipped_cards_map[imageKey]);
     setCardImages((prev) => ({
       ...prev,
-      [cardName]: unequipped_cards_map[imageKey],
+      [boosterName]: unequipped_cards_map[imageKey],
     }));
     setDropdownVisible((prev) => ({
       ...prev,
-      [cardName]: false,
+      [boosterName]: false,
     }));
   };
 
-  const handleRemoveCard = (cardName: string) => {
-    console.log("Unequipping card", cardName);
+  const handleRemoveCard = async (boosterName: string) => {
+    const key = boosterMap[boosterName];
+    if (key == null || key == "") {
+      alert("Something went wrong when trying to unequip the card.");
+      return;
+    }
+    const resp = await API.unequipCard(username, key);
+    const respJson = await resp.json();
+    console.log(respJson);
+    
+    if (!resp.ok) {
+      alert("Something went wrong when trying to unequip the card.");
+      return;
+    }
+    let newBoosterMap = boosterMap;
+    newBoosterMap[boosterName] = "";
+    setBoosterMap(newBoosterMap);
+    
     setCardImages((prev) => ({
       ...prev,
-      [cardName]: emptyCardImage, // Replace the image with the empty card
+      [boosterName]: emptyCardImage, // Replace the image with the empty card
     }));
   };
 
