@@ -13,6 +13,9 @@ import emptyCardImage from "../../assets/boosterCard/empty_card.png";
 import beetrootStatsImage from "../../assets/boosterCard/beetroot_stats.png";
 import butternutStatsImage from "../../assets/boosterCard/butternut_stats.png";
 import carrotStatsImage from "../../assets/boosterCard/carrot_stats.png";
+import eggplantStatsImage from "../../assets/boosterCard/eggplant_stats.png";
+import farmerStatsImage from "../../assets/boosterCard/farmer_stats.png";
+import soilbagStatsImage from "../../assets/boosterCard/soilbag_stats.png";
 
 import { API } from "../../lib/api";
 
@@ -59,6 +62,9 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
     [butternutImage]: butternutStatsImage,
     [beetrootImage]: beetrootStatsImage,
     [carrotImage]: carrotStatsImage,
+    [eggplantImage]: eggplantStatsImage,
+    [farmerImage]: farmerStatsImage,
+    [soilbagImage]: soilbagStatsImage,
   };
 
   const [visibleStats, setStatsVisible] = useState<string | null>(null); // Show or Hide stats
