@@ -18,7 +18,7 @@ const BroccoliiButton: React.FC<BroccoliiButtonProps> = ({
   image,
   text,
   onClick,
-  clickValue
+  clickValue,
 }) => {
   const [plusOnes, setPlusOnes] = useState<PlusOne[]>([]);
 
