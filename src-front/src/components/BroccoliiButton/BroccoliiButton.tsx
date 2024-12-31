@@ -5,6 +5,7 @@ interface BroccoliiButtonProps {
   image: string;
   text: string;
   onClick: () => void;
+  clickValue: number;
 }
 
 interface PlusOne {
@@ -17,6 +18,7 @@ const BroccoliiButton: React.FC<BroccoliiButtonProps> = ({
   image,
   text,
   onClick,
+  clickValue
 }) => {
   const [plusOnes, setPlusOnes] = useState<PlusOne[]>([]);
 
@@ -58,8 +60,7 @@ const BroccoliiButton: React.FC<BroccoliiButtonProps> = ({
           className={styles.plusOne}
           style={{ top: `${top}%`, left: `${left}%` }}
         >
-          {/* TODO: update to a variable that handle booster effect */}
-          +1
+          +{clickValue}
         </span>
       ))}
     </div>

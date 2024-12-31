@@ -2,17 +2,17 @@ import styles from "./clickerHUD.module.css";
 
 interface ClickerHUDProps {
   statNbBroccos: number;
-  statClickrate: number;
+  statClickvalue: number;
 }
 
 const ClickerHUD: React.FC<ClickerHUDProps> = ({
   statNbBroccos,
-  statClickrate,
+  statClickvalue,
 }) => {
   return (
     <div className={styles.container}>
       <p className={styles.statBrocco}>{statNbBroccos} brocolis</p>
-      <p className={styles.stat}>Generating {statClickrate} broccolis/second</p>
+      <p className={styles.stat}>Generating {statClickvalue} broccolis/click</p>
     </div>
   );
 };
