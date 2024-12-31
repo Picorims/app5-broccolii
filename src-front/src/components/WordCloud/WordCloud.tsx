@@ -658,6 +658,7 @@ export default function WordCloud({
 
           if (word.getText() === inputValue) {
             setInputValue("");
+            refPreviousEntry.current = "";
             resetUserProgress();
             fightSession.current?.submitWord();
           }
