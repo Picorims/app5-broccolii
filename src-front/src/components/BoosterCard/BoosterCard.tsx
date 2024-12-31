@@ -32,7 +32,28 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
     soilbag: soilbagImage,
   };
 
-  let owned_cards = {};
+  const CARDS_ID_CORRESPONDANCY: Record<string, string> = {
+    "1": CARD_NAME_AND_IMAGE_MAP.farmer,
+    "2": CARD_NAME_AND_IMAGE_MAP.farmer,
+    "3": CARD_NAME_AND_IMAGE_MAP.soilbag,
+    "4": CARD_NAME_AND_IMAGE_MAP.soilbag,
+    "5": CARD_NAME_AND_IMAGE_MAP.farmer,
+    "6": CARD_NAME_AND_IMAGE_MAP.farmer,
+    "7": CARD_NAME_AND_IMAGE_MAP.soilbag,
+    "8": CARD_NAME_AND_IMAGE_MAP.soilbag,
+    "9": CARD_NAME_AND_IMAGE_MAP.eggplant,
+    "10": CARD_NAME_AND_IMAGE_MAP.eggplant,
+    "11": CARD_NAME_AND_IMAGE_MAP.carrot,
+    "12": CARD_NAME_AND_IMAGE_MAP.carrot,
+    "13": CARD_NAME_AND_IMAGE_MAP.beetroot,
+    "14": CARD_NAME_AND_IMAGE_MAP.beetroot,
+    "15": CARD_NAME_AND_IMAGE_MAP.butternut,
+    "16": CARD_NAME_AND_IMAGE_MAP.butternut,
+  };
+
+  let unequipped_cards = [];
+
+  let unequipped_cards_map: Record<string, string> = {};
 
   const STATS_MAP = {
     [butternutImage]: butternutStatsImage,
@@ -67,11 +88,27 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
     console.log("Clicked Equip Slot", cardName);
     // If the clicked image is emptyCardImage, show dropdown to choose an image
     if (cardImages[cardName] === emptyCardImage) {
-      const resp = await API.getCards(username);
+      const resp = await API.getUnequippedCards(username);
       const respJson = await resp.json();
-      console.log("Equip Slot respJson: ", respJson.cards_owned_ids, 'of', username);
-      owned_cards = respJson.cards_owned_ids;
-      console.log("Owned cards: ", owned_cards);
+      console.log(
+        "Equip Slot respJson: ",
+        respJson.cards_unequipped_ids,
+        "of",
+        username,
+      );
+      unequipped_cards = respJson.cards_unequipped_ids;
+      console.log("unequipped_cards : ", unequipped_cards);
+      for (const card_id in unequipped_cards) {
+        console.log(
+          "TODO recup avec table",
+          unequipped_cards[card_id],
+          CARDS_ID_CORRESPONDANCY[unequipped_cards[card_id]],
+        );
+        unequipped_cards_map[unequipped_cards[card_id]] =
+          CARDS_ID_CORRESPONDANCY[unequipped_cards[card_id]];
+      }
+      console.log("unequipped_cards_map : ", unequipped_cards_map);
+
       setDropdownVisible((prev) => ({
         ...prev,
         [cardName]: !prev[cardName],
@@ -99,7 +136,7 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
     cardName: string,
     imageKey: keyof typeof CARD_NAME_AND_IMAGE_MAP,
   ) => {
-    console.log("Choosing card", imageKey);
+    console.log("Choosing card", imageKey, CARD_NAME_AND_IMAGE_MAP[imageKey]);
     setCardImages((prev) => ({
       ...prev,
       [cardName]: CARD_NAME_AND_IMAGE_MAP[imageKey],
@@ -143,14 +180,21 @@ const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
           {/* Dropdown menu for choosing an image */}
           {dropdownVisible[cardName] && (
             <div className={styles.dropdownMenu}>
-              {Object.keys(CARD_NAME_AND_IMAGE_MAP).map((key) => (
+              {Object.keys(unequipped_cards_map).map((key) => (
                 <img
                   key={key}
-                  src={CARD_NAME_AND_IMAGE_MAP[key as keyof typeof CARD_NAME_AND_IMAGE_MAP]}
+                  src={
+                    unequipped_cards_map[
+                      key as keyof typeof unequipped_cards_map
+                    ]
+                  }
                   alt={key}
                   className={styles.dropdownImage}
                   onClick={() =>
-                    handleChooseImage(cardName, key as keyof typeof CARD_NAME_AND_IMAGE_MAP)
+                    handleChooseImage(
+                      cardName,
+                      key as keyof typeof CARD_NAME_AND_IMAGE_MAP,
+                    )
                   }
                 />
               ))}

@@ -230,6 +230,25 @@ class Account:
         }
     
     @staticmethod
+    def get_unequipped_cards(username):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        req = """
+            SELECT idCard
+            FROM AccountCard
+            INNER JOIN Account ON AccountCard.idAccount = Account.id
+            WHERE Account.username = ?
+            AND AccountCard.isEquipped = 0
+        """ #TODO : check condition
+        cursor.execute(req, (username,))
+        result = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return {
+            "cards_unequipped_ids": [elem[0] for elem in result],
+        }
+    
+    @staticmethod
     def get_owned_cards(username):
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()

@@ -96,7 +96,7 @@ const ClickerPage = () => {
           onClick={handleBroccoliiClick}
         />
 
-        <BoosterCard onClick={handleBoosterClick} username = {username.current} />
+        <BoosterCard onClick={handleBoosterClick} username={username.current} />
       </div>
       <Button
         type="button"
