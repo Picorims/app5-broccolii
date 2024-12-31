@@ -8,8 +8,16 @@
 */
 
 .button {
-  font-size: 1.2rem;
   transition: 0.1s transform;
+
+  margin: var(--spacing-s) 0;
+  padding: var(--spacing-xs) var(--spacing-s);
+
+  box-shadow: 0 2px 1px -2px var(--shadow-800);
+  border: none;
+  border-radius: var(--border-radius-s);
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 .button:hover {
   cursor: pointer;
@@ -19,18 +27,26 @@
 }
 
 .button:global(.primary) {
-  margin: var(--spacing-s) 0;
-  padding: var(--spacing-xs) var(--spacing-s);
-
   color: var(--text-50);
-
-  border: none;
-  border-radius: var(--border-radius-s);
   background-color: var(--primary-700);
-  font-weight: bold;
-
-  box-shadow: 0 2px 1px -2px var(--shadow-800);
 }
 .button:global(.primary):hover {
   background-color: var(--primary-800);
+}
+
+.button:global(.secondary) {
+  color: var(--text-50);
+  background-color: var(--secondary-700);
+}
+.button:global(.secondary):hover {
+  background-color: var(--secondary-800);
+}
+
+.button:global(.accent) {
+  color: var(--text-50);
+  background-color: var(--accent-600);
+  border: 2px solid var(--accent-800);
+}
+.button:global(.accent):hover {
+  background-color: var(--accent-700);
 }
