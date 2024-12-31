@@ -237,7 +237,7 @@ class Account:
         """
         cursor.execute(req, (username,))
         total_broccoli_amount = cursor.fetchone()
-        print(f'total broccoli amount of {username} : {total_broccoli_amount}')
+        print(f"total broccoli amount of {username} : {total_broccoli_amount}")
         cursor.close()
         connection.close()
         return total_broccoli_amount
@@ -387,7 +387,7 @@ class Account:
             "status": "unknown",
             "message": "TODO",
             "broccolis": Account.get_broccoli_amount(username),
-            "click_broccoli_value"  : broccoli_amount,
+            "click_broccoli_value": broccoli_amount,
         }
 
 
