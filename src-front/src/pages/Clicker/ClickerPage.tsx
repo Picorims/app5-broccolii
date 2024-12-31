@@ -25,7 +25,7 @@ import BasePage from "../../components/BasePage/BasePage";
 
 const ClickerPage = () => {
   const [statNbBroccos, setStatNbBroccos] = useState<number>(0);
-  const [statClickvalue, setStatClickvalue] = useState<number>(0);
+  const [statClickValue, setStatClickValue] = useState<number>(0);
 
   // Array of objects representing images and their corresponding texts.
   const items = [
@@ -52,7 +52,7 @@ const ClickerPage = () => {
     const respJson = await resp.json();
     console.log("respJson: ", respJson);
     setStatNbBroccos(respJson.broccolis);
-    setStatClickvalue(respJson.click_broccoli_value);
+    setStatClickValue(respJson.click_broccoli_value);
   };
 
   /*
@@ -83,14 +83,14 @@ const ClickerPage = () => {
       <div className={styles.container}>
         <ClickerHUD
           statNbBroccos={statNbBroccos}
-          statClickvalue={statClickvalue}
+          statClickvalue={statClickValue}
         />
         <h1>Page Clicker</h1>
         <BroccoliiButton
           image={currentItem.image}
           text={currentItem.text}
           onClick={handleBroccoliiClick}
-          clickValue={statClickvalue}
+          clickValue={statClickValue}
         />
 
         <BoosterCard onClick={handleBoosterClick} />
@@ -116,7 +116,7 @@ const ClickerPage = () => {
         type="button"
         variant="primary"
         onClick={() => {
-          setStatClickvalue(statClickvalue + 10);
+          setStatClickValue(statClickValue + 10);
         }}
       >
         Change rate

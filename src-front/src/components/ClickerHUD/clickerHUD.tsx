@@ -7,12 +7,12 @@ interface ClickerHUDProps {
 
 const ClickerHUD: React.FC<ClickerHUDProps> = ({
   statNbBroccos,
-  statClickvalue,
+  statClickvalue: statClickValue,
 }) => {
   return (
     <div className={styles.container}>
       <p className={styles.statBrocco}>{statNbBroccos} brocolis</p>
-      <p className={styles.stat}>Generating {statClickvalue} broccolis/click</p>
+      <p className={styles.stat}>Generating {statClickValue} broccolis/click</p>
     </div>
   );
 };
