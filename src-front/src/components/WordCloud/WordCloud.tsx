@@ -713,11 +713,18 @@ export default function WordCloud({
               timeBeforeStart > 0 ? "Game starts soon..." : "Enter a word."
             }
           />
-          <Button type="button" className={styles.submit} disabled={timeBeforeStart > 0 || remainingTime <= 0} onClick={() => {
-            // simulate enter key press
-            handleKeyPress({ code: "Enter" } as KeyboardEvent);
-            console.log("Submit button clicked");
-          }}>Submit</Button>
+          <Button
+            type="button"
+            className={styles.submit}
+            disabled={timeBeforeStart > 0 || remainingTime <= 0}
+            onClick={() => {
+              // simulate enter key press
+              handleKeyPress({ code: "Enter" } as KeyboardEvent);
+              console.log("Submit button clicked");
+            }}
+          >
+            Submit
+          </Button>
           <div className={styles.score_board}>
             <p>fight ID: {fightId}</p>
             <p>name: {roomName}</p>
