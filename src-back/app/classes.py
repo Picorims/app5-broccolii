@@ -382,8 +382,6 @@ class Account:
         Account.update_broccoli_total_amount(username, broccoli_amount)
 
         return {
-            "status": "unknown",
-            "message": "TODO",
             "broccolis": Account.get_broccoli_amount(username),
             "click_broccoli_value": broccoli_amount,
         }
