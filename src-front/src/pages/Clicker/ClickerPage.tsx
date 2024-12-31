@@ -51,8 +51,23 @@ const ClickerPage = () => {
     const resp = await API.patchClick(username.current);
     const respJson = await resp.json();
     console.log("respJson: ", respJson);
-    setStatClickrate(respJson.broccolis);
+    setStatNbBroccos(respJson.broccolis);
+    //setStatClickrate(respJson.click_broccoli_value); # we nned to put this variable instead in the '+1' in BroccoliiButton.tsx
   };
+
+  /*
+  TODO: make the following function work
+  // Function to update the total amount of broccolis of current user when the page is loaded.
+  useEffect(() => {
+    const fetchBroccos = async () => {
+      const resp = await API.patchClick(username.current);
+      const respJson = await resp.json();
+      setStatNbBroccos(respJson.broccolis);
+    };
+    
+    fetchBroccos();
+  }, []);
+ */
 
   const handleBoosterClick = () => {
     console.log("BoosterCard clicked!");
