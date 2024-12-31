@@ -4,6 +4,9 @@ import styles from "./BoosterCard.module.css";
 import beetrootImage from "../../assets/boosterCard/beetroot.png";
 import butternutImage from "../../assets/boosterCard/butternut.png";
 import carrotImage from "../../assets/boosterCard/carrot.png";
+import eggplantImage from "../../assets/boosterCard/eggplant.png";
+import farmerImage from "../../assets/boosterCard/farmer.png";
+import soilbagImage from "../../assets/boosterCard/soilbag.png";
 
 import emptyCardImage from "../../assets/boosterCard/empty_card.png";
 
@@ -11,13 +14,25 @@ import beetrootStatsImage from "../../assets/boosterCard/beetroot_stats.png";
 import butternutStatsImage from "../../assets/boosterCard/butternut_stats.png";
 import carrotStatsImage from "../../assets/boosterCard/carrot_stats.png";
 
-const BoosterCard: React.FC<{ onClick: () => void }> = () => {
+import { API } from "../../lib/api";
+
+interface BoosterCardProps {
+  onClick: () => void;
+  username: string;
+}
+
+const BoosterCard: React.FC<BoosterCardProps> = ({ username }) => {
   // Constants for image mapping
-  const IMAGE_MAP = {
+  const CARD_NAME_AND_IMAGE_MAP = {
     butternut: butternutImage,
     beetroot: beetrootImage,
     carrot: carrotImage,
+    eggplant: eggplantImage,
+    farmer: farmerImage,
+    soilbag: soilbagImage,
   };
+
+  let owned_cards = {};
 
   const STATS_MAP = {
     [butternutImage]: butternutStatsImage,
@@ -48,9 +63,15 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
     booster3: false,
   });
 
-  const handleImageClick = (cardName: string) => {
+  const handleImageClick = async (cardName: string) => {
+    console.log("Clicked Equip Slot", cardName);
     // If the clicked image is emptyCardImage, show dropdown to choose an image
     if (cardImages[cardName] === emptyCardImage) {
+      const resp = await API.getCards(username);
+      const respJson = await resp.json();
+      console.log("Equip Slot respJson: ", respJson.cards_owned_ids, 'of', username);
+      owned_cards = respJson.cards_owned_ids;
+      console.log("Owned cards: ", owned_cards);
       setDropdownVisible((prev) => ({
         ...prev,
         [cardName]: !prev[cardName],
@@ -76,11 +97,12 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
   // Handle image selection from dropdown
   const handleChooseImage = (
     cardName: string,
-    imageKey: keyof typeof IMAGE_MAP,
+    imageKey: keyof typeof CARD_NAME_AND_IMAGE_MAP,
   ) => {
+    console.log("Choosing card", imageKey);
     setCardImages((prev) => ({
       ...prev,
-      [cardName]: IMAGE_MAP[imageKey],
+      [cardName]: CARD_NAME_AND_IMAGE_MAP[imageKey],
     }));
     setDropdownVisible((prev) => ({
       ...prev,
@@ -89,6 +111,7 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
   };
 
   const handleRemoveCard = (cardName: string) => {
+    console.log("Unequipping card", cardName);
     setCardImages((prev) => ({
       ...prev,
       [cardName]: emptyCardImage, // Replace the image with the empty card
@@ -120,14 +143,14 @@ const BoosterCard: React.FC<{ onClick: () => void }> = () => {
           {/* Dropdown menu for choosing an image */}
           {dropdownVisible[cardName] && (
             <div className={styles.dropdownMenu}>
-              {Object.keys(IMAGE_MAP).map((key) => (
+              {Object.keys(CARD_NAME_AND_IMAGE_MAP).map((key) => (
                 <img
                   key={key}
-                  src={IMAGE_MAP[key as keyof typeof IMAGE_MAP]}
+                  src={CARD_NAME_AND_IMAGE_MAP[key as keyof typeof CARD_NAME_AND_IMAGE_MAP]}
                   alt={key}
                   className={styles.dropdownImage}
                   onClick={() =>
-                    handleChooseImage(cardName, key as keyof typeof IMAGE_MAP)
+                    handleChooseImage(cardName, key as keyof typeof CARD_NAME_AND_IMAGE_MAP)
                   }
                 />
               ))}

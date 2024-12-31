@@ -181,6 +181,23 @@ export class API {
     });
   }
 
+
+  public static async getCards(username: string) {
+    API._refreshTokensIfNecessary();
+    const url = `${getEnv().backendUrl}/api/v1/card/get-cards`;
+
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      body: JSON.stringify({
+        username: username,
+      }),
+    });
+  }
+
   public static async addCard(username: string, cardId: string) {
     API._refreshTokensIfNecessary();
     const url = `${getEnv().backendUrl}/api/v1/card/add`;

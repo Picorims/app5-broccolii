@@ -73,7 +73,11 @@ const ClickerPage = () => {
     console.log("BoosterCard clicked!");
   };
 
+  // Get the current user's username when the page renders and when it changes.
   const userInfo = usePlayerInfo();
+  useEffect(() => {
+    username.current = userInfo?.username ?? "";
+  }, [userInfo?.username]);
   useEffect(() => {
     username.current = userInfo?.username ?? "";
   });
@@ -92,7 +96,7 @@ const ClickerPage = () => {
           onClick={handleBroccoliiClick}
         />
 
-        <BoosterCard onClick={handleBoosterClick} />
+        <BoosterCard onClick={handleBoosterClick} username = {username.current} />
       </div>
       <Button
         type="button"

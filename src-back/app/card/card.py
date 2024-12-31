@@ -11,6 +11,38 @@ class AddCardBody(BaseModel):
     username: str
     cardId: str
 
+class GetCardBody(BaseModel):
+    username: str
+
+
+@router.post(
+    "/card/get-cards",
+    status_code=status.HTTP_200_OK,
+    description="Gets the list of the cards ids of the user.",
+    tags=["user", "card"],
+    responses={
+        201: {
+            "description": "Cards ids retrieved successfully",
+        },
+        400: {"description": "Missing username"},
+    },
+    response_model=dict[str, str],
+)
+async def getCards(body: GetCardBody):
+    # check that all API values are present
+    if body.username is None:
+        print("Missing username")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username"
+        )
+
+    response = Account.get_owned_cards(body.username)
+
+    return JSONResponse(
+        content=response,
+        media_type="application/json",
+    )
+
 
 @router.post(
     "/card/add",
