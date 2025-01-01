@@ -220,7 +220,7 @@ class Account:
             INNER JOIN Account ON AccountCard.idAccount = Account.id
             WHERE Account.username = ?
             AND AccountCard.isEquipped = 1
-        """ #TODO : check condition
+        """
         cursor.execute(req, (username,))
         result = cursor.fetchall()
         cursor.close()
@@ -228,7 +228,7 @@ class Account:
         return {
             "cards_equipped_ids": [elem[0] for elem in result],
         }
-    
+
     @staticmethod
     def get_unequipped_cards(username):
         connection = sqlite3.connect(db_name)
@@ -239,7 +239,7 @@ class Account:
             INNER JOIN Account ON AccountCard.idAccount = Account.id
             WHERE Account.username = ?
             AND AccountCard.isEquipped = 0
-        """ #TODO : check condition
+        """
         cursor.execute(req, (username,))
         result = cursor.fetchall()
         cursor.close()
@@ -247,7 +247,7 @@ class Account:
         return {
             "cards_unequipped_ids": [elem[0] for elem in result],
         }
-    
+
     @staticmethod
     def get_owned_cards(username):
         connection = sqlite3.connect(db_name)
@@ -379,7 +379,7 @@ class Account:
 
     @staticmethod
     def route_click_placeholder(username):
-        cards = Account.get_cards(username)['cards_equipped_ids']
+        cards = Account.get_cards(username)["cards_equipped_ids"]
 
         print(cards)
         broccoli_amount = 1

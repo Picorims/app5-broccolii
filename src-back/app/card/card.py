@@ -33,9 +33,7 @@ async def getCards(body: GetCardBody):
     # check that all API values are present
     if body.username is None:
         print("Missing username")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username")
 
     response = Account.get_owned_cards(body.username)
 
@@ -58,8 +56,6 @@ async def getCards(body: GetCardBody):
     },
     response_model=dict[str, str],
 )
-
-
 # async def getCards(body: GetCardBody):
 #     # check that all API values are present
 #     if body.username is None:
@@ -67,14 +63,11 @@ async def getCards(body: GetCardBody):
 #         raise HTTPException(
 #             status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username"
 #         )
-
 #     response = Account.get_cards(body.username)
-
 #     return JSONResponse(
 #         content=response,
 #         media_type="application/json",
 #     )
-
 @router.post(
     "/card/get-unequipped-cards",
     status_code=status.HTTP_200_OK,
@@ -92,9 +85,7 @@ async def getUnequippedCards(body: GetCardBody):
     # check that all API values are present
     if body.username is None:
         print("Missing username")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username")
 
     response = Account.get_unequipped_cards(body.username)
 
