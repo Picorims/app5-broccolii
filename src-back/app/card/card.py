@@ -29,7 +29,7 @@ class GetCardBody(BaseModel):
     },
     response_model=dict[str, str],
 )
-async def getCards(body: GetCardBody):
+async def getOwnedCards(body: GetCardBody):
     # check that all API values are present
     if body.username is None:
         print("Missing username")
@@ -56,18 +56,18 @@ async def getCards(body: GetCardBody):
     },
     response_model=dict[str, str],
 )
-# async def getCards(body: GetCardBody):
-#     # check that all API values are present
-#     if body.username is None:
-#         print("Missing username")
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username"
-#         )
-#     response = Account.get_cards(body.username)
-#     return JSONResponse(
-#         content=response,
-#         media_type="application/json",
-#     )
+async def getEquippedCards(body: GetCardBody):
+    # check that all API values are present
+    if body.username is None:
+        print("Missing username")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username")
+    response = Account.get_cards(body.username)
+    return JSONResponse(
+        content=response,
+        media_type="application/json",
+    )
+
+
 @router.post(
     "/card/get-unequipped-cards",
     status_code=status.HTTP_200_OK,
@@ -109,7 +109,7 @@ async def getUnequippedCards(body: GetCardBody):
     response_model=dict[str, str],
 )
 async def addCard(body: AddCardBody):
-    print("addCard :", body.username, body.cardId)
+    #print("addCard :", body.username, body.cardId)
     # check that all API values are present
     if body.username is None or body.cardId is None:
         print("Missing username or cardId")

@@ -186,7 +186,7 @@ export class API {
 
     const url = `${getEnv().backendUrl}/api/v1/user/broccolis`;
     console.log("[API] [POST] " + url);
-    
+
     return fetch(url, {
       method: "POST",
       headers: {

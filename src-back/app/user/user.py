@@ -61,7 +61,6 @@ class ClickBody(BaseModel):
     },
 )
 async def click(body: ClickBody):
-    print("click by :", body.username)
     # check that all API values are present
     if body.username is None:
         print("Missing username")
@@ -93,7 +92,6 @@ class BroccoBody(BaseModel):
     },
 )
 async def brocco(body: BroccoBody):
-    print("click by :", body.username)
     # check that all API values are present
     if body.username is None:
         print("Missing username")
