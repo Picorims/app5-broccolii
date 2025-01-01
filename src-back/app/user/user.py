@@ -78,6 +78,7 @@ async def click(body: ClickBody):
 class BroccoBody(BaseModel):
     username: str
 
+
 @router.post(
     "/user/broccolis",
     status_code=status.HTTP_200_OK,
@@ -91,7 +92,7 @@ class BroccoBody(BaseModel):
         400: {"description": "Missing username"},
     },
 )
-async def click(body: BroccoBody):
+async def brocco(body: BroccoBody):
     print("click by :", body.username)
     # check that all API values are present
     if body.username is None:

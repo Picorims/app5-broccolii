@@ -96,7 +96,7 @@ const ClickerPage = () => {
       }
       
     }
-  }, [userInfo]);
+  }, [userInfo, statNbBroccos]);
 
   return (
     <BasePage bodyNamespace="clicker">
