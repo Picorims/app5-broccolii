@@ -12,6 +12,7 @@ import {
 import { FightSession } from "../../lib/fight_session";
 import { Link } from "react-router-dom";
 import WordCloudMovingText from "../WordCloudMovingText/WordCloudMovingText";
+import Button from "../Button/Button";
 
 class Word {
   private static colWordBox = "#444";
@@ -171,6 +172,7 @@ export default function WordCloud({
   //const [app, setApp] = useState<Application<PIXI.Renderer>>();
   const refApp = useRef<Application<PIXI.Renderer>>();
   const refWords = useRef<Word[]>([]);
+  const refInput = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState("");
   //const [error, setError] = useState("");
   const [scores, setScores] = useState<Record<string, number>>({});
@@ -650,11 +652,13 @@ export default function WordCloud({
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       if (event.code === "Enter") {
+        console.log("Enter pressed");
         for (let i = refWords.current.length - 1; i >= 0; i--) {
           const word = refWords.current[i];
 
           if (word.getText() === inputValue) {
             setInputValue("");
+            refPreviousEntry.current = "";
             resetUserProgress();
             fightSession.current?.submitWord();
           }
@@ -698,6 +702,7 @@ export default function WordCloud({
         <>
           <div ref={refCanvas}></div>
           <input
+            ref={refInput}
             type="text"
             id="playerInput"
             value={inputValue}
@@ -708,6 +713,18 @@ export default function WordCloud({
               timeBeforeStart > 0 ? "Game starts soon..." : "Enter a word."
             }
           />
+          <Button
+            type="button"
+            className={styles.submit}
+            disabled={timeBeforeStart > 0 || remainingTime <= 0}
+            onClick={() => {
+              // simulate enter key press
+              handleKeyPress({ code: "Enter" } as KeyboardEvent);
+              console.log("Submit button clicked");
+            }}
+          >
+            Submit
+          </Button>
           <div className={styles.score_board}>
             <p>fight ID: {fightId}</p>
             <p>name: {roomName}</p>
