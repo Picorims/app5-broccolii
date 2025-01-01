@@ -78,6 +78,26 @@ const ClickerPage = () => {
     username.current = userInfo?.username ?? "";
   });
 
+  const init_done = useRef(false);
+  useEffect(() => {
+    username.current = userInfo?.username ?? "";    
+
+    const fetchBroccos = async () => {
+      init_done.current = true;
+      const resp = await API.getBroccoliAmount(username.current);
+      const respJson = await resp.json();
+      console.log("respJson  useeeftt: ", respJson);
+      setStatNbBroccos(respJson.broccolis);
+    };
+
+    if (statNbBroccos == 0 && username.current !== "" && !init_done.current) {
+      if (init_done.current === false) {
+        fetchBroccos();
+      }
+      
+    }
+  }, [userInfo]);
+
   return (
     <BasePage bodyNamespace="clicker">
       <div className={styles.container}>

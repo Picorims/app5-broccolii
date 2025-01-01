@@ -181,6 +181,24 @@ export class API {
     });
   }
 
+  public static async getBroccoliAmount(username: string) {
+    API._refreshTokensIfNecessary();
+
+    const url = `${getEnv().backendUrl}/api/v1/user/broccolis`;
+    console.log("[API] [POST] " + url);
+
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      body: JSON.stringify({
+        username: username,
+      }),
+    });
+  }
+
   public static async addCard(username: string, cardId: string) {
     API._refreshTokensIfNecessary();
     const url = `${getEnv().backendUrl}/api/v1/card/add`;

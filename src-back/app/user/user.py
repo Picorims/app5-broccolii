@@ -73,3 +73,38 @@ async def click(body: ClickBody):
         content=response,
         media_type="application/json",
     )
+
+
+class BroccoBody(BaseModel):
+    username: str
+
+@router.post(
+    "/user/broccolis",
+    status_code=status.HTTP_200_OK,
+    description="Returns the amount of broccolis of the user",
+    tags=["user", "clicker"],
+    response_model=dict[str, str],
+    responses={
+        200: {
+            "description": "Returned successfully",
+        },
+        400: {"description": "Missing username"},
+    },
+)
+async def click(body: BroccoBody):
+    print("click by :", body.username)
+    # check that all API values are present
+    if body.username is None:
+        print("Missing username")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing username")
+
+    response = Account.get_broccoli_amount(body.username)
+    if response is not None and len(response) != 0:
+        response = {"status": "success", "broccolis": response[0]}
+    else:
+        response = {"status": "error", "message": "broccoli not found"}
+
+    return JSONResponse(
+        content=response,
+        media_type="application/json",
+    )
