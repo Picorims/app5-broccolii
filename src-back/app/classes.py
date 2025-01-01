@@ -208,10 +208,48 @@ class Account:
 
         # TODO make the following line work
         # self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
-        return {"status": "success", "message": "Equipped card."}
+        return {"status": "success", "message": "Unequipped card."}
 
     @staticmethod
     def get_cards(username):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        req = """
+            SELECT idCard
+            FROM AccountCard
+            INNER JOIN Account ON AccountCard.idAccount = Account.id
+            WHERE Account.username = ?
+            AND AccountCard.isEquipped = 1
+        """
+        cursor.execute(req, (username,))
+        result = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return {
+            "cards_equipped_ids": [elem[0] for elem in result],
+        }
+
+    @staticmethod
+    def get_unequipped_cards(username):
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        req = """
+            SELECT idCard
+            FROM AccountCard
+            INNER JOIN Account ON AccountCard.idAccount = Account.id
+            WHERE Account.username = ?
+            AND AccountCard.isEquipped = 0
+        """
+        cursor.execute(req, (username,))
+        result = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return {
+            "cards_unequipped_ids": [elem[0] for elem in result],
+        }
+
+    @staticmethod
+    def get_owned_cards(username):
         connection = sqlite3.connect(db_name)
         cursor = connection.cursor()
         req = """
@@ -224,7 +262,9 @@ class Account:
         result = cursor.fetchall()
         cursor.close()
         connection.close()
-        return result
+        return {
+            "cards_owned_ids": [elem[0] for elem in result],
+        }
 
     @staticmethod
     def get_broccoli_amount(username):
@@ -339,10 +379,9 @@ class Account:
 
     @staticmethod
     def route_click_placeholder(username):
-        cards = [
-            elem[0] for elem in Account.get_cards(username)
-        ]  # turning a list of tuples into a list of integers
+        cards = Account.get_cards(username)["cards_equipped_ids"]
 
+        print(cards)
         broccoli_amount = 1
 
         card_id_list = cards
