@@ -80,7 +80,7 @@ const ClickerPage = () => {
 
   const init_done = useRef(false);
   useEffect(() => {
-    username.current = userInfo?.username ?? "";    
+    username.current = userInfo?.username ?? "";
 
     const fetchBroccos = async () => {
       init_done.current = true;
@@ -94,7 +94,6 @@ const ClickerPage = () => {
       if (init_done.current === false) {
         fetchBroccos();
       }
-      
     }
   }, [userInfo, statNbBroccos]);
 
