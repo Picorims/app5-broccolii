@@ -90,14 +90,6 @@ class Account:
         self.username = username
         self.cards = cards
 
-    def add_card(self, card):
-        connection = sqlite3.connect(db_name)
-        cursor = connection.cursor()
-        self.cards.append([card, 0])
-        cursor.execute(f"INSERT INTO AccountCard VALUES ({self.id}, {card.id}, 0)")
-        cursor.close()
-        connection.close()
-
     @staticmethod
     def add_card_from_username(username, card_id):
         connection = sqlite3.connect(db_name)
@@ -112,23 +104,14 @@ class Account:
 
         req2 = "INSERT INTO AccountCard VALUES (?, ?, 0)"
         cursor.execute(req2, (user_id, card_id))
-        print("res insertion : ", cursor.fetchone())
+
+        if VERBOSE:
+            print("res insertion : ", cursor.fetchone())
 
         connection.commit()
         cursor.close()
         connection.close()
         return {"status": "success", "message": "Card added to account."}
-
-    def equip_card(self, card):
-        connection = sqlite3.connect(db_name)
-        cursor = connection.cursor()
-        self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
-        cursor.execute(
-            f"UPDATE AccountCard SET isEquipped = 1 WHERE (idAccount = {self.id}\n"
-            f"AND idCard = {card.id})"
-        )
-        cursor.close()
-        connection.close()
 
     def equip_card_from_username(username, cardId):
         # WARNING this function equips ALL the cards that have cardId
@@ -157,7 +140,9 @@ class Account:
 
         req4 = "SELECT * from AccountCard WHERE idAccount = ?"
         cursor.execute(req4, (user_id,))
-        print(f"all cards from {username}\n:, {cursor.fetchall()}")
+
+        if VERBOSE:
+            print(f"all cards from {username}\n:, {cursor.fetchall()}")
 
         connection.commit()
         cursor.close()
@@ -166,14 +151,6 @@ class Account:
         # TODO make the following line work
         # self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
         return {"status": "success", "message": "Equipped card."}
-
-    def unequip_card(self, card):
-        self.cards = [[c, 1] if c == card else [c, v] for c, v in self.cards]
-        # TODO: this request won't work. modify inpired by above working request
-        cursor.execute(
-            f"UPDATE TABLE AccountCard SET isEquipped = 0 WHERE idAccount = {self.id}\n"
-            f"AND idCard = {card.id})"
-        )
 
     def unequip_card_from_username(username, cardId):
         # WARNING this function unequips ALL the cards that have cardId
@@ -187,13 +164,17 @@ class Account:
         if resultId is None:
             return {"status": "error", "message": "Account not found."}
         user_id = resultId[0]
-        print("id user", user_id)
+
+        if VERBOSE:
+            print("id user", user_id)
 
         req2 = "SELECT * FROM AccountCard WHERE idAccount = ?"
         req2 += "AND idCard = ? AND isEquipped = 1"
         cursor.execute(req2, (user_id, cardId))
         resultCards = cursor.fetchone()
-        print("la carte :", resultCards)
+
+        if VERBOSE:
+            print("la carte :", resultCards)
 
         if resultCards is None:
             return {"status": "error", "message": "Account does not own the card."}
@@ -381,7 +362,6 @@ class Account:
     def route_click_placeholder(username):
         cards = Account.get_cards(username)["cards_equipped_ids"]
 
-        print(cards)
         broccoli_amount = 1
 
         card_id_list = cards
