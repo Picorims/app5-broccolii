@@ -109,7 +109,7 @@ async def getUnequippedCards(body: GetCardBody):
     response_model=dict[str, str],
 )
 async def addCard(body: AddCardBody):
-    #print("addCard :", body.username, body.cardId)
+    # print("addCard :", body.username, body.cardId)
     # check that all API values are present
     if body.username is None or body.cardId is None:
         print("Missing username or cardId")
